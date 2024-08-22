@@ -1,0 +1,50 @@
+﻿@page "/"
+@inject IJSRuntime JS
+@inject GeolocationService GeoService
+
+
+
+<AbsoluteLayout>
+    <!-- Mapa que ocupa todo el espacio -->
+    <div id="map" style="width: 100%; height: 100vh;"></div>
+
+</AbsoluteLayout>
+
+
+@code {
+
+    private Timer? _timer;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Inicializar el mapa al cargar la página
+            await JS.InvokeVoidAsync("initializeMap");
+
+            // Obtener la posición actual y actualizar el marcador en el mapa
+            _timer = new Timer(async _ => await GetLocationAsync(), null, 0, 5000);
+        }
+    }
+
+    private async Task GetLocationAsync()
+    {
+        var location = await GeoService.GetCurrentLocationAsync();
+        if (location != null)
+        {
+            // Pasar las coordenadas al método JavaScript para actualizar el marcador
+            await JS.InvokeVoidAsync("updateMapMarker", location.Latitude, location.Longitude);
+        }
+        else
+        {
+            // Manejar el caso en que no se pueda obtener la ubicación
+            Console.WriteLine("No se pudo obtener la ubicación.");
+        }
+    }
+
+    private void OnOptionsClicked()
+    {
+        // Manejar la lógica para el botón de opciones aquí
+        Console.WriteLine("Botón de opciones presionado.");
+    }
+}
