@@ -2,28 +2,27 @@
 @inject IJSRuntime JS
 @inject GeolocationService GeoService
 
+<!--<div id="ad-container" style="width: 100%; height: 50px;"></div>-->
+<!-- Mapa que ocupa todo el espacio -->
+<div id="map" style="width: 100%; height: 100vh;"></div>
 
-
-<AbsoluteLayout>
-    <!-- Mapa que ocupa todo el espacio -->
-    <div id="map" style="width: 100%; height: 100vh;"></div>
-
-</AbsoluteLayout>
 
 
 @code {
 
-    private Timer? _timer;
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            await JS.InvokeVoidAsync("initializeAd");
+
             // Inicializar el mapa al cargar la página
             await JS.InvokeVoidAsync("initializeMap");
 
             // Obtener la posición actual y actualizar el marcador en el mapa
-            _timer = new Timer(async _ => await GetLocationAsync(), null, 0, 5000);
+            await GetLocationAsync();
         }
     }
 
@@ -42,9 +41,4 @@
         }
     }
 
-    private void OnOptionsClicked()
-    {
-        // Manejar la lógica para el botón de opciones aquí
-        Console.WriteLine("Botón de opciones presionado.");
-    }
 }
