@@ -74,8 +74,8 @@ function drawGpxOnMap(gpxContent) {
     }
 
     // Ajustar la vista del mapa para que todos los puntos sean visibles
-    const bounds = Array.from(waypoints).map(point => [point.getAttribute("lat"), point.getAttribute("lon")]);
-    map.fitBounds(bounds);
+    //const bounds = Array.from(waypoints).map(point => [point.getAttribute("lat"), point.getAttribute("lon")]);
+    //map.fitBounds(bounds);
 
     const trackPoints = gpx.getElementsByTagName("trkpt");
     for (let i = 0; i < trackPoints.length; i++) {
@@ -129,6 +129,44 @@ function drawGpxOnMap(gpxContent) {
         // Ajustar la vista del mapa para que todos los waypoints sean visibles
         map.fitBounds(polyline.getBounds());
     }
+
+    calcdistance(gpx);
+}
+
+function calcdistance(gpx) {
+
+    const trackPoints = gpx.getElementsByTagName("trkpt");
+    let totalDistance = 0;
+
+    for (let i = 1; i < trackPoints.length; i++) {
+        const lat1 = parseFloat(trackPoints[i - 1].getAttribute("lat"));
+        const lon1 = parseFloat(trackPoints[i - 1].getAttribute("lon"));
+        const lat2 = parseFloat(trackPoints[i].getAttribute("lat"));
+        const lon2 = parseFloat(trackPoints[i].getAttribute("lon"));
+
+        totalDistance += calculateDistance(lat1, lon1, lat2, lon2);
+    }
+
+    // Convertir la distancia total a kilómetros y mostrarla en la página
+    const distanceKm = (totalDistance / 1000).toFixed(2);
+    document.getElementById("distance").innerText = `Distancia total: ${distanceKm} km`;
+
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371e3; // Radio de la Tierra en metros
+    const φ1 = lat1 * Math.PI / 180; // φ, λ en radianes
+    const φ2 = lat2 * Math.PI / 180;
+    const Δφ = (lat2 - lat1) * Math.PI / 180;
+    const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+        Math.cos(φ1) * Math.cos(φ2) *
+        Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    const d = R * c; // Distancia en metros
+    return d;
 }
 
 window.triggerFileInputClick = function () {

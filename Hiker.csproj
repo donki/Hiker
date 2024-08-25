@@ -2,16 +2,6 @@
 
   <PropertyGroup>
     <TargetFrameworks>net8.0-android</TargetFrameworks>
-    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
-    <!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
-    <!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen</TargetFrameworks> -->
-
-    <!-- Note for MacCatalyst:
-            The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
-            When specifying both architectures, use the plural <RuntimeIdentifiers> instead of the singular <RuntimeIdentifier>.
-            The Mac App Store will NOT accept apps with ONLY maccatalyst-arm64 indicated;
-            either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
-    <!-- For example: <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
 
     <OutputType>Exe</OutputType>
     <RootNamespace>Hiker</RootNamespace>
@@ -28,62 +18,33 @@
     <ApplicationId>com.organiccoating.hiker</ApplicationId>
 
     <!-- Versions -->
-    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <ApplicationDisplayVersion>1.4</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>
 
-    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
-    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">14.0</SupportedOSPlatformVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
-    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
-    <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
-    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
-    <PackageIcon>hikericon.png</PackageIcon>
-    <Version>1.3</Version>
+    <PackageIcon>hiker.png</PackageIcon>
+    <Version>1.4</Version>
     <Title>Hiker</Title>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.22621.0</SupportedOSPlatformVersion>
+    <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.22621.0</TargetPlatformMinVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|AnyCPU'">
     <ApplicationId>com.organiccoating.hiker</ApplicationId>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
-    <ApplicationId>com.organiccoating.hiker</ApplicationId>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-maccatalyst|AnyCPU'">
-    <ApplicationId>com.organiccoating.hiker</ApplicationId>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-windows10.0.19041.0|AnyCPU'">
-    <ApplicationId>com.organiccoating.hiker</ApplicationId>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
-    <ApplicationId>com.organiccoating.hiker</ApplicationId>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-ios|AnyCPU'">
-    <ApplicationId>com.organiccoating.hiker</ApplicationId>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-maccatalyst|AnyCPU'">
-    <ApplicationId>com.organiccoating.hiker</ApplicationId>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-windows10.0.19041.0|AnyCPU'">
-    <ApplicationId>com.organiccoating.hiker</ApplicationId>
+  <PropertyGroup>
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.22621.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
     <!-- App Icon -->
-    <MauiIcon Include="Resources\AppIcon\hikericon.png">
-      <Color>#512BD4</Color>
+    <MauiIcon Include="Resources\AppIcon\hiker.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </MauiIcon>
-    <MauiIcon Include="Resources\Images\hiker.png">
-      <Color>#512BD4</Color>
-    </MauiIcon>
-
-    <!-- Splash Screen -->
+    <MauiSplashScreen Include="Resources\AppIcon\hikersplash.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </MauiSplashScreen>
 
     <!-- Images -->
     <MauiImage Include="Resources\Images\*" />
@@ -100,16 +61,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <MauiImage Remove="Resources\Images\hiker.png" />
+    <None Remove="Resources\AppIcon\hikersplash.png" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="Resources\Images\hiker.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="wwwroot\favicon.png" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
@@ -134,11 +88,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Resources\AppIcon\hikericon.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Update="Resources\AppIcon\hikericon.png">
+    <Folder Include="Resources\Images\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\AppIcon\hiker.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

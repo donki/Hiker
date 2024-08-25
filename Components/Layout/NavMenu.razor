@@ -5,7 +5,7 @@
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">Hiker</a>
+        <a class="navbar-brand" href=""> Hiker</a>
     </div>
 </div>
 
@@ -13,12 +13,6 @@
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-
         <div class="nav-item px-3">
             <NavLink href="#" class="nav-link" @onclick="TriggerFileUpload">
                 <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Cargar Ruta
@@ -71,7 +65,7 @@
         if (ModoRuta)
         {
             // Si se activa, iniciar la actualización de posición
-            GetLocationAsync();
+            await GetLocationAsync();
             _timer = new Timer(async _ => await GetLocationAsync(), null, 0, 5000);
             await JS.InvokeVoidAsync("requestWakeLock");
         }
