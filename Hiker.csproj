@@ -18,12 +18,12 @@
     <ApplicationId>com.organiccoating.hiker</ApplicationId>
 
     <!-- Versions -->
-    <ApplicationDisplayVersion>1.4</ApplicationDisplayVersion>
+    <ApplicationDisplayVersion>1.5</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
     <PackageIcon>hiker.png</PackageIcon>
-    <Version>1.4</Version>
+    <Version>1.5</Version>
     <Title>Hiker</Title>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.22621.0</SupportedOSPlatformVersion>
     <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.22621.0</TargetPlatformMinVersion>
@@ -40,6 +40,9 @@
   <ItemGroup>
     <!-- App Icon -->
     <MauiIcon Include="Resources\AppIcon\hiker.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </MauiIcon>
+    <MauiIcon Include="wwwroot\images\hikermenu.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </MauiIcon>
     <MauiSplashScreen Include="Resources\AppIcon\hikersplash.png">
@@ -61,7 +64,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <MauiImage Remove="Resources\Images\hikermenu.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Resources\AppIcon\hikersplash.png" />
+    <None Remove="Resources\Images\hikermenu.png" />
   </ItemGroup>
 
 
@@ -88,14 +96,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Resources\Images\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="Resources\AppIcon\hiker.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\Images\" />
   </ItemGroup>
 
   <ProjectExtensions>
