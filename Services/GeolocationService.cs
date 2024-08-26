@@ -6,16 +6,11 @@
         {
             try
             {
-                var location = await Geolocation.GetLastKnownLocationAsync();
-
-                if (location == null)
+                var location = await Geolocation.GetLocationAsync(new GeolocationRequest
                 {
-                    location = await Geolocation.GetLocationAsync(new GeolocationRequest
-                    {
-                        DesiredAccuracy = GeolocationAccuracy.High,
-                        Timeout = TimeSpan.FromSeconds(30)
-                    });
-                }
+                    DesiredAccuracy = GeolocationAccuracy.Best,
+                    Timeout = TimeSpan.FromSeconds(10)
+                });
 
                 return location;
             }
