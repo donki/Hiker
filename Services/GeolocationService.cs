@@ -6,13 +6,22 @@
         {
             try
             {
-                var location = await Geolocation.GetLocationAsync(new GeolocationRequest
+                // Asegurar que la solicitud de permisos y obtención de ubicación se realiza en el hilo principal
+                return await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
-                    DesiredAccuracy = GeolocationAccuracy.Best,
-                    Timeout = TimeSpan.FromSeconds(10)
-                });
+                    var location = await Geolocation.GetLastKnownLocationAsync();
 
-                return location;
+                    if (location == null)
+                    {
+                        location = await Geolocation.GetLocationAsync(new GeolocationRequest
+                        {
+                            DesiredAccuracy = GeolocationAccuracy.Best,
+                            Timeout = TimeSpan.FromSeconds(120)
+                        });
+                    }
+
+                    return location;
+                });
             }
             catch (Exception ex)
             {
@@ -22,5 +31,6 @@
             }
         }
     }
+
 }
 

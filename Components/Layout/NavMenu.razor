@@ -1,11 +1,12 @@
-﻿@inject IJSRuntime JS
+﻿@using System.Text
+@inject IJSRuntime JS
 @inject GeolocationService GeoService
-
-
+@inject IFileSaver FileSaver
+@inject IDialogService DialogService
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">         
+        <a class="navbar-brand" href="">
             <img src="images/hikermenu.png" width="32" height="32" alt="Logo" style="margin-right: 8px;" /> Hiker
         </a>
     </div>
@@ -44,6 +45,29 @@
             <InputFile id="gpxFileInput" OnChange="HandleFileSelected" style="display:none;" />
         </div>
         <div class="nav-item px-3">
+            <NavLink href="#" class="nav-link" @onclick="ToggleRecordingMode">
+
+                <span style="display: inline-flex; align-items: center; line-height: 1;">
+                    @if (ModoGrabación)
+                    {
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16" style="vertical-align: middle; margin-right: 4px;">
+                            <circle cx="256" cy="256" r="256" fill="red" />
+                        </svg>
+
+                    }
+                    else
+                    {
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16" style="vertical-align: middle; margin-right: 4px;">
+                            <circle cx="256" cy="256" r="256" fill="gray" />
+                        </svg>
+
+                    }
+                    Modo Grabación
+                </span>
+            </NavLink>
+            <InputFile id="gpxFileInput" OnChange="HandleFileSelected" style="display:none;" />
+        </div>
+        <div class="nav-item px-3">
             <NavLink class="nav-link" href="about" Match="NavLinkMatch.All">
                 <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Acerca de...
             </NavLink>
@@ -58,6 +82,86 @@
 
     private Timer? _timer;
     private bool ModoRuta = false;
+    private bool ModoGrabación = false;
+    private List<Location> recordedLocations = new();
+
+    private async Task ToggleRecordingMode()
+    {
+        ModoGrabación = !ModoGrabación;
+
+        if (ModoGrabación)
+        {
+            recordedLocations.Clear(); // Limpiar las grabaciones anteriores
+            _timer = new Timer(async _ => await RecordLocationAsync(), null, 0, 5000);
+        }
+        else
+        {
+            _timer?.Dispose();
+            await PromptSaveRecording();
+        }
+    }
+
+    private async Task RecordLocationAsync()
+    {
+        var location = await GeoService.GetCurrentLocationAsync();
+        if (location != null)
+        {
+            recordedLocations.Add(location);
+            await JS.InvokeVoidAsync("updateMapMarker", location.Latitude, location.Longitude);
+            await DrawRouteAsync();
+        }
+    }
+
+    private async Task DrawRouteAsync()
+    {
+        if (recordedLocations.Count > 1)
+        {
+            var latLngs = recordedLocations.Select(loc => new { lat = loc.Latitude, lon = loc.Longitude }).ToArray();
+            await JS.InvokeVoidAsync("drawPolyline", latLngs);
+        }
+    }
+
+    private async Task PromptSaveRecording()
+    {
+        // Preguntar al usuario si quiere guardar la grabación
+        var save = await DialogService.ShowConfirmationDialog("Confirmación", "¿Desea guardar la ruta grabada?");
+        if (save)
+        {
+            var mgpx = await SaveRecordingAsGpx();
+            var result = await FileSaver.SaveAsync("ruta.gpx", mgpx);
+
+
+
+        }
+    }
+
+    private async Task<MemoryStream> SaveRecordingAsGpx()
+    {
+        var gpxData = GenerateGpxContent(recordedLocations);
+
+        return new MemoryStream(Encoding.Default.GetBytes(gpxData));
+
+    }
+
+    private string GenerateGpxContent(List<Location> locations)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        sb.AppendLine("<gpx version=\"1.1\" creator=\"HikerApp\">");
+        sb.AppendLine("<trk>");
+        sb.AppendLine("<trkseg>");
+        foreach (var loc in locations)
+        {
+            sb.AppendLine($"<trkpt lat=\"{loc.Latitude}\" lon=\"{loc.Longitude}\">");
+            sb.AppendLine($"<time>{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ssZ}</time>");
+            sb.AppendLine("</trkpt>");
+        }
+        sb.AppendLine("</trkseg>");
+        sb.AppendLine("</trk>");
+        sb.AppendLine("</gpx>");
+        return sb.ToString();
+    }
+
 
     private async Task StartUpdatingPosition()
     {

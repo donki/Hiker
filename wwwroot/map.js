@@ -169,6 +169,17 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     return d;
 }
 
+function drawPolyline(latLngs) {
+    if (polyline) {
+        polyline.remove();
+    }
+    polyline = L.polyline(latLngs, {
+        color: 'red',
+        weight: 3,
+        opacity: 0.7, smoothFactor: 1
+    }).addTo(map);
+}
+
 window.triggerFileInputClick = function () {
     document.getElementById('gpxFileInput').click();
 };
