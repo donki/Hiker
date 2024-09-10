@@ -93,11 +93,13 @@
         {
             recordedLocations.Clear(); // Limpiar las grabaciones anteriores
             _timer = new Timer(async _ => await RecordLocationAsync(), null, 0, 5000);
+            await JS.InvokeVoidAsync("requestWakeLock");
         }
         else
         {
             _timer?.Dispose();
             await PromptSaveRecording();
+            await JS.InvokeVoidAsync("releaseWakeLock");
         }
     }
 
@@ -116,8 +118,10 @@
     {
         if (recordedLocations.Count > 1)
         {
-            var latLngs = recordedLocations.Select(loc => new { lat = loc.Latitude, lon = loc.Longitude }).ToArray();
-            await JS.InvokeVoidAsync("drawPolyline", latLngs);
+            var latLngs = recordedLocations
+                .Select(loc => new[] { loc.Latitude, loc.Longitude })  // Array de [lat, lon]
+                .ToArray();
+            await JS.InvokeVoidAsync("drawPolyline", recordedLocations);
         }
     }
 
@@ -152,7 +156,7 @@
         sb.AppendLine("<trkseg>");
         foreach (var loc in locations)
         {
-            sb.AppendLine($"<trkpt lat=\"{loc.Latitude}\" lon=\"{loc.Longitude}\">");
+            sb.AppendLine($"<trkpt lat=\"{loc.Latitude.ToString().Replace(",", ".")}\" lon=\"{loc.Longitude.ToString().Replace(",", ".")}\">");
             sb.AppendLine($"<time>{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ssZ}</time>");
             sb.AppendLine("</trkpt>");
         }

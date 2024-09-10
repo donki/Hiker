@@ -12,7 +12,7 @@ function initializeMap() {
     }).addTo(map);
 
     userMarker = L.marker([0, 0]).addTo(map) // Coordenadas iniciales (0,0)
-        .bindPopup('Aquí estás')
+        .bindPopup('Estás Aquí')
         .openPopup();
     map.zoomControl.remove();
 }
@@ -169,16 +169,34 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     return d;
 }
 
-function drawPolyline(latLngs) {
+function drawPolyline(recordedLocations) {
+    console.log("Recorded Locations received:", recordedLocations); // Depuración para ver los datos
+
     if (polyline) {
-        polyline.remove();
+        polyline.remove(); // Eliminar la línea anterior si existe
     }
-    polyline = L.polyline(latLngs, {
-        color: 'red',
-        weight: 3,
-        opacity: 0.7, smoothFactor: 1
-    }).addTo(map);
+
+    if (recordedLocations && recordedLocations.length > 1) {
+        const latLngs = [];
+
+        // Usar un bucle for para construir el array de [lat, lon]
+        for (let i = 0; i < recordedLocations.length; i++) {
+            const loc = recordedLocations[i];
+            latLngs.push([loc.latitude, loc.longitude]);
+        }
+
+        // Dibujar la polilínea con las coordenadas convertidas
+        polyline = L.polyline(latLngs, {
+            color: 'red',
+            weight: 3,
+            opacity: 0.7,
+            smoothFactor: 1
+        }).addTo(map);
+    } else {
+        console.error("No valid recordedLocations to draw the polyline");
+    }
 }
+
 
 window.triggerFileInputClick = function () {
     document.getElementById('gpxFileInput').click();

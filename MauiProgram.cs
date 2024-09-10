@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Storage;
 using Hiker.Services;
-using Microsoft.Extensions.Logging;
 using Radzen;
 
 namespace Hiker
@@ -24,6 +23,8 @@ namespace Hiker
             builder.Services.AddSingleton<IFileSaver>(FileSaver.Default);
             builder.Services.AddSingleton<IDialogService, Hiker.Services.DialogService>();
             builder.Services.AddRadzenComponents();
+
+
 
 
 #if DEBUG
