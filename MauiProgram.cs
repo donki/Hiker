@@ -20,6 +20,8 @@ namespace Hiker
 
             builder.Services.AddMauiBlazorWebView();
             builder.Services.AddSingleton<GeolocationService>();
+            builder.Services.AddSingleton<SettingsService>();
+            builder.Services.AddSingleton<RouteService>();
             builder.Services.AddSingleton<IFileSaver>(FileSaver.Default);
             builder.Services.AddSingleton<IDialogService, Hiker.Services.DialogService>();
             builder.Services.AddRadzenComponents();
@@ -29,7 +31,7 @@ namespace Hiker
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
-            builder.Logging.AddDebug();
+
 #endif
 
             return builder.Build();

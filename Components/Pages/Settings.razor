@@ -1,0 +1,37 @@
+﻿@page "/settings"
+@inject SettingsService SettingsService
+@inject NavigationManager Navigation
+
+<RadzenCard Style="padding: 20px; max-width: 800px; margin: auto;">
+    <RadzenText TextStyle="TextStyle.H2" Style="margin-bottom: 20px;">Configuración</RadzenText>
+
+    <div class="form-group rz-mb-3">
+        <label id="maxSpeedLabel" for="maxSpeed">Velocidad máxima aceptada (m/s):</label>
+        <RadzenNumeric @bind-Value="SettingsService.AppSettings.MaxSpeed" Min="0" Max="10" Step="0.1" />
+    </div>
+
+    <div class="form-group rz-mb-3">
+        <label id="timerIntervalLabel" for="timerInterval">Tiempo entre actualizaciones de posición (s):</label>
+        <RadzenNumeric TValue="int" @bind-Value="SettingsService.AppSettings.TimerInterval" Min="1" Max="10" Step="1" />
+    </div>
+
+    <div class="form-group rz-mb-3">
+        <RadzenCheckBox @bind-Value="SettingsService.AppSettings.IsKalmanFilterEnabled" />
+        <label>Activar filtrado Kalman</label>
+    </div>
+
+    <RadzenButton Text="Guardar" Click="@SaveSettings" ButtonStyle="ButtonStyle.Primary" Style="margin-top: 20px;" />
+</RadzenCard>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await SettingsService.LoadSettingsAsync();
+    }
+
+    private async Task SaveSettings()
+    {
+        await SettingsService.SaveSettingsAsync();
+        Navigation.NavigateTo("/");
+    }
+}

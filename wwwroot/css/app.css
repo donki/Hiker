@@ -84,3 +84,75 @@ h1:focus {
         padding-left: env(safe-area-inset-left);
     }
 }
+
+
+
+/********    menu *******/
+.nav-scrollable {
+    position: fixed;
+    top: 10px;
+    right: 0; /* El menú sale desde la derecha */
+    width: 250px;
+    background-color: #007bff; /* Azul */
+    color: #ffffff; /* Texto blanco */
+    border-radius: 10px; /* Bordes redondeados */
+    padding: 10px;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; /* Transición de deslizamiento y visibilidad */
+    z-index: 1000; /* Asegura que esté por encima del contenido */
+    height: auto; /* Ajusta automáticamente a las opciones visibles */
+    max-height: 100vh; /* Limita la altura máxima a la altura de la pantalla */
+    overflow-y: auto; /* Permite desplazamiento si el contenido excede la altura */
+    opacity: 0; /* Oculto por defecto */
+    pointer-events: none; /* Desactivar interacciones cuando está oculto */
+}
+
+.closed {
+    transform: translateX(100%); /* Esconde el menú fuera de la pantalla a la derecha */
+    opacity: 0; /* Oculto */
+    pointer-events: none; /* Evita clics */
+}
+
+.open {
+    transform: translateX(0); /* Muestra el menú */
+    opacity: 1; /* Totalmente visible */
+    pointer-events: all; /* Habilita interacciones */
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+    nav ul li {
+        margin-bottom: 15px;
+    }
+
+.nav-link {
+    color: #ffffff; /* Texto blanco */
+    text-decoration: none;
+    font-size: 16px;
+}
+
+    .nav-link:hover {
+        background-color: #0056b3; /* Un tono más oscuro al hacer hover */
+        padding: 5px;
+        border-radius: 4px;
+    }
+
+/* Estilo del banner para que esté superpuesto al mapa */
+.ad-banner {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: 1000; /* Asegúrate que esté por encima del mapa */
+    background-color: white; /* Opcional: fondo blanco para mayor visibilidad */
+    text-align: center;
+}
+
+/* Estilo opcional para ajustar la apariencia del banner */
+.ad-banner-container {
+    display: inline-block;
+    width: 100%;
+    height: 50px; /* Altura del banner */
+}

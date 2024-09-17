@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <style name="MainTheme" parent="Theme.Maui">
+    <!-- Personalización del tema principal -->
+  </style>
+  <style name="MainTheme.SplashTheme" parent="Theme.Maui.SplashTheme">
+    <!-- Fondo del splash screen en negro -->
+    <item name="android:windowBackground">@android:color/white</item>
+  </style>
+</resources>

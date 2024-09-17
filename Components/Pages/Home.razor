@@ -1,42 +1,67 @@
 ﻿@page "/"
 @inject IJSRuntime JS
 @inject GeolocationService GeoService
+@inject RouteService RouteService
+
 
 <!--<div id="ad-container" style="width: 100%; height: 50px;"></div>-->
 <!-- Mapa que ocupa todo el espacio -->
 <div id="map" style="width: 100%; height: 100vh;"></div>
 
+<NavMenu isMenuOpen="isNavMenuOpen" OnToggleMenu="ToggleNavMenu">></NavMenu>
+<button class="hamburger-button" @onclick="ToggleNavMenu">
+    <span class="hamburger-icon">&#9776;</span>
+</button>
 
-<!-- Div para mostrar la distancia total -->
-<div id="distance" style="text-align: center; margin-top: 10px; font-weight: bold;">
-    Distancia total: 0 km
-</div>
 
 @code {
 
 
+    private bool isNavMenuOpen = false;
+
+    private void ToggleNavMenu()
+    {
+        isNavMenuOpen = !isNavMenuOpen;
+
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await JS.InvokeVoidAsync("initializeAd");
-
-            // Inicializar el mapa al cargar la página
             await JS.InvokeVoidAsync("initializeMap");
 
-            // Obtener la posición actual y actualizar el marcador en el mapa
-            await GetLocationAsync();
+            // Obtener la ruta almacenada en RouteService
+            var gpxContent = RouteService.GetRoute();
+            if (!string.IsNullOrEmpty(gpxContent))
+            {
+                // Llama a la función JavaScript para dibujar la ruta en el mapa
+                await JS.InvokeVoidAsync("drawGpxOnMap", gpxContent);
+                RouteService.SetRoute("");
+
+                // Obtener la posición actual y actualizar el marcador en el mapa
+            }
+            else
+            {
+                await GetLocationAsync();
+            }
         }
     }
+
 
     private async Task GetLocationAsync()
     {
         var location = await GeoService.GetCurrentLocationAsync();
         if (location != null)
         {
-            // Pasar las coordenadas al método JavaScript para actualizar el marcador
-            await JS.InvokeVoidAsync("updateMapMarker", location.Latitude, location.Longitude);
+            if (RouteService.isRecording)
+            {
+                await JS.InvokeVoidAsync("updateMapMarker", "Grabando aquí...", location.Latitude, location.Longitude);
+            }
+            {
+                await JS.InvokeVoidAsync("updateMapMarker", "Estas aquí...", location.Latitude, location.Longitude);
+            }
+
         }
         else
         {
@@ -44,5 +69,6 @@
             Console.WriteLine("No se pudo obtener la ubicación.");
         }
     }
+
 
 }

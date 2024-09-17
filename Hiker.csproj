@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFrameworks>net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
@@ -28,7 +28,7 @@
     <ApplicationId>com.organiccoating.hiker</ApplicationId>
 
     <!-- Versions -->
-    <ApplicationDisplayVersion>1.7.1.0</ApplicationDisplayVersion>
+    <ApplicationDisplayVersion>1.9.0</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
@@ -40,9 +40,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <FileVersion>1.7.1.0</FileVersion>
-    <AssemblyVersion>1.7.1.0</AssemblyVersion>
-    <Version>1.7.1.0</Version>
+    <FileVersion>1.9.0</FileVersion>
+    <AssemblyVersion>1.9.0</AssemblyVersion>
+    <Version>1.9.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -61,6 +61,10 @@
 
     <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
     <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AndroidResource Remove="Platforms\Android\Resources\values\styles.xml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -84,6 +88,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\icons\" />
   </ItemGroup>
 
 </Project>

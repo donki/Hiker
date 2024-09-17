@@ -17,9 +17,10 @@ function initializeMap() {
     map.zoomControl.remove();
 }
 
-function updateMapMarker(latitude, longitude) {
+function updateMapMarker(message, latitude, longitude) {
     if (userMarker) {
         userMarker.setLatLng([latitude, longitude]);
+        userMarker.bindPopup(message);
         const currentZoom = map.getZoom();
         map.setView([latitude, longitude], currentZoom); // Mueve el mapa a la posición actual
     }
@@ -149,8 +150,6 @@ function calcdistance(gpx) {
 
     // Convertir la distancia total a kilómetros y mostrarla en la página
     const distanceKm = (totalDistance / 1000).toFixed(2);
-    document.getElementById("distance").innerText = `Distancia total: ${distanceKm} km`;
-
 }
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
