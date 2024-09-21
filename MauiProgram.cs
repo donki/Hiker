@@ -22,6 +22,8 @@ namespace Hiker
             builder.Services.AddSingleton<GeolocationService>();
             builder.Services.AddSingleton<SettingsService>();
             builder.Services.AddSingleton<RouteService>();
+            builder.Services.AddSingleton<GpsFilterService>();
+
             builder.Services.AddSingleton<IFileSaver>(FileSaver.Default);
             builder.Services.AddSingleton<IDialogService, Hiker.Services.DialogService>();
             builder.Services.AddRadzenComponents();

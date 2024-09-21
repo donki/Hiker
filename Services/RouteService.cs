@@ -5,7 +5,12 @@
 
         public bool isRecording = false;
 
-        public string GpxContent { get; set; } = string.Empty;
+        private string GpxContent { get; set; } = string.Empty;
+
+        private readonly SettingsService _settingsService;
+        private Location LastLocation;
+        private DateTime LastUpdateTime;
+
 
         public void SetRoute(string gpxContent)
         {
@@ -16,6 +21,7 @@
         {
             return GpxContent;
         }
+
     }
 
 }

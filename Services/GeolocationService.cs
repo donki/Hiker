@@ -1,100 +1,64 @@
-﻿using Hiker.Helpers;
-
-namespace Hiker.Services
+﻿namespace Hiker.Services
 {
     public class GeolocationService
     {
         private readonly SettingsService _settingsService;
-        private Location LastLocation;
-        private DateTime LastUpdateTime;
-        private KalmanFilter kalmanFilter;
+        private bool isListening = false;
 
-        // Inyectar SettingsService
+        public delegate void Location_Changed(Location point);
+
+        public Location_Changed? OnLocationChangedDelegate;
+
+        public async Task ListeningStartAsync()
+        {
+            if (isListening) { return; }
+            isListening = true;
+            Geolocation.LocationChanged += Geolocation_LocationChanged;
+            var request = new GeolocationListeningRequest(GeolocationAccuracy.Best, TimeSpan.FromSeconds(_settingsService.AppSettings.TimerInterval));
+            var success = await Geolocation.StartListeningForegroundAsync(request);
+        }
+
+        public async Task ListeningStopAsync()
+        {
+            Geolocation.LocationChanged -= Geolocation_LocationChanged;
+            Geolocation.StopListeningForeground();
+            isListening = false;
+        }
+
+        private void Geolocation_LocationChanged(object? sender, GeolocationLocationChangedEventArgs e)
+        {
+            if (OnLocationChangedDelegate != null)
+            {
+                OnLocationChangedDelegate(e.Location);
+            }
+            else
+            {
+                ListeningStopAsync().Wait();
+            }
+        }
+
         public GeolocationService(SettingsService settingsService)
         {
             _settingsService = settingsService;
-            kalmanFilter = new KalmanFilter((float)settingsService.AppSettings.MaxSpeed); // Establece el valor predeterminado, se puede ajustar
         }
 
         public async Task<Location?> GetCurrentLocationAsync()
         {
             try
             {
-                // Asegurar que la solicitud de permisos y obtención de ubicación se realiza en el hilo principal
                 return await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
-                    if (LastLocation == null)
-                    {
-                        LastLocation = await Geolocation.GetLastKnownLocationAsync();
-                    }
 
                     var location = await Geolocation.GetLocationAsync(new GeolocationRequest
                     {
-                        DesiredAccuracy = GeolocationAccuracy.Best,
-                        Timeout = TimeSpan.FromSeconds(_settingsService.AppSettings.TimerInterval) // Usar el valor de configuración para el temporizador
+                        DesiredAccuracy = GeolocationAccuracy.Best
                     });
 
-                    if (location != null)
-                    {
-                        long currentTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-
-                        // Si está activado el filtro Kalman en los ajustes
-                        if (_settingsService.AppSettings.IsKalmanFilterEnabled)
-                        {
-                            if (kalmanFilter.TimeStamp == 0)
-                            {
-                                // Si es la primera vez que se usa el filtro, inicializar el estado
-                                kalmanFilter.SetState(location.Latitude, location.Longitude, (float)location.Accuracy, currentTimestamp);
-                            }
-                            else
-                            {
-                                // Aplicar el filtro Kalman a la nueva ubicación
-                                kalmanFilter.Process(location.Latitude, location.Longitude, (float)location.Accuracy, currentTimestamp);
-                                var newlocation = new Location(kalmanFilter.Latitude, kalmanFilter.Longitude);
-                                newlocation.Altitude = location.Altitude;
-                                newlocation.Accuracy = location.Accuracy;
-                                newlocation.Speed = location.Speed;
-                                newlocation.Course = location.Course;
-                            }
-                        }
-
-                        // Si es la primera vez o no tenemos una ubicación anterior, guardamos la nueva
-                        if (LastLocation == null)
-                        {
-                            LastLocation = location;
-                            LastUpdateTime = DateTime.UtcNow;
-                            return location;
-                        }
-
-                        // Calcular la distancia entre la nueva ubicación y la última conocida
-                        double distance = Location.CalculateDistance(LastLocation, location, DistanceUnits.Kilometers) * 1000; // Convertir a metros
-
-                        // Calcular el tiempo transcurrido desde la última actualización
-                        double timeInSeconds = (DateTime.UtcNow - LastUpdateTime).TotalSeconds;
-
-                        // Calcular la velocidad (metros por segundo)
-                        double speed = distance / timeInSeconds;
-
-                        // Si la velocidad es razonable, actualizamos la ubicación
-                        if (speed <= _settingsService.AppSettings.MaxSpeed) // Usar el valor de configuración para la velocidad máxima
-                        {
-                            LastLocation = location;
-                            LastUpdateTime = DateTime.UtcNow;
-                            return location;
-                        }
-                        else
-                        {
-                            // Si la velocidad es muy alta, devolvemos la última ubicación conocida
-                            return LastLocation;
-                        }
-                    }
-
-                    return LastLocation; // Si no hay nueva ubicación, devolvemos la última conocida
+                    return location;
                 });
             }
             catch (Exception ex)
             {
-                // Manejo de errores
                 Console.WriteLine($"Error obteniendo la ubicación: {ex.Message}");
                 return null;
             }

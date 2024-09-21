@@ -2,16 +2,150 @@
 @inject IJSRuntime JS
 @inject GeolocationService GeoService
 @inject RouteService RouteService
+@inject SettingsService SettingsService
+@inject IFileSaver FileSaver
+@inject IDialogService DialogService
+@inject NavigationManager Navigation
+@inject RouteService RouteService;
+@inject GpsFilterService GpsFilterService;
 
 
-<!--<div id="ad-container" style="width: 100%; height: 50px;"></div>-->
-<!-- Mapa que ocupa todo el espacio -->
+
 <div id="map" style="width: 100%; height: 100vh;"></div>
 
-<NavMenu isMenuOpen="isNavMenuOpen" OnToggleMenu="ToggleNavMenu">></NavMenu>
 <button class="hamburger-button" @onclick="ToggleNavMenu">
     <span class="hamburger-icon">&#9776;</span>
 </button>
+
+<div id="coordinatesDiv" class="floating-coordinates">
+    Lat: @currentLatitude, Lon: @currentLongitude
+</div>
+
+@if (isMenuOpen)
+{
+    <nav class="hamburger-menu flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link bi bi-cloud-upload-fill" href="loadroute">
+                <span class="me-2"></span> Cargar Ruta
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink href="#" class="nav-link" @onclick="StartUpdatingPosition">
+
+                <span style="display: inline-flex; align-items: center; line-height: 1;">
+                    @if (ModoRuta)
+                    {
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="lime" class="bi bi-geo-alt-fill" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 4px;">
+                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6" />
+                        </svg>
+
+                    }
+                    else
+                    {
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="gray" class="bi bi-geo-alt-fill" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 4px;">
+                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6" />
+                        </svg>
+
+                    }
+                    Modo Ruta
+                </span>
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink href="#" class="nav-link" @onclick="ToggleRecordingMode">
+
+                <span style="display: inline-flex; align-items: center; line-height: 1;">
+                    @if (ModoGrabacion)
+                    {
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16" style="vertical-align: middle; margin-right: 4px;">
+                            <circle cx="256" cy="256" r="256" fill="red" />
+                        </svg>
+
+                    }
+                    else
+                    {
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16" style="vertical-align: middle; margin-right: 4px;">
+                            <circle cx="256" cy="256" r="256" fill="gray" />
+                        </svg>
+
+                    }
+                    Modo Grabación
+                </span>
+            </NavLink>
+            <InputFile id="gpxFileInput" OnChange="HandleFileSelected" style="display:none;" />
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link bi bi-gear-fill" @onclick="OpenSettings">
+                <span class="me-2"></span> Configuración
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link bi bi-info-circle-fill" Match="NavLinkMatch.All" @onclick="OpenAbout">
+                <span class="me-2"></span> Acerca de...
+            </NavLink>
+        </div>
+
+
+
+    </nav>
+
+}
+
+
+<style>
+
+    .floating-coordinates {
+        position: fixed;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 10px;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        font-size: 14px;
+        border-radius: 5px;
+        z-index: 10000;
+    }
+    /* Botón flotante de hamburguesa */
+    .hamburger-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        box-shadow: 0px 4px 10px black; /* Sombra del menú */
+        font-size: 24px;
+        cursor: pointer;
+        z-index: 99999; /* Asegura que esté por encima del menú */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .hamburger-menu {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: auto;
+        height: auto;
+        color: white;
+        background-color: #007bff;
+        border-radius: 5px;
+        box-shadow: 0px 4px 10px black; /* Sombra del menú */
+        z-index: 99999; /* Asegura que esté por encima del menú */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .hamburger-icon {
+        font-size: 30px;
+    }
+</style>
 
 
 @code {
@@ -29,46 +163,263 @@
     {
         if (firstRender)
         {
-            await JS.InvokeVoidAsync("initializeMap");
+            await JS.InvokeVoidAsync("initializeMap", "<i class=\"bi bi-geo-alt-fill fs-6 text-success\"></i>Estás aquí...");
 
-            // Obtener la ruta almacenada en RouteService
             var gpxContent = RouteService.GetRoute();
             if (!string.IsNullOrEmpty(gpxContent))
             {
-                // Llama a la función JavaScript para dibujar la ruta en el mapa
                 await JS.InvokeVoidAsync("drawGpxOnMap", gpxContent);
                 RouteService.SetRoute("");
 
-                // Obtener la posición actual y actualizar el marcador en el mapa
             }
             else
             {
-                await GetLocationAsync();
+                await GetLocationAsync(await GeoService.GetCurrentLocationAsync());
             }
         }
     }
 
 
-    private async Task GetLocationAsync()
+
+
+
+    [Parameter]
+    public bool isMenuOpen { get; set; }
+
+    [Parameter]
+    public EventCallback OnToggleMenu { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private bool ModoRuta = false;
+    private bool ModoGrabacion = false;
+    private List<Location> recordedLocations = new();
+    private double currentLatitude;
+    private double currentLongitude;
+
+
+
+    #region RECORD ROUTE
+
+    private async Task RecordLocationAsync(Location location)
     {
-        var location = await GeoService.GetCurrentLocationAsync();
+        if (location != null)
+        {
+            //location = GpsFilterService.ProcessLocation(location);
+            currentLatitude = location.Latitude;
+            currentLongitude = location.Longitude;
+
+            recordedLocations.Add(location);
+
+            await JS.InvokeVoidAsync("updateMapMarker", "<i class=\"bi bi-record-fill fs-6 text-danger\"></i>Grabando ...", location.Latitude, location.Longitude, location.Course);
+            await DrawRecordingRouteAsync();
+        }
+    }
+
+    private async Task DrawRecordingRouteAsync()
+    {
+        if (recordedLocations.Count > 1)
+        {
+            var latLngs = recordedLocations
+                .Select(loc => new[] { loc.Latitude, loc.Longitude })  // Array de [lat, lon]
+                .ToArray();
+            await JS.InvokeVoidAsync("drawPolyline", recordedLocations);
+        }
+    }
+
+    private async Task PromptSaveRecording()
+    {
+        // Preguntar al usuario si quiere guardar la grabación
+        var save = await DialogService.ShowConfirmationDialog("Confirmación", "¿Desea guardar la ruta grabada?");
+        if (save)
+        {
+            var mgpx = await SaveRecordingAsGpx();
+            var result = await FileSaver.SaveAsync("ruta.gpx", mgpx);
+
+        }
+        recordedLocations.Clear();
+    }
+
+    private async Task<MemoryStream> SaveRecordingAsGpx()
+    {
+        var gpxData = GenerateGpxContent(recordedLocations);
+
+        return new MemoryStream(Encoding.Default.GetBytes(gpxData));
+
+    }
+
+    private string GenerateGpxContent(List<Location> locations)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        sb.AppendLine("<gpx version=\"1.1\" creator=\"HikerApp\">");
+        sb.AppendLine("<trk>");
+        sb.AppendLine("<trkseg>");
+        foreach (var loc in locations)
+        {
+            sb.AppendLine($"<trkpt lat=\"{loc.Latitude.ToString().Replace(",", ".")}\" lon=\"{loc.Longitude.ToString().Replace(",", ".")}\">");
+
+            if (loc.Altitude.HasValue)
+            {
+                sb.AppendLine($"<ele>{loc.Altitude.Value.ToString("F2").Replace(",", ".")}</ele>");
+            }
+
+            sb.AppendLine($"<time>{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ssZ}</time>");
+            sb.AppendLine("</trkpt>");
+        }
+        sb.AppendLine("</trkseg>");
+        sb.AppendLine("</trk>");
+        sb.AppendLine("</gpx>");
+        return sb.ToString();
+    }
+
+
+    private async Task ToggleRecordingMode()
+    {
+        isMenuOpen = false;
+        await OnToggleMenu.InvokeAsync(null);
+        ModoGrabacion = !ModoGrabacion;
+
+        if (ModoGrabacion)
+        {
+            StartRecordingMode();
+        }
+        else
+        {
+            StopRecordingMode();
+        }
+    }
+
+    private async Task StopRecordingMode()
+    {
+        await PromptSaveRecording();
+        await JS.InvokeVoidAsync("releaseWakeLock");
+        RouteService.isRecording = false;
+    }
+
+    private async Task StartRecordingMode()
+    {
+        ModoRuta = false;
+        recordedLocations.Clear();
+        RouteService.isRecording = true;
+        await JS.InvokeVoidAsync("requestWakeLock");
+        RecordLocationAsync(await GeoService.GetCurrentLocationAsync());
+        GeoService.OnLocationChangedDelegate += LocationChange;
+        await GeoService.ListeningStartAsync();
+
+    }
+    #endregion
+
+
+
+    public void LocationChange(Location location)
+    {
+        currentLatitude = location.Latitude;
+        currentLongitude = location.Longitude;
+        if (ModoGrabacion)
+        {
+            RecordLocationAsync(location);
+        }
+        else
+        {
+            GetLocationAsync(location);
+        }
+    }
+
+    #region TRACK ROUTE
+    private async Task StartUpdatingPosition()
+    {
+        isMenuOpen = false;
+        await OnToggleMenu.InvokeAsync(null);
+        ModoRuta = !ModoRuta;
+
+        if (ModoRuta)
+        {
+            if (ModoGrabacion)
+            {
+                await StopRecordingMode();
+                ModoGrabacion = false;
+            }
+
+            GeoService.OnLocationChangedDelegate += LocationChange;
+            await GeoService.ListeningStartAsync();
+
+            await JS.InvokeVoidAsync("requestWakeLock");
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("releaseWakeLock");
+        }
+    }
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        var files = e.File;
+        if (files != null)
+        {
+            using var stream = files.OpenReadStream();
+            using var reader = new StreamReader(stream);
+            var gpxContent = await reader.ReadToEndAsync();
+
+            // Procesar y dibujar la ruta GPX en el mapa
+            await LoadGpxOnMap(gpxContent);
+        }
+    }
+
+    private async Task LoadGpxOnMap(string gpxContent)
+    {
+        JS.InvokeVoidAsync("drawGpxOnMap", gpxContent);
+    }
+
+    private async Task TriggerFileUpload()
+    {
+        isMenuOpen = false;
+        //await JS.InvokeVoidAsync("triggerFileInputClick");
+
+    }
+
+    private async Task GetLocationAsync(Location location)
+    {
         if (location != null)
         {
             if (RouteService.isRecording)
             {
-                await JS.InvokeVoidAsync("updateMapMarker", "Grabando aquí...", location.Latitude, location.Longitude);
+                await JS.InvokeVoidAsync("updateMapMarker", "<i class=\"bi bi-record-fill fs-6 text-danger\"></i>Grabando ...", location.Latitude, location.Longitude, location.Course);
             }
             {
-                await JS.InvokeVoidAsync("updateMapMarker", "Estas aquí...", location.Latitude, location.Longitude);
+                await JS.InvokeVoidAsync("updateMapMarker", "<i class=\"bi bi-geo-alt-fill fs-6 text-success\"></i>Estás aquí...", location.Latitude, location.Longitude, location.Course);
             }
 
         }
         else
         {
-            // Manejar el caso en que no se pueda obtener la ubicación
             Console.WriteLine("No se pudo obtener la ubicación.");
         }
     }
 
+    #endregion
 
+
+    private async Task OpenSettings()
+    {
+
+        if (ModoGrabacion)
+        {
+            StopRecordingMode();
+        }
+
+        Navigation.NavigateTo("/settings");
+    }
+
+    private async Task OpenAbout()
+    {
+
+        if (ModoGrabacion)
+        {
+            StopRecordingMode();
+        }
+
+        Navigation.NavigateTo("/about");
+    }
 }

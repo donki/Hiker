@@ -6,21 +6,42 @@
     <RadzenText TextStyle="TextStyle.H2" Style="margin-bottom: 20px;">Configuración</RadzenText>
 
     <div class="form-group rz-mb-3">
-        <label id="maxSpeedLabel" for="maxSpeed">Velocidad máxima aceptada (m/s):</label>
+        <label for="maxSpeed">Velocidad máxima (m/s):</label>
         <RadzenNumeric @bind-Value="SettingsService.AppSettings.MaxSpeed" Min="0" Max="10" Step="0.1" />
     </div>
 
     <div class="form-group rz-mb-3">
-        <label id="timerIntervalLabel" for="timerInterval">Tiempo entre actualizaciones de posición (s):</label>
-        <RadzenNumeric TValue="int" @bind-Value="SettingsService.AppSettings.TimerInterval" Min="1" Max="10" Step="1" />
+        <label for="minAccuracy">Precisión mínima (m):</label>
+        <RadzenNumeric @bind-Value="SettingsService.AppSettings.MinAccuracy" Min="0" Max="100" Step="1" />
     </div>
 
     <div class="form-group rz-mb-3">
-        <RadzenCheckBox @bind-Value="SettingsService.AppSettings.IsKalmanFilterEnabled" />
-        <label>Activar filtrado Kalman</label>
+        <label for="timerInterval">Refresco posición (s):</label>
+        <RadzenNumeric @bind-Value="SettingsService.AppSettings.TimerInterval" Min="1" Max="60" Step="1" />
+    </div>
+
+    <div class="form-group rz-mb-3">
+        <label for="windowSize">Tamaño de la ventana para el promedio móvil:</label>
+        <RadzenNumeric @bind-Value="SettingsService.AppSettings.WindowSize" Min="1" Max="10" Step="1" />
+    </div>
+
+    <div class="form-group rz-mb-3">
+        <label for="kalmanEnabled">Filtro de Kalman activado:</label>
+        <RadzenCheckBox @bind-Value="SettingsService.AppSettings.KalmanFilterEnabled" />
+    </div>
+
+    <div class="form-group rz-mb-3">
+        <label for="averageFilterEnabled">Filtro de Promedio Móvil activado:</label>
+        <RadzenCheckBox @bind-Value="SettingsService.AppSettings.AverageFilterEnabled" />
+    </div>
+
+    <div class="form-group rz-mb-3">
+        <label for="distanceFilterEnabled">Filtro de Distancia activado:</label>
+        <RadzenCheckBox @bind-Value="SettingsService.AppSettings.DistanceFilterEnabled" />
     </div>
 
     <RadzenButton Text="Guardar" Click="@SaveSettings" ButtonStyle="ButtonStyle.Primary" Style="margin-top: 20px;" />
+    <RadzenButton Text="Salir" Click="@Close" ButtonStyle="ButtonStyle.Secondary" Style="margin-top: 20px; margin-left: 10px;" />
 </RadzenCard>
 
 @code {
@@ -32,6 +53,11 @@
     private async Task SaveSettings()
     {
         await SettingsService.SaveSettingsAsync();
+        await Close();
+    }
+
+    private async Task Close()
+    {
         Navigation.NavigateTo("/");
     }
 }

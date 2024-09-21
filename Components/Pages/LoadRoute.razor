@@ -68,7 +68,6 @@
         try
         {
 
-            KalmanFilter kalmanFilter = new KalmanFilter((float)SettingsService.AppSettings.MaxSpeed);
             // Parsear el archivo GPX con soporte para namespaces
             var xmlDocument = new System.Xml.XmlDocument();
             xmlDocument.LoadXml(gpxContent);
@@ -106,23 +105,6 @@
                 double lon = double.Parse(point.Attributes["lon"].Value);
                 long timestamp = DateTime.Parse(point.SelectSingleNode("default:time", namespaceManager)?.InnerText ?? DateTime.UtcNow.ToString())
                  .ToUniversalTime().Ticks / TimeSpan.TicksPerMillisecond;
-
-                if (SettingsService.AppSettings.IsKalmanFilterEnabled)
-                {
-                    if (kalmanFilter.TimeStamp == 0)
-                    {
-                        kalmanFilter.SetState(lat, lon, 1.0f, timestamp); // Inicializar el estado con los primeros valores
-                    }
-                    else
-                    {
-                        kalmanFilter.Process(lat, lon, 1.0f, timestamp); // Aplicar el filtro Kalman
-                    }
-
-                    // Obtener los valores filtrados de latitud y longitud
-                    lat = kalmanFilter.Latitude;
-                    lon = kalmanFilter.Longitude;
-
-                }
 
                 // Calcular distancia entre puntos consecutivos
                 if (prevLatitude.HasValue && prevLongitude.HasValue)

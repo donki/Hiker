@@ -3,26 +3,41 @@ let userMarker = null;
 let markers = [];
 let polyline;
 
-function initializeMap() {
-    map = L.map('map').setView([0, 0], 13); // Coordenadas iniciales (0,0) antes de obtener la ubicación real
+const UsermarkerOptions = {
+    title: `Point ${i + 1}`,
+    icon: new L.Icon({
+        iconUrl: 'images/flecha-abajo.png',
+        iconSize: [25, 41], // Tamaño del icono
+        iconAnchor: [12, 41], // Ancla del icono (punto de unión con el mapa)
+        popupAnchor: [1, -34], // Ancla del popup
+    })
+};
+
+function initializeMap(message) {
+    map = L.map('map').setView([0, 0], 19); // Coordenadas iniciales (0,0) antes de obtener la ubicación real
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    userMarker = L.marker([0, 0]).addTo(map) // Coordenadas iniciales (0,0)
-        .bindPopup('Estás Aquí')
+
+
+    userMarker = L.marker([0, 0], UsermarkerOptions).addTo(map) // Coordenadas iniciales (0,0)
+        .bindPopup(message)
         .openPopup();
     map.zoomControl.remove();
 }
 
-function updateMapMarker(message, latitude, longitude) {
+function updateMapMarker(message, latitude, longitude, heading = null) {
     if (userMarker) {
         userMarker.setLatLng([latitude, longitude]);
         userMarker.bindPopup(message);
         const currentZoom = map.getZoom();
         map.setView([latitude, longitude], currentZoom); // Mueve el mapa a la posición actual
+        if (heading !== null) {
+            userMarker.setRotationAngle(heading); // Rotar el marcador según el heading
+        }
     }
 }
 
