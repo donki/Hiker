@@ -1,10 +1,10 @@
 @page "/about"
 @inject NavigationManager Navigation
 
-<RadzenCard Style="padding: 20px; max-width: 800px; margin: auto;">
-    <RadzenText TextStyle="TextStyle.H2" Style="margin-bottom: 20px;"> Hiker @appVersion</RadzenText>
-    <RadzenText TextStyle="TextStyle.H3" Style="margin-bottom: 10px;" Text="Acerca de esta aplicación" />
-    <RadzenText TextStyle="TextStyle.H6" Style="margin-bottom: 20px;" Text="Esta aplicación ha sido desarrollada por Organic Coating para ayudar a los usuarios a rastrear y mapear sus rutas de manera eficiente." />
+<RadzenStack Style="padding: 20px; max-width: 800px; margin: auto;">
+    <RadzenText TextStyle="TextStyle.H3" Style="margin-bottom: 20px;"> Hiker @appVersion</RadzenText>
+    <RadzenText TextStyle="TextStyle.H4" Style="margin-bottom: 10px;" Text="Acerca de esta aplicación" />
+    <RadzenText TextStyle="TextStyle.H6" Style="margin-bottom: 20px;" Text="Esta aplicación ha sido desarrollada por Organic Coating para ayudar a los usuarios a rastrear y mapear sus rutas." />
 
     <RadzenText TextStyle="TextStyle.H3" Style="margin-bottom: 10px;" Text="Créditos" />
     <RadzenText TextStyle="TextStyle.H6" Style="margin-bottom: 10px;">
@@ -20,12 +20,12 @@
     <RadzenText TextStyle="TextStyle.H6" Style="margin-bottom: 10px;">
         La visualización de los mapas y rutas en esta aplicación se realiza mediante <RadzenLink href="https://leafletjs.com/" Target="_blank">Leaflet</RadzenLink>, una biblioteca JavaScript de código abierto que ofrece funcionalidades de mapas interactivas y altamente personalizables.
     </RadzenText>
+    <div style="margin-top: 20px; display:flex; justify-content:center">
+        <RadzenButton Text="Volver a Inicio" ButtonStyle="ButtonStyle.Primary"
+                      Click="@(() => Navigation.NavigateTo("/"))" />
+    </div>
 
-    <!-- Botón azul para volver a la pantalla inicial -->
-    <RadzenButton Text="Volver a Inicio" ButtonStyle="ButtonStyle.Primary"
-                  Style="display: block; margin-top: 20px; width: 100%;"
-                  Click="@(() => Navigation.NavigateTo("/"))" />
-</RadzenCard>
+</RadzenStack>
 
 @code {
     private string appVersion;

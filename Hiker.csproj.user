@@ -3,7 +3,7 @@
   <PropertyGroup>
     <IsFirstTimeProjectOpen>False</IsFirstTimeProjectOpen>
     <ActiveDebugFramework>net8.0-android</ActiveDebugFramework>
-    <ActiveDebugProfile>Asus _I005DA (Android 9.0 - API 28)</ActiveDebugProfile>
+    <ActiveDebugProfile>Xiaomi M2101K6G (Android 12.0 - API 31)</ActiveDebugProfile>
     <SelectedPlatformGroup>PhysicalDevice</SelectedPlatformGroup>
     <DefaultDevice>Subsistema de Windows para Android</DefaultDevice>
   </PropertyGroup>

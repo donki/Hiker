@@ -40,8 +40,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <FileVersion>1.9.13</FileVersion>
-    <AssemblyVersion>1.9.13</AssemblyVersion>
+    <FileVersion>1.9.12</FileVersion>
+    <AssemblyVersion>1.9.12</AssemblyVersion>
     <Version>1.9.2</Version>
   </PropertyGroup>
 
@@ -63,7 +63,7 @@
     <MauiIcon Include="Resources\AppIcon\hiker.png" Color="#FFFFFF" />
     <MauiIcon Include="wwwroot\images\hikermenu.png" Color="#FFFFFF" />
     <!-- Splash Screen -->
-    <MauiSplashScreen Include="Resources\AppIcon\hikersplash.png" Color="white" />
+    <MauiSplashScreen Include="Resources\AppIcon\hikersplash.png" Color="#FFFFFF" BaseSize="1024,2048" />
 
     <!-- Images -->
     <MauiImage Include="Resources\Images\*" />
@@ -109,11 +109,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AndroidResource Update="Platforms\Android\Resources\values\colors.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </AndroidResource>
     <None Update="Platforms\Android\Resources\values\styles.xml">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

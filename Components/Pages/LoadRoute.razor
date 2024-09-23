@@ -6,38 +6,97 @@
 @inject RouteService RouteService
 @inject SettingsService SettingsService
 
-<h3>Cargar Ruta</h3>
+<RadzenStack Style="padding: 20px; max-width: 800px; margin: auto;">
+    <RadzenText TextStyle="TextStyle.H3" Style="margin-bottom: 20px;">Cargar Ruta</RadzenText>
 
-<RadzenButton Text="Cargar Ruta GPX" Click="@OpenFileDialog" />
+    <RadzenButton Text="Cargar Ruta" ButtonStyle="ButtonStyle.Primary" Click="@OpenFileDialog" />
 
-@if (!string.IsNullOrEmpty(routeName))
-{
-    <h4>Ruta: @routeName</h4>
-    <p><strong>Distancia Total:</strong> @totalDistance Km</p>
-    <p><strong>Elevación Mínima:</strong> @minElevation metros</p>
-    <p><strong>Elevación Máxima:</strong> @maxElevation metros</p>
-    <p><strong>Desnivel:</strong> @desnivel metros</p>
-    <p><strong>Tiempo Estimado:</strong> @estimatedTime horas</p>
-}
+    @if (!string.IsNullOrEmpty(gpxContent))
+    {
+        <h4>Ruta: @routeName</h4>
+        <p><strong>Distancia Total:</strong> @FormatingHelper.FloatToStr(totalDistance) Km</p>
+        <p><strong>Elevación Mínima:</strong> @FormatingHelper.FloatToStr(minElevation) metros</p>
+        <p><strong>Elevación Máxima:</strong> @FormatingHelper.FloatToStr(maxElevation) metros</p>
+        <p><strong>Desnivel:</strong> @FormatingHelper.FloatToStr(desnivel) metros</p>
+        <p><strong>Tiempo Estimado:</strong> @FormatingHelper.FloatToStr(estimatedTime) horas</p>
 
-<InputFile id="gpxFileInput" style="display:none;" OnChange="OnFileSelected" />
+        <RadzenChart>
+            <RadzenLineSeries Smooth="true" Data="@elevationData" CategoryProperty="Distance" ValueProperty="Elevation" LineType="LineType.Solid" Title="Elevación" />
+            <RadzenLegend Position="LegendPosition.Top" />
+            <RadzenCategoryAxis Min="0" Max="@totalDistance" Step="@stepDistance" />
+        </RadzenChart>
+    }
 
-@if (!string.IsNullOrEmpty(gpxContent))
-{
-    <div style="margin-top: 20px;">
-        <RadzenButton Text="Cargar Ruta" ButtonStyle="ButtonStyle.Primary" Click="LoadRouteOnMap" Style="margin-right: 10px;" />
+    <InputFile id="gpxFileInput" style="display:none;" OnChange="OnFileSelected" />
+
+    <div style="margin-top: 20px; display:flex; justify-content:center">
+        @if (!string.IsNullOrEmpty(gpxContent))
+        {
+            <RadzenButton Text="Cargar Ruta" ButtonStyle="ButtonStyle.Primary" Click="LoadRouteOnMap" Style="margin-right:20px" />
+        }
         <RadzenButton Text="Cerrar" ButtonStyle="ButtonStyle.Secondary" Click="CloseDialog" />
     </div>
+
+</RadzenStack>
+
+@if (isLoading)
+{
+    <div class="overlay">
+        <div class="spinner-container">
+            <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Primary" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+            <p>Por favor, espera...</p>
+        </div>
+    </div>
 }
+
+
+<style>
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro semitransparente */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000; /* Asegura que esté por encima de otros elementos */
+    }
+
+    .spinner-container {
+        background-color: white; /* Fondo blanco */
+        padding: 20px;
+        border-radius: 10px; /* Bordes redondeados */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para efecto visual */
+        text-align: center;
+        width: 300px; /* Ancho fijo */
+        height: 150px; /* Alto fijo */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+        .spinner-container p {
+            margin-top: 10px;
+            font-size: 18px;
+            color: black; /* Color del texto */
+        }
+</style>
+
 
 @code {
     private string routeName = "Ruta sin nombre";
     private double totalDistance;
     private double minElevation;
     private double maxElevation;
+    private double stepDistance = 1;
     private double desnivel;
     private double estimatedTime; // Tiempo estimado en horas para recorrer la ruta
     private string gpxContent;
+    private bool isLoading = false;
+    private List<ElevationPoint> elevationData = new List<ElevationPoint>();
 
     private async Task OpenFileDialog()
     {
@@ -46,14 +105,23 @@
 
     private async Task OnFileSelected(InputFileChangeEventArgs e)
     {
-        var file = e.File;
-        if (file != null)
+        isLoading = true;
+        try
         {
-            using var stream = file.OpenReadStream();
-            using var reader = new StreamReader(stream);
-            gpxContent = await reader.ReadToEndAsync();
+            var file = e.File;
+            if (file != null)
+            {
+                using var stream = file.OpenReadStream();
+                using var reader = new StreamReader(stream);
+                gpxContent = await reader.ReadToEndAsync();
 
-            ProcessGpxData(gpxContent);
+                ProcessGpxData(gpxContent);
+            }
+
+        }
+        finally
+        {
+            isLoading = false;
         }
     }
 
@@ -98,6 +166,7 @@
 
             DateTime? startTime = null;
             DateTime? endTime = null;
+            elevationData.Clear();
 
             foreach (System.Xml.XmlNode point in trackPoints)
             {
@@ -129,6 +198,12 @@
                     {
                         maxElevation = elevation;
                     }
+
+                    elevationData.Add(new ElevationPoint
+                        {
+                            Distance = totalDistanceInMeters / 1000, // Distancia en km
+                            Elevation = elevation
+                        });
                 }
 
                 // Extraer tiempo (si está presente)
@@ -144,14 +219,14 @@
                 }
             }
 
-
             desnivel = maxElevation - minElevation;
             // Calcular la distancia total en kilómetros
             totalDistance = totalDistanceInMeters / 1000;
+            double stepDistance = totalDistance / 10;
             Console.WriteLine("Distancia total: " + totalDistance + " km");
 
             // Calcular el tiempo estimado basado en la distancia (asumiendo velocidad promedio de 5 km/h)
-            estimatedTime = totalDistance / 5;
+            estimatedTime = totalDistance / SettingsService.AppSettings.MaxSpeed;
 
             // Calcular el tiempo real si hay marcas de tiempo
             if (startTime.HasValue && endTime.HasValue)
@@ -178,5 +253,11 @@
     private void CloseDialog()
     {
         Navigation.NavigateTo("/");
+    }
+
+    public class ElevationPoint
+    {
+        public double Distance { get; set; }
+        public double Elevation { get; set; }
     }
 }

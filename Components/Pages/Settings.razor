@@ -2,47 +2,42 @@
 @inject SettingsService SettingsService
 @inject NavigationManager Navigation
 
-<RadzenCard Style="padding: 20px; max-width: 800px; margin: auto;">
-    <RadzenText TextStyle="TextStyle.H2" Style="margin-bottom: 20px;">Configuración</RadzenText>
+<RadzenStack Style="padding: 20px; max-width: 800px; margin: auto;">
+    <RadzenText TextStyle="TextStyle.H3" Style="margin-bottom: 20px;">Configuración</RadzenText>
 
-    <div class="form-group rz-mb-3">
-        <label for="maxSpeed">Velocidad máxima (m/s):</label>
-        <RadzenNumeric @bind-Value="SettingsService.AppSettings.MaxSpeed" Min="0" Max="10" Step="0.1" />
+    <label for="maxSpeed">Velocidad máxima (m/s):</label>
+    <RadzenNumeric @bind-Value="SettingsService.AppSettings.MaxSpeed" Min="0" Max="10" Step="0.1" />
+
+    <label for="minAccuracy">Precisión mínima (m):</label>
+    <RadzenNumeric @bind-Value="SettingsService.AppSettings.MinAccuracy" Min="0" Max="100" Step="1" />
+
+    <label for="timerInterval">Refresco posición (s):</label>
+    <RadzenNumeric @bind-Value="SettingsService.AppSettings.TimerInterval" Min="1" Max="60" Step="1" />
+
+    <label for="windowSize">Elementos para el promedio móvil:</label>
+    <RadzenNumeric @bind-Value="SettingsService.AppSettings.WindowSize" Min="1" Max="10" Step="1" />
+
+    <label for="kalmanEnabled">Filtro de Kalman</label>
+    <RadzenSwitch @bind-Value="SettingsService.AppSettings.KalmanFilterEnabled" />
+
+    <label for="averageFilterEnabled">Filtro de Promedio Móvil</label>
+    <RadzenSwitch @bind-Value="SettingsService.AppSettings.AverageFilterEnabled" />
+
+    <label for="distanceFilterEnabled">Filtro de Distancia</label>
+    <RadzenSwitch @bind-Value="SettingsService.AppSettings.DistanceFilterEnabled" />
+
+    <label for="distanceFilterEnabled">Localización nativa</label>
+    <RadzenSwitch @bind-Value="SettingsService.AppSettings.UseNativeGeolocation" />
+
+    <label for="distanceFilterEnabled">Mostrar datos de localización</label>
+    <RadzenSwitch @bind-Value="SettingsService.AppSettings.ShowlocalizationData" />
+
+    <div style="margin-top: 20px; display:flex; justify-content:center">
+        <RadzenButton Text="Guardar" Click="@SaveSettings" ButtonStyle="ButtonStyle.Primary" Style="margin-right:20px" />
+        <RadzenButton Text="Cerrar" Click="@Close" ButtonStyle="ButtonStyle.Secondary" />
     </div>
 
-    <div class="form-group rz-mb-3">
-        <label for="minAccuracy">Precisión mínima (m):</label>
-        <RadzenNumeric @bind-Value="SettingsService.AppSettings.MinAccuracy" Min="0" Max="100" Step="1" />
-    </div>
-
-    <div class="form-group rz-mb-3">
-        <label for="timerInterval">Refresco posición (s):</label>
-        <RadzenNumeric @bind-Value="SettingsService.AppSettings.TimerInterval" Min="1" Max="60" Step="1" />
-    </div>
-
-    <div class="form-group rz-mb-3">
-        <label for="windowSize">Tamaño de la ventana para el promedio móvil:</label>
-        <RadzenNumeric @bind-Value="SettingsService.AppSettings.WindowSize" Min="1" Max="10" Step="1" />
-    </div>
-
-    <div class="form-group rz-mb-3">
-        <label for="kalmanEnabled">Filtro de Kalman activado:</label>
-        <RadzenCheckBox @bind-Value="SettingsService.AppSettings.KalmanFilterEnabled" />
-    </div>
-
-    <div class="form-group rz-mb-3">
-        <label for="averageFilterEnabled">Filtro de Promedio Móvil activado:</label>
-        <RadzenCheckBox @bind-Value="SettingsService.AppSettings.AverageFilterEnabled" />
-    </div>
-
-    <div class="form-group rz-mb-3">
-        <label for="distanceFilterEnabled">Filtro de Distancia activado:</label>
-        <RadzenCheckBox @bind-Value="SettingsService.AppSettings.DistanceFilterEnabled" />
-    </div>
-
-    <RadzenButton Text="Guardar" Click="@SaveSettings" ButtonStyle="ButtonStyle.Primary" Style="margin-top: 20px;" />
-    <RadzenButton Text="Salir" Click="@Close" ButtonStyle="ButtonStyle.Secondary" Style="margin-top: 20px; margin-left: 10px;" />
-</RadzenCard>
+</RadzenStack>
 
 @code {
     protected override async Task OnInitializedAsync()

@@ -39,6 +39,8 @@ namespace Hiker.Services
         public bool AverageFilterEnabled { get; set; } = true;
         public bool DistanceFilterEnabled { get; set; } = true;
         public int WindowSize { get; set; } = 3;
+        public bool UseNativeGeolocation { get; set; } = false;
+        public bool ShowlocalizationData { get; set; } = false;
     }
 
 }

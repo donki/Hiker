@@ -17,11 +17,13 @@
     <span class="hamburger-icon">&#9776;</span>
 </button>
 
-<div id="coordinatesDiv" class="floating-coordinates">
-    Lat: @currentLatitude, Lon: @currentLongitude
-</div>
-
-@if (isMenuOpen)
+@if (SettingsService.AppSettings.ShowlocalizationData)
+{
+    <div id="coordinatesDiv" class="floating-coordinates">
+        Lat: @currentLatitude, Lon: @currentLongitude
+    </div>
+}
+@if (isNavMenuOpen)
 {
     <nav class="hamburger-menu flex-column">
         <div class="nav-item px-3">
@@ -151,12 +153,23 @@
 @code {
 
 
+    private bool ModoRuta = false;
+    private bool ModoGrabacion = false;
+    private List<Location> recordedLocations = new();
+    private double currentLatitude;
+    private double currentLongitude;
     private bool isNavMenuOpen = false;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await SettingsService.LoadSettingsAsync();
+    }
 
     private void ToggleNavMenu()
     {
         isNavMenuOpen = !isNavMenuOpen;
-
+        StateHasChanged();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -180,26 +193,6 @@
     }
 
 
-
-
-
-    [Parameter]
-    public bool isMenuOpen { get; set; }
-
-    [Parameter]
-    public EventCallback OnToggleMenu { get; set; }
-
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
-
-    private bool ModoRuta = false;
-    private bool ModoGrabacion = false;
-    private List<Location> recordedLocations = new();
-    private double currentLatitude;
-    private double currentLongitude;
-
-
-
     #region RECORD ROUTE
 
     private async Task RecordLocationAsync(Location location)
@@ -207,8 +200,6 @@
         if (location != null)
         {
             //location = GpsFilterService.ProcessLocation(location);
-            currentLatitude = location.Latitude;
-            currentLongitude = location.Longitude;
 
             recordedLocations.Add(location);
 
@@ -277,8 +268,7 @@
 
     private async Task ToggleRecordingMode()
     {
-        isMenuOpen = false;
-        await OnToggleMenu.InvokeAsync(null);
+        isNavMenuOpen = false;
         ModoGrabacion = !ModoGrabacion;
 
         if (ModoGrabacion)
@@ -295,6 +285,7 @@
     {
         await PromptSaveRecording();
         await JS.InvokeVoidAsync("releaseWakeLock");
+        GeoService.ListeningStopAsync();
         RouteService.isRecording = false;
     }
 
@@ -315,10 +306,13 @@
 
     public void LocationChange(Location location)
     {
-        currentLatitude = location.Latitude;
-        currentLongitude = location.Longitude;
+
         if (ModoGrabacion)
         {
+            currentLatitude = location.Latitude;
+            currentLongitude = location.Longitude;
+            StateHasChanged();
+
             RecordLocationAsync(location);
         }
         else
@@ -330,8 +324,8 @@
     #region TRACK ROUTE
     private async Task StartUpdatingPosition()
     {
-        isMenuOpen = false;
-        await OnToggleMenu.InvokeAsync(null);
+        isNavMenuOpen = false;
+
         ModoRuta = !ModoRuta;
 
         if (ModoRuta)
@@ -350,6 +344,7 @@
         else
         {
             await JS.InvokeVoidAsync("releaseWakeLock");
+            GeoService.ListeningStopAsync();
         }
     }
 
@@ -374,7 +369,7 @@
 
     private async Task TriggerFileUpload()
     {
-        isMenuOpen = false;
+        isNavMenuOpen = false;
         //await JS.InvokeVoidAsync("triggerFileInputClick");
 
     }
@@ -383,14 +378,16 @@
     {
         if (location != null)
         {
+            currentLatitude = location.Latitude;
+            currentLongitude = location.Longitude;
             if (RouteService.isRecording)
             {
-                await JS.InvokeVoidAsync("updateMapMarker", "<i class=\"bi bi-record-fill fs-6 text-danger\"></i>Grabando ...", location.Latitude, location.Longitude, location.Course);
+                await JS.InvokeVoidAsync("updateMapMarker", "<i class=\"bi bi-record-fill fs-6 text-danger\"></i>Grabando...", location.Latitude, location.Longitude, location.Course);
             }
             {
                 await JS.InvokeVoidAsync("updateMapMarker", "<i class=\"bi bi-geo-alt-fill fs-6 text-success\"></i>Estás aquí...", location.Latitude, location.Longitude, location.Course);
             }
-
+            StateHasChanged();
         }
         else
         {
@@ -407,6 +404,7 @@
         if (ModoGrabacion)
         {
             StopRecordingMode();
+            GeoService.ListeningStopAsync();
         }
 
         Navigation.NavigateTo("/settings");
@@ -418,6 +416,7 @@
         if (ModoGrabacion)
         {
             StopRecordingMode();
+            GeoService.ListeningStopAsync();
         }
 
         Navigation.NavigateTo("/about");

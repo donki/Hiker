@@ -1,11 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <style name="MainTheme" parent="Theme.Maui">
-    <!-- Personalización del tema principal -->
-  </style>
-  <style name="MainTheme.SplashTheme" parent="Theme.Maui.SplashTheme">
-    <item name="android:windowBackground">@android:color/colorPrimaryDark</item>
+  <style name="Maui.SplashTheme">
+    <item name="android:windowBackground">@color/colorPrimaryDark</item>
     <item name="android:windowSplashScreenBackground">@color/colorPrimaryDark</item>
-    <item name="android:windowLightStatusBar">true</item>
   </style>
 </resources>
