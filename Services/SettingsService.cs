@@ -8,8 +8,15 @@ namespace Hiker.Services
         public Settings AppSettings { get; private set; } = new Settings
         {
             MaxSpeed = 3.0,
+            MinAccuracy = 3.0,
             TimerInterval = 1,
-            KalmanFilterEnabled = true
+            KalmanFilterEnabled = true,
+            AverageFilterEnabled = true,
+            DistanceFilterEnabled = true,
+            WindowSize = 3,
+            UseNativeGeolocation = true,
+            ShowlocalizationData = true
+
         };
 
         public async Task LoadSettingsAsync()
@@ -33,7 +40,7 @@ namespace Hiker.Services
     public class Settings
     {
         public double MaxSpeed { get; set; } = 3.0;
-        public double MinAccuracy { get; set; } = 5.0;
+        public double MinAccuracy { get; set; } = 3.0;
         public int TimerInterval { get; set; } = 1;
         public bool KalmanFilterEnabled { get; set; } = true;
         public bool AverageFilterEnabled { get; set; } = true;

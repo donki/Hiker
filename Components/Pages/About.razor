@@ -33,7 +33,9 @@
     protected override void OnInitialized()
     {
         // Obtener la versión de la aplicación
-        var version = VersionTracking.CurrentVersion;
-        appVersion = $"{version}";
+        var assemblyVer = Assembly.GetExecutingAssembly().GetName().Version;
+        var version = assemblyVer.Major.ToString() + "." + assemblyVer.Minor.ToString() + "." + assemblyVer.Build.ToString();
+
+        appVersion = $"v.{version}";
     }
 }
