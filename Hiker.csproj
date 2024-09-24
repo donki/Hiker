@@ -40,8 +40,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <FileVersion>1.9.35</FileVersion>
-    <AssemblyVersion>1.9.35</AssemblyVersion>
+    <FileVersion>1.9.56</FileVersion>
+    <AssemblyVersion>1.9.56</AssemblyVersion>
     <Version>1.9.18</Version>
   </PropertyGroup>
 
@@ -90,10 +90,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AndroidResource Remove="Platforms\Android\Resources\values\styles.xml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="CommunityToolkit.Maui" Version="9.0.3" />
     <PackageReference Include="Geolocator.Plugin" Version="1.0.2" />
     <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.0-rc.1.24453.9" />
@@ -118,16 +114,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Platforms\Android\Resources\values\" />
     <Folder Include="wwwroot\icons\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <AndroidResource Update="Platforms\Android\Resources\values\colors.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </AndroidResource>
-    <None Update="Platforms\Android\Resources\values\styles.xml">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

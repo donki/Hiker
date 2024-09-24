@@ -8,8 +8,8 @@
     <label for="maxSpeed">Velocidad máxima (m/s):</label>
     <RadzenNumeric @bind-Value="SettingsService.AppSettings.MaxSpeed" Min="0" Max="10" Step="0.1" />
 
-    <label for="minAccuracy">Precisión mínima (m):</label>
-    <RadzenNumeric @bind-Value="SettingsService.AppSettings.MinAccuracy" Min="0" Max="100" Step="1" />
+    <!--<label for="minAccuracy">Precisión mínima (m):</label>
+    <RadzenNumeric @bind-Value="SettingsService.AppSettings.MinAccuracy" Min="0" Max="100" Step="1" />-->
 
     <label for="timerInterval">Refresco posición (s):</label>
     <RadzenNumeric @bind-Value="SettingsService.AppSettings.TimerInterval" Min="1" Max="60" Step="1" />
@@ -23,11 +23,11 @@
     <label for="averageFilterEnabled">Filtro de Promedio Móvil</label>
     <RadzenSwitch @bind-Value="SettingsService.AppSettings.AverageFilterEnabled" />
 
-    <label for="distanceFilterEnabled">Filtro de Distancia</label>
+    <!--<label for="distanceFilterEnabled">Filtro de Distancia</label>
     <RadzenSwitch @bind-Value="SettingsService.AppSettings.DistanceFilterEnabled" />
 
     <label for="distanceFilterEnabled">Localización nativa</label>
-    <RadzenSwitch @bind-Value="SettingsService.AppSettings.UseNativeGeolocation" />
+    <RadzenSwitch @bind-Value="SettingsService.AppSettings.UseNativeGeolocation" />-->
 
     <label for="distanceFilterEnabled">Mostrar datos de localización</label>
     <RadzenSwitch @bind-Value="SettingsService.AppSettings.ShowlocalizationData" />

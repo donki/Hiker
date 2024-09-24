@@ -12,7 +12,7 @@ namespace Hiker.Services
             TimerInterval = 1,
             KalmanFilterEnabled = true,
             AverageFilterEnabled = true,
-            DistanceFilterEnabled = true,
+            DistanceFilterEnabled = false,
             WindowSize = 3,
             UseNativeGeolocation = true,
             ShowlocalizationData = true
@@ -26,6 +26,8 @@ namespace Hiker.Services
             if (!string.IsNullOrEmpty(json))
             {
                 AppSettings = JsonSerializer.Deserialize<Settings>(json) ?? new Settings();
+                AppSettings.UseNativeGeolocation = true;
+                AppSettings.DistanceFilterEnabled = false;
             }
         }
 
