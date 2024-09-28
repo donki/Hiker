@@ -6,6 +6,7 @@
 @inject RouteService RouteService
 @inject SettingsService SettingsService
 
+
 <RadzenStack Style="padding: 20px; max-width: 800px; margin: auto;">
     <RadzenText TextStyle="TextStyle.H3" Style="margin-bottom: 20px;">Cargar Ruta</RadzenText>
 
@@ -15,10 +16,10 @@
     {
         <h4>Ruta: @routeName</h4>
         <p><strong>Distancia Total:</strong> @FormatingHelper.FloatToStr(totalDistance) Km</p>
-        <p><strong>Elevación Mínima:</strong> @FormatingHelper.FloatToStr(minElevation) metros</p>
-        <p><strong>Elevación Máxima:</strong> @FormatingHelper.FloatToStr(maxElevation) metros</p>
-        <p><strong>Desnivel:</strong> @FormatingHelper.FloatToStr(desnivel) metros</p>
-        <p><strong>Tiempo Estimado:</strong> @FormatingHelper.FloatToStr(estimatedTime) horas</p>
+        <p><strong>Elevación Mínima:</strong> @FormatingHelper.FloatToStr(minElevation) m</p>
+        <p><strong>Elevación Máxima:</strong> @FormatingHelper.FloatToStr(maxElevation) m</p>
+        <p><strong>Desnivel:</strong> @FormatingHelper.FloatToStr(desnivel) m</p>
+        <p><strong>Tiempo Estimado:</strong> @sEstimatedTime h</p>
 
         <RadzenChart>
             <RadzenLineSeries Smooth="true" Data="@elevationData" CategoryProperty="Distance" ValueProperty="Elevation" LineType="LineType.Solid" Title="Elevación" />
@@ -32,7 +33,7 @@
     <div style="margin-top: 20px; display:flex; justify-content:center">
         @if (!string.IsNullOrEmpty(gpxContent))
         {
-            <RadzenButton Text="Cargar Ruta" ButtonStyle="ButtonStyle.Primary" Click="LoadRouteOnMap" Style="margin-right:20px" />
+            <RadzenButton Text="Al mapa" ButtonStyle="ButtonStyle.Primary" Click="LoadRouteOnMap" Style="margin-right:20px" />
         }
         <RadzenButton Text="Cerrar" ButtonStyle="ButtonStyle.Secondary" Click="CloseDialog" />
     </div>
@@ -88,16 +89,15 @@
 
 @code {
     private string routeName = "Ruta sin nombre";
+    private bool isLoading = false;
     private double totalDistance;
     private double minElevation;
     private double maxElevation;
-    private double stepDistance = 1;
+    private double stepDistance = 20;
     private double desnivel;
-    private double estimatedTime; // Tiempo estimado en horas para recorrer la ruta
-    private string gpxContent;
-    private bool isLoading = false;
+    private string sEstimatedTime; // Tiempo estimado en horas para recorrer la ruta
     private List<ElevationPoint> elevationData = new List<ElevationPoint>();
-
+    private string gpxContent = null;
     private async Task OpenFileDialog()
     {
         await JS.InvokeVoidAsync("triggerFileInputClick");
@@ -115,137 +115,28 @@
                 using var reader = new StreamReader(stream);
                 gpxContent = await reader.ReadToEndAsync();
 
-                ProcessGpxData(gpxContent);
+                var routeData = await RouteService.SetRoute(gpxContent);
+                totalDistance = routeData.totalDistance;
+                minElevation = routeData.minElevation;
+                maxElevation = routeData.maxElevation;
+                stepDistance = routeData.stepDistance == 0 ? 1 : routeData.stepDistance;
+                desnivel = routeData.desnivel;
+                elevationData = routeData.elevationData;
+                routeName = routeData.routeName;
+                sEstimatedTime = routeData.estimatedTime.Hours + ":" + routeData.estimatedTime.Minutes;
             }
 
         }
         finally
         {
             isLoading = false;
+            StateHasChanged();
         }
     }
 
-    private void ProcessGpxData(string gpxContent)
-    {
-        if (string.IsNullOrEmpty(gpxContent))
-        {
-            Console.WriteLine("El contenido del archivo GPX está vacío.");
-            return;
-        }
-
-        try
-        {
-
-            // Parsear el archivo GPX con soporte para namespaces
-            var xmlDocument = new System.Xml.XmlDocument();
-            xmlDocument.LoadXml(gpxContent);
-
-            // Definir el espacio de nombres (namespace) utilizado en el archivo GPX
-            var namespaceManager = new System.Xml.XmlNamespaceManager(xmlDocument.NameTable);
-            namespaceManager.AddNamespace("default", "http://www.topografix.com/GPX/1/1");
-
-            // Extraer el nombre de la ruta (si está disponible)
-            var nameNode = xmlDocument.SelectSingleNode("//default:gpx/default:trk/default:name", namespaceManager);
-            routeName = nameNode?.InnerText ?? "Ruta sin nombre";
-            Console.WriteLine("Nombre de la ruta: " + routeName);
-
-            // Extraer los puntos de la ruta (trkpt)
-            var trackPoints = xmlDocument.SelectNodes("//default:gpx/default:trk/default:trkseg/default:trkpt", namespaceManager);
-
-            if (trackPoints == null || trackPoints.Count < 2)
-            {
-                Console.WriteLine("No se encontraron suficientes puntos en la ruta.");
-                return; // No se puede calcular la ruta si no hay al menos dos puntos
-            }
-
-            double totalDistanceInMeters = 0;
-            double? prevLatitude = null;
-            double? prevLongitude = null;
-            minElevation = double.MaxValue;
-            maxElevation = double.MinValue;
-
-            DateTime? startTime = null;
-            DateTime? endTime = null;
-            elevationData.Clear();
-
-            foreach (System.Xml.XmlNode point in trackPoints)
-            {
-                double lat = double.Parse(point.Attributes["lat"].Value);
-                double lon = double.Parse(point.Attributes["lon"].Value);
-                long timestamp = DateTime.Parse(point.SelectSingleNode("default:time", namespaceManager)?.InnerText ?? DateTime.UtcNow.ToString())
-                 .ToUniversalTime().Ticks / TimeSpan.TicksPerMillisecond;
-
-                // Calcular distancia entre puntos consecutivos
-                if (prevLatitude.HasValue && prevLongitude.HasValue)
-                {
-                    double distance = Location.CalculateDistance(prevLatitude.Value, prevLongitude.Value, lat, lon, DistanceUnits.Kilometers);
-                    totalDistanceInMeters += distance * 1000; // Convertir a metros
-                }
-
-                prevLatitude = lat;
-                prevLongitude = lon;
-
-                // Extraer elevación
-                var eleNode = point.SelectSingleNode("default:ele", namespaceManager);
-                if (eleNode != null)
-                {
-                    double elevation = double.Parse(eleNode.InnerText);
-                    if (elevation < minElevation)
-                    {
-                        minElevation = elevation;
-                    }
-                    if (elevation > maxElevation)
-                    {
-                        maxElevation = elevation;
-                    }
-
-                    elevationData.Add(new ElevationPoint
-                        {
-                            Distance = totalDistanceInMeters / 1000, // Distancia en km
-                            Elevation = elevation
-                        });
-                }
-
-                // Extraer tiempo (si está presente)
-                var timeNode = point.SelectSingleNode("default:time", namespaceManager);
-                if (timeNode != null)
-                {
-                    var time = DateTime.Parse(timeNode.InnerText);
-                    if (startTime == null)
-                    {
-                        startTime = time;
-                    }
-                    endTime = time;
-                }
-            }
-
-            desnivel = maxElevation - minElevation;
-            // Calcular la distancia total en kilómetros
-            totalDistance = totalDistanceInMeters / 1000;
-            double stepDistance = totalDistance / 10;
-            Console.WriteLine("Distancia total: " + totalDistance + " km");
-
-            // Calcular el tiempo estimado basado en la distancia (asumiendo velocidad promedio de 5 km/h)
-            estimatedTime = totalDistance / SettingsService.AppSettings.MaxSpeed;
-
-            // Calcular el tiempo real si hay marcas de tiempo
-            if (startTime.HasValue && endTime.HasValue)
-            {
-                TimeSpan timeSpan = endTime.Value - startTime.Value;
-                estimatedTime = timeSpan.TotalHours;
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error al procesar el archivo GPX: {ex.Message}");
-        }
-    }
 
     private void LoadRouteOnMap()
     {
-        // Almacena el contenido GPX en el servicio compartido
-        RouteService.SetRoute(gpxContent);
-
         // Redirige al componente Home para cargar la ruta en el mapa
         Navigation.NavigateTo("/");
     }
@@ -255,9 +146,5 @@
         Navigation.NavigateTo("/");
     }
 
-    public class ElevationPoint
-    {
-        public double Distance { get; set; }
-        public double Elevation { get; set; }
-    }
+
 }

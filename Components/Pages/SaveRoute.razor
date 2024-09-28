@@ -1,0 +1,88 @@
+﻿@page "/saveroute"
+@inject IJSRuntime JS
+@inject IFileSaver FileSaver
+@inject IDialogService DialogService
+@inject NavigationManager Navigation
+@inject RouteService RouteService
+@inject SettingsService SettingsService
+@inject IFileSaver FileSaver
+
+
+<RadzenStack Style="padding: 20px; max-width: 800px; margin: auto;">
+    <RadzenText TextStyle="TextStyle.H3" Style="margin-bottom: 20px;">Guardar Ruta</RadzenText>
+
+
+    <h4>Ruta</h4>
+    <RadzenTextBox @bind-Value="routeName" Placeholder="Nombre de la ruta" Style="width: 100%;" />
+    <p><strong>Distancia Total:</strong> @FormatingHelper.FloatToStr(totalDistance) Km</p>
+    <p><strong>Elevación Mínima:</strong> @FormatingHelper.FloatToStr(minElevation) m</p>
+    <p><strong>Elevación Máxima:</strong> @FormatingHelper.FloatToStr(maxElevation) m</p>
+    <p><strong>Desnivel:</strong> @FormatingHelper.FloatToStr(desnivel) m</p>
+    <p><strong>Tiempo Estimado:</strong> @sEstimatedTime h</p>
+
+    <RadzenChart>
+        <RadzenLineSeries Smooth="true" Data="@elevationData" CategoryProperty="Distance" ValueProperty="Elevation" LineType="LineType.Solid" Title="Elevación" />
+        <RadzenLegend Position="LegendPosition.Top" />
+        <RadzenCategoryAxis Min="0" Max="@totalDistance" Step="@stepDistance" />
+    </RadzenChart>
+
+
+    <div style="margin-top: 20px; display:flex; justify-content:center">
+
+        <RadzenButton Text="Guardar" ButtonStyle="ButtonStyle.Primary" Click="Save" Style="margin-right:20px" />
+
+        <RadzenButton Text="Cerrar" ButtonStyle="ButtonStyle.Secondary" Click="Close" />
+    </div>
+
+</RadzenStack>
+
+@if (isLoading)
+{
+    <div class="overlay">
+        <div class="spinner-container">
+            <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Primary" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+            <p>Por favor, espera...</p>
+        </div>
+    </div>
+}
+
+
+
+@code {
+    private bool isLoading = false;
+    private double totalDistance;
+    private double minElevation;
+    private double maxElevation;
+    private double stepDistance = 20;
+    private double desnivel;
+    private string sEstimatedTime; // Tiempo estimado en horas para recorrer la ruta
+    private List<ElevationPoint> elevationData = new List<ElevationPoint>();
+    private string routeName;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var routeData = await RouteService.GetRouteData();
+        totalDistance = routeData.totalDistance;
+        minElevation = routeData.minElevation;
+        maxElevation = routeData.maxElevation;
+        stepDistance = routeData.stepDistance == 0 ? 1 : routeData.stepDistance;
+        desnivel = routeData.desnivel;
+        elevationData = routeData.elevationData;
+        routeName = "Ruta " + DateTime.Now.ToString("ddMMyyyyHHmm");
+        sEstimatedTime = routeData.estimatedTime.Hours + ":" + routeData.estimatedTime.Minutes;
+    }
+
+    private async Task Save()
+    {
+        var mmRoute = await RouteService.SaveTrack(routeName);
+        await FileSaver.SaveAsync(routeName, mmRoute);
+        Navigation.NavigateTo("/");
+    }
+
+    private async Task Close()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+
+}

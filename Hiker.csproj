@@ -40,8 +40,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <FileVersion>1.9.56</FileVersion>
-    <AssemblyVersion>1.9.56</AssemblyVersion>
+    <FileVersion>1.9.148</FileVersion>
+    <AssemblyVersion>1.9.148</AssemblyVersion>
     <Version>1.9.18</Version>
   </PropertyGroup>
 
@@ -90,6 +90,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="BlueToque.SharpGPX" Version="2.22.302" />
     <PackageReference Include="CommunityToolkit.Maui" Version="9.0.3" />
     <PackageReference Include="Geolocator.Plugin" Version="1.0.2" />
     <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.0-rc.1.24453.9" />

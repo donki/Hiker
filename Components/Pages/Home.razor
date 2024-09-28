@@ -3,7 +3,6 @@
 @inject GeolocationService GeoService
 @inject RouteService RouteService
 @inject SettingsService SettingsService
-@inject IFileSaver FileSaver
 @inject IDialogService DialogService
 @inject NavigationManager Navigation
 @inject RouteService RouteService;
@@ -96,6 +95,58 @@
 
 <style>
 
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .dialog-container {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        width: 300px;
+    }
+
+    .route-input {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+        font-size: 16px;
+    }
+
+    .dialog-buttons {
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .btn-save, .btn-cancel {
+        padding: 10px 20px;
+        cursor: pointer;
+    }
+
+    .btn-save {
+        background-color: #28a745;
+        color: white;
+        border: none;
+    }
+
+    .btn-cancel {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+    }
+
     .floating-coordinates {
         position: fixed;
         top: 10px;
@@ -151,13 +202,27 @@
 
 
 @code {
+    private bool showRouteNameDialog = false;
     private bool ModoRuta = false;
     private bool ModoGrabacion = false;
     private List<Location> recordedLocations = new();
     private double currentLatitude;
     private double currentLongitude;
     private bool isNavMenuOpen = false;
+    private string DefaultRouteName = "Ruta " + DateTime.Now.ToString("ddMMyyyyHHmm");
 
+
+    private async Task PromptSaveRecording()
+    {
+        // Preguntar al usuario si quiere guardar la grabación
+        var save = await DialogService.ShowConfirmationDialog("Confirmación", "¿Desea guardar la ruta grabada?");
+        if (save)
+        {
+            await RouteService.SetLocations(recordedLocations);
+            Navigation.NavigateTo("/saveroute");
+            recordedLocations.Clear();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -217,53 +282,6 @@
         }
     }
 
-    private async Task PromptSaveRecording()
-    {
-        // Preguntar al usuario si quiere guardar la grabación
-        var save = await DialogService.ShowConfirmationDialog("Confirmación", "¿Desea guardar la ruta grabada?");
-        if (save)
-        {
-            var mgpx = await SaveRecordingAsGpx();
-            var result = await FileSaver.SaveAsync("ruta.gpx", mgpx);
-
-        }
-        recordedLocations.Clear();
-    }
-
-    private async Task<MemoryStream> SaveRecordingAsGpx()
-    {
-        var gpxData = GenerateGpxContent(recordedLocations);
-
-        return new MemoryStream(Encoding.Default.GetBytes(gpxData));
-
-    }
-
-    private string GenerateGpxContent(List<Location> locations)
-    {
-        var sb = new StringBuilder();
-        sb.AppendLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        sb.AppendLine("<gpx version=\"1.1\" creator=\"HikerApp\">");
-        sb.AppendLine("<trk>");
-        sb.AppendLine("<trkseg>");
-        foreach (var loc in locations)
-        {
-            sb.AppendLine($"<trkpt lat=\"{loc.Latitude.ToString().Replace(",", ".")}\" lon=\"{loc.Longitude.ToString().Replace(",", ".")}\">");
-
-            if (loc.Altitude.HasValue)
-            {
-                sb.AppendLine($"<ele>{loc.Altitude.Value.ToString("F2").Replace(",", ".")}</ele>");
-            }
-
-            sb.AppendLine($"<time>{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ssZ}</time>");
-            sb.AppendLine("</trkpt>");
-        }
-        sb.AppendLine("</trkseg>");
-        sb.AppendLine("</trk>");
-        sb.AppendLine("</gpx>");
-        return sb.ToString();
-    }
-
-
     private async Task ToggleRecordingMode()
     {
         isNavMenuOpen = false;
@@ -309,7 +327,6 @@
         {
             currentLatitude = location.Latitude;
             currentLongitude = location.Longitude;
-            StateHasChanged();
 
             RecordLocationAsync(location);
         }
