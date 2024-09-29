@@ -1,6 +1,6 @@
 using Hiker.Data;
-using SharpGPX;
-using SharpGPX.GPX1_1;
+using Hiker.Helpers;
+using System.Text;
 
 namespace Hiker.Services
 {
@@ -45,44 +45,57 @@ namespace Hiker.Services
 
         public async Task<RouteData> GetRouteData()
         {
-            return await ProcessGpxData(await SaveTrack(""));
+            return await ProcessData(await GetGPXFileHelper());
         }
 
         public async Task<MemoryStream> SaveTrack(string routeName)
         {
 
-            return await SaveTrack(this.locations, routeName);
+            var tmp = await SaveTrack(this.locations, routeName);
+
+
+            return new MemoryStream(Encoding.UTF8.GetBytes(tmp));
+
         }
 
-        public async Task<MemoryStream> SaveTrack(List<Location> locations, string routeName)
+        public async Task<string> SaveTrack(List<Location> locations, string routeName)
         {
             var defaultRouteName = routeName;
 
+            GPXFileHelper gpxFile = CreateGPXFileHelper(locations, defaultRouteName);
 
-            var gpxFile = new SharpGPX.GpxClass(GpxVersion.GPX_1_1);
+            return gpxFile.ToXML();
+
+        }
+
+        public async Task<GPXFileHelper> GetGPXFileHelper()
+        {
+
+            return CreateGPXFileHelper(this.locations, "");
+
+
+        }
+
+        private static GPXFileHelper CreateGPXFileHelper(List<Location> locations, string defaultRouteName)
+        {
+            var gpxFile = new GPXFileHelper();
             gpxFile.Creator = "Hiker";
 
-            var track = new trkType();
-            track.name = defaultRouteName;
+            var track = new Track();
+            track.Name = defaultRouteName;
 
-            gpxFile.AddTrack(track);
+            gpxFile.Tracks.Add(track);
 
-            var segments = new trksegType();
-            track.trkseg.Add(segments);
+            var segments = new TrackSegment();
+            track.Segments.Add(segments);
 
             foreach (var location in locations)
             {
-                var trackpoint = new wptType(location.Latitude, location.Longitude, location.Altitude, location.Timestamp.DateTime);
-                segments.trkpt.Add(trackpoint);
+                var trackpoint = new TrackPoint(location.Latitude, location.Longitude, location.Altitude, location.Timestamp.DateTime);
+                segments.TrackPoints.Add(trackpoint);
             }
 
-            var memoryStream = new MemoryStream();
-
-            gpxFile.ToStream(memoryStream);
-
-            memoryStream.Position = 0;
-
-            return memoryStream;
+            return gpxFile;
         }
 
         private async Task<RouteData?> ProcessGpxData(MemoryStream gpxContent)
@@ -91,7 +104,7 @@ namespace Hiker.Services
             {
 
 
-                var gpxFile = SharpGPX.GpxClass.FromStream(gpxContent);
+                var gpxFile = GPXFileHelper.FromStream(gpxContent);
                 return await ProcessData(gpxFile);
 
             }
@@ -109,7 +122,7 @@ namespace Hiker.Services
             {
 
 
-                var gpxFile = SharpGPX.GpxClass.FromXml(gpxContent);
+                var gpxFile = GPXFileHelper.FromXML(gpxContent);
                 return await ProcessData(gpxFile);
 
             }
@@ -121,19 +134,19 @@ namespace Hiker.Services
 
         }
 
-        private async Task<RouteData> ProcessData(GpxClass gpxFile)
+        private async Task<RouteData> ProcessData(GPXFileHelper gpxFile)
         {
             var track = gpxFile.Tracks.FirstOrDefault();
 
             if (track != null)
             {
-                Console.WriteLine($"Nombre de la ruta: {track.name}");
-                Console.WriteLine($"Número de segmentos: {track.trkseg.Count}");
+                Console.WriteLine($"Nombre de la ruta: {track.Name}");
+                Console.WriteLine($"Número de segmentos: {track.Segments.Count}");
 
 
             }
 
-            routeName = track.name;
+            routeName = track.Name;
 
             double totalDistanceInMeters = 0;
             double? prevLatitude = null;
@@ -144,13 +157,13 @@ namespace Hiker.Services
             DateTime? startTime = null;
             DateTime? endTime = null;
             elevationData.Clear();
-            foreach (var segment in track.trkseg)
+            foreach (var segment in track.Segments)
             {
-                foreach (var point in segment.trkpt)
+                foreach (var point in segment.TrackPoints)
                 {
-                    var lat = (double)point.lat;
-                    var lon = (double)point.lon;
-                    DateTime timestamp = point.time;
+                    var lat = (double)point.Latitude;
+                    var lon = (double)point.Longitude;
+                    DateTime timestamp = point.Time;
 
 
                     if (prevLatitude.HasValue && prevLongitude.HasValue)
@@ -163,7 +176,7 @@ namespace Hiker.Services
                     prevLongitude = lon;
 
 
-                    var elevation = (double)point.ele;
+                    var elevation = (double)point.Elevation;
                     if (elevation < minElevation)
                     {
                         minElevation = elevation;
@@ -181,7 +194,7 @@ namespace Hiker.Services
 
 
 
-                    var time = point.time;
+                    var time = point.Time;
                     if (startTime == null)
                     {
                         startTime = time;

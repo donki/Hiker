@@ -5,24 +5,24 @@
 @inject NavigationManager Navigation
 @inject RouteService RouteService
 @inject SettingsService SettingsService
-
+@inject TranslationService TranslationService
 
 <RadzenStack Style="padding: 20px; max-width: 800px; margin: auto;">
-    <RadzenText TextStyle="TextStyle.H3" Style="margin-bottom: 20px;">Cargar Ruta</RadzenText>
+    <RadzenText TextStyle="TextStyle.H3" Style="margin-bottom: 20px;">@TranslationService.Translate("Cargar Ruta")</RadzenText>
 
-    <RadzenButton Text="Cargar Ruta" ButtonStyle="ButtonStyle.Primary" Click="@OpenFileDialog" />
+    <RadzenButton Text=@TranslationService.Translate("Cargar Ruta") ButtonStyle="ButtonStyle.Primary" Click="@OpenFileDialog" />
 
     @if (!string.IsNullOrEmpty(gpxContent))
     {
-        <h4>Ruta: @routeName</h4>
-        <p><strong>Distancia Total:</strong> @FormatingHelper.FloatToStr(totalDistance) Km</p>
-        <p><strong>Elevación Mínima:</strong> @FormatingHelper.FloatToStr(minElevation) m</p>
-        <p><strong>Elevación Máxima:</strong> @FormatingHelper.FloatToStr(maxElevation) m</p>
-        <p><strong>Desnivel:</strong> @FormatingHelper.FloatToStr(desnivel) m</p>
-        <p><strong>Tiempo Estimado:</strong> @sEstimatedTime h</p>
+        <h4>@TranslationService.Translate("Ruta"): @routeName</h4>
+        <p><strong>@TranslationService.Translate("Distancia Total"):</strong> @FormatingHelper.FloatToStr(totalDistance) Km</p>
+        <p><strong>@TranslationService.Translate("Elevación Mínima"):</strong> @FormatingHelper.FloatToStr(minElevation) m</p>
+        <p><strong>@TranslationService.Translate("Elevación Máxima"):</strong> @FormatingHelper.FloatToStr(maxElevation) m</p>
+        <p><strong>@TranslationService.Translate("Desnivel"):</strong> @FormatingHelper.FloatToStr(desnivel) m</p>
+        <p><strong>@TranslationService.Translate("Tiempo Estimado"):</strong> @sEstimatedTime h</p>
 
         <RadzenChart>
-            <RadzenLineSeries Smooth="true" Data="@elevationData" CategoryProperty="Distance" ValueProperty="Elevation" LineType="LineType.Solid" Title="Elevación" />
+            <RadzenLineSeries Smooth="true" Data="@elevationData" CategoryProperty="Distance" ValueProperty="Elevation" LineType="LineType.Solid" Title="@TranslationService.Translate("Elevación")" />
             <RadzenLegend Position="LegendPosition.Top" />
             <RadzenCategoryAxis Min="0" Max="@totalDistance" Step="@stepDistance" />
         </RadzenChart>
@@ -33,9 +33,9 @@
     <div style="margin-top: 20px; display:flex; justify-content:center">
         @if (!string.IsNullOrEmpty(gpxContent))
         {
-            <RadzenButton Text="Al mapa" ButtonStyle="ButtonStyle.Primary" Click="LoadRouteOnMap" Style="margin-right:20px" />
+            <RadzenButton Text="@TranslationService.Translate("Al mapa")" ButtonStyle="ButtonStyle.Primary" Click="LoadRouteOnMap" Style="margin-right:20px" />
         }
-        <RadzenButton Text="Cerrar" ButtonStyle="ButtonStyle.Secondary" Click="CloseDialog" />
+        <RadzenButton Text="@TranslationService.Translate("Cerrar")" ButtonStyle="ButtonStyle.Secondary" Click="CloseDialog" />
     </div>
 
 </RadzenStack>
@@ -45,7 +45,7 @@
     <div class="overlay">
         <div class="spinner-container">
             <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Primary" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
-            <p>Por favor, espera...</p>
+            <p>@TranslationService.Translate("Por favor, espera...")</p>
         </div>
     </div>
 }

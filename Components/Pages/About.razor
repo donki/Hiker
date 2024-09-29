@@ -1,30 +1,45 @@
 @page "/about"
 @inject NavigationManager Navigation
+@inject TranslationService TranslationService
 
 <RadzenStack Style="padding: 20px; max-width: 800px; margin: auto;">
     <RadzenText TextStyle="TextStyle.H3" Style="margin-bottom: 20px;"> Hiker @appVersion</RadzenText>
-    <RadzenText TextStyle="TextStyle.H4" Style="margin-bottom: 10px;" Text="Acerca de esta aplicación" />
-    <RadzenText TextStyle="TextStyle.H6" Style="margin-bottom: 20px;" Text="Esta aplicación ha sido desarrollada por Organic Coating para ayudar a los usuarios a rastrear y mapear sus rutas." />
 
-    <RadzenText TextStyle="TextStyle.H3" Style="margin-bottom: 10px;" Text="Créditos" />
+    <RadzenText TextStyle="TextStyle.H4" Style="margin-bottom: 10px;" Text="@TranslationService.Translate("Acerca de esta aplicación")" />
+
+    <RadzenText TextStyle="TextStyle.H6" Style="margin-bottom: 20px;" Text="@TranslationService.Translate("Esta aplicación ha sido desarrollada por Organic Coating para ayudar a los usuarios a rastrear y mapear sus rutas.")" />
+
+    <RadzenText TextStyle="TextStyle.H3" Style="margin-bottom: 10px;" Text="@TranslationService.Translate("Créditos")" />
+
     <RadzenText TextStyle="TextStyle.H6" Style="margin-bottom: 10px;">
-        <RadzenLink href="https://smashicons.com/" Target="_blank">Smashicons</RadzenLink> se utilizan bajo sus términos de licencia. Estos iconos proporcionan un aspecto moderno y elegante a la interfaz de usuario de la aplicación.
+        <RadzenLink href="https://smashicons.com/" Target="_blank">Smashicons</RadzenLink> @TranslationService.Translate("se utilizan bajo sus términos de licencia. Estos iconos proporcionan un aspecto moderno y elegante a la interfaz de usuario de la aplicación.")
     </RadzenText>
+
     <RadzenText TextStyle="TextStyle.H6" Style="margin-bottom: 10px;">
-        Iconos de <RadzenLink href="https://www.flaticon.com/authors/muhammad-usman" Target="_blank">Muhammad Usman</RadzenLink> y de
-        <RadzenLink href="https://www.flaticon.es/autores/hexagon075" Target="_blank">Hexagon75</RadzenLink> también se utilizan en esta aplicación, mejorando su usabilidad y diseño visual.
+        @TranslationService.Translate("Iconos de")
+        <RadzenLink href="https://www.flaticon.com/authors/muhammad-usman" Target="_blank">Muhammad Usman</RadzenLink> @TranslationService.Translate("y de")
+        <RadzenLink href="https://www.flaticon.es/autores/hexagon075" Target="_blank">Hexagon75</RadzenLink> @TranslationService.Translate("también se utilizan en esta aplicación, mejorando su usabilidad y diseño visual.")
     </RadzenText>
+
     <RadzenText TextStyle="TextStyle.H6" Style="margin-bottom: 10px;">
-        Esta aplicación utiliza datos de mapas proporcionados por <RadzenLink href="https://www.openstreetmap.org/copyright" Target="_blank">OpenStreetMap</RadzenLink>, una fuente libre y abierta de datos de mapas que es mantenida por una comunidad global de colaboradores.
+        @TranslationService.Translate("Esta aplicación utiliza datos de mapas proporcionados por")
+        <RadzenLink href="https://www.openstreetmap.org/copyright" Target="_blank">OpenStreetMap</RadzenLink>, @TranslationService.Translate("una fuente libre y abierta de datos de mapas que es mantenida por una comunidad global de colaboradores.")
     </RadzenText>
+
     <RadzenText TextStyle="TextStyle.H6" Style="margin-bottom: 10px;">
-        La visualización de los mapas y rutas en esta aplicación se realiza mediante <RadzenLink href="https://leafletjs.com/" Target="_blank">Leaflet</RadzenLink>, una biblioteca JavaScript de código abierto que ofrece funcionalidades de mapas interactivas y altamente personalizables.
+        @TranslationService.Translate("La visualización de los mapas y rutas en esta aplicación se realiza mediante")
+        <RadzenLink href="https://leafletjs.com/" Target="_blank">Leaflet</RadzenLink>, @TranslationService.Translate("una biblioteca JavaScript de código abierto que ofrece funcionalidades de mapas interactivas y altamente personalizables.")
     </RadzenText>
+
+    <RadzenText TextStyle="TextStyle.H6" Style="margin-bottom: 20px;">
+        @TranslationService.Translate("Agradecimientos a Michael Coyle por su librería BlueToque.SharpGPX para la lectura y escritura de archivos GPX.")
+        <RadzenLink href="https://github.com/MichaelFCoyle/SharpGPX" Target="_blank">SharpGPX</RadzenLink>
+    </RadzenText>
+
     <div style="margin-top: 20px; display:flex; justify-content:center">
-        <RadzenButton Text="Volver a Inicio" ButtonStyle="ButtonStyle.Primary"
+        <RadzenButton Text="@TranslationService.Translate("Volver a Inicio")" ButtonStyle="ButtonStyle.Primary"
                       Click="@(() => Navigation.NavigateTo("/"))" />
     </div>
-
 </RadzenStack>
 
 @code {
