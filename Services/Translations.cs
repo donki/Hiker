@@ -254,17 +254,57 @@
                     { "es", "Guardar" },
                     { "en", "Save" }
                 }
-            }
+            },    { "Idioma del sistema", new Dictionary<string, string>
+        {
+            { "es", "Idioma del sistema" },
+            { "en", "System Language" }
+        }
+    },
+    { "Velocidad máxima (m/s)", new Dictionary<string, string>
+        {
+            { "es", "Velocidad máxima (m/s)" },
+            { "en", "Max Speed (m/s)" }
+        }
+    },
+    { "Refresco posición (s)", new Dictionary<string, string>
+        {
+            { "es", "Refresco posición (s)" },
+            { "en", "Position Refresh (s)" }
+        }
+    },
+    { "Elementos para el promedio móvil", new Dictionary<string, string>
+        {
+            { "es", "Elementos para el promedio móvil" },
+            { "en", "Items for Moving Average" }
+        }
+    },
+    { "Filtro de Kalman", new Dictionary<string, string>
+        {
+            { "es", "Filtro de Kalman" },
+            { "en", "Kalman Filter" }
+        }
+    },
+    { "Filtro de Promedio Móvil", new Dictionary<string, string>
+        {
+            { "es", "Filtro de Promedio Móvil" },
+            { "en", "Moving Average Filter" }
+        }
+    },
+    { "Mostrar datos de localización", new Dictionary<string, string>
+        {
+            { "es", "Mostrar datos de localización" },
+            { "en", "Show Localization Data" }
+        }
+    }
         };
 
 
-        public static string Translate(string nativePhrase)
+        public static string Translate(string nativePhrase, string currentLanguage)
         {
-            string systemLanguage = "en";// CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
 
-            if (TranslationDict.ContainsKey(nativePhrase) && TranslationDict[nativePhrase].ContainsKey(systemLanguage))
+            if (TranslationDict.ContainsKey(nativePhrase) && TranslationDict[nativePhrase].ContainsKey(currentLanguage))
             {
-                return TranslationDict[nativePhrase][systemLanguage];
+                return TranslationDict[nativePhrase][currentLanguage];
             }
 
             return nativePhrase + "...wo Translation";

@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Globalization;
+using System.Text.Json;
 
 namespace Hiker.Services
 {
@@ -15,8 +16,8 @@ namespace Hiker.Services
             DistanceFilterEnabled = false,
             WindowSize = 3,
             UseNativeGeolocation = true,
-            ShowlocalizationData = true
-
+            ShowlocalizationData = true,
+            Language = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName
         };
 
         public async Task LoadSettingsAsync()
@@ -25,16 +26,16 @@ namespace Hiker.Services
 
             if (!string.IsNullOrEmpty(json))
             {
-                AppSettings = JsonSerializer.Deserialize<Settings>(json) ?? new Settings();
-                AppSettings.UseNativeGeolocation = true;
-                AppSettings.DistanceFilterEnabled = false;
+                AppSettings = JsonSerializer.Deserialize<Settings>(json) ?? new Settings
+                {
+                    Language = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName
+                };
             }
         }
 
         public async Task SaveSettingsAsync()
         {
             var json = JsonSerializer.Serialize(AppSettings);
-
             Preferences.Set(SettingsKey, json);
         }
     }
@@ -50,6 +51,7 @@ namespace Hiker.Services
         public int WindowSize { get; set; } = 3;
         public bool UseNativeGeolocation { get; set; } = false;
         public bool ShowlocalizationData { get; set; } = false;
-    }
 
+        public string Language { get; set; } = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    }
 }
