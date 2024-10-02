@@ -20,7 +20,7 @@
 @if (SettingsService.AppSettings.ShowlocalizationData)
 {
     <div id="coordinatesDiv" class="floating-coordinates">
-        @TranslationService.Translate("Lat:") @currentLatitude, @TranslationService.Translate("Lon:") @currentLongitude
+        @TranslationService.Translate("Lat:") @currentLatitude, @TranslationService.Translate("Lon:") @currentLongitude , @TranslationService.Translate("Points:") @recordedLocations.Count
     </div>
 }
 @if (isNavMenuOpen)

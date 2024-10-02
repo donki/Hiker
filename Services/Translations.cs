@@ -295,6 +295,12 @@
             { "es", "Mostrar datos de localización" },
             { "en", "Show Localization Data" }
         }
+    },
+    { "Points:", new Dictionary<string, string>
+        {
+            { "es", "Puntos:" },
+            { "en", "Points:" }
+        }
     }
         };
 

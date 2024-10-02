@@ -206,7 +206,7 @@ namespace Hiker.Services
 
             desnivel = maxElevation - minElevation;
             totalDistance = totalDistanceInMeters / 1000;
-            double stepDistance = totalDistance / 10;
+            double stepDistance = (int)(totalDistance / 10);
             Console.WriteLine("Distancia total: " + totalDistance + " km");
 
 
