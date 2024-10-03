@@ -20,7 +20,8 @@
 @if (SettingsService.AppSettings.ShowlocalizationData)
 {
     <div id="coordinatesDiv" class="floating-coordinates">
-        @TranslationService.Translate("Lat:") @currentLatitude, @TranslationService.Translate("Lon:") @currentLongitude , @TranslationService.Translate("Points:") @recordedLocations.Count
+        @TranslationService.Translate("Lat:") @currentLatitude, @TranslationService.Translate("Lon:") @currentLongitude ,
+        @TranslationService.Translate("Accu:") @accuracy
     </div>
 }
 @if (isNavMenuOpen)
@@ -208,6 +209,7 @@
     private List<Location> recordedLocations = new();
     private double currentLatitude;
     private double currentLongitude;
+    private double accuracy;
     private bool isNavMenuOpen = false;
     private string DefaultRouteName = "R. " + DateTime.Now.ToString("ddMMyyyyHHmm");
 
@@ -265,7 +267,7 @@
 
             recordedLocations.Add(location);
 
-            await JS.InvokeVoidAsync("updateMapMarker", "<i class=\"bi bi-record-fill fs-6 text-danger\"></i>" + TranslationService.Translate("Grabando..."), location.Latitude, location.Longitude, location.Course);
+            await JS.InvokeVoidAsync("updateMapMarker", "<i class=\"bi bi-record-fill fs-6 text-danger\"></i>" + TranslationService.Translate("Grabando..."), location.Latitude, location.Longitude, location.Accuracy);
             await DrawRecordingRouteAsync();
         }
     }
@@ -326,6 +328,7 @@
         {
             currentLatitude = location.Latitude;
             currentLongitude = location.Longitude;
+            accuracy = (int)location.Accuracy.Value;
 
             RecordLocationAsync(location);
         }
@@ -394,14 +397,14 @@
         {
             currentLatitude = location.Latitude;
             currentLongitude = location.Longitude;
+            accuracy = (int)location.Accuracy.Value;
             if (RouteService.isRecording)
             {
-                await JS.InvokeVoidAsync("updateMapMarker", "<i class=\"bi bi-record-fill fs-6 text-danger\"></i>" + TranslationService.Translate("Grabando..."), location.Latitude, location.Longitude, location.Course);
+                await JS.InvokeVoidAsync("updateMapMarker", "<i class=\"bi bi-record-fill fs-6 text-danger\"></i>" + TranslationService.Translate("Grabando..."), location.Latitude, location.Longitude, location.Accuracy);
             }
             {
-                await JS.InvokeVoidAsync("updateMapMarker", "<i class=\"bi bi-geo-alt-fill fs-6 text-success\"></i>" + TranslationService.Translate("Estás aquí..."), location.Latitude, location.Longitude, location.Course);
+                await JS.InvokeVoidAsync("updateMapMarker", "<i class=\"bi bi-geo-alt-fill fs-6 text-success\"></i>" + TranslationService.Translate("Estás aquí..."), location.Latitude, location.Longitude, location.Accuracy);
             }
-            StateHasChanged();
         }
         else
         {

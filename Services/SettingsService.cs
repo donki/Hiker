@@ -49,7 +49,7 @@ namespace Hiker.Services
         public bool AverageFilterEnabled { get; set; } = true;
         public bool DistanceFilterEnabled { get; set; } = true;
         public int WindowSize { get; set; } = 3;
-        public bool UseNativeGeolocation { get; set; } = false;
+        public bool UseNativeGeolocation { get; set; } = true;
         public bool ShowlocalizationData { get; set; } = false;
 
         public string Language { get; set; } = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;

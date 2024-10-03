@@ -1,5 +1,6 @@
 ﻿let map;
 let userMarker = null;
+let userCircle = null;
 let markers = [];
 let polyline;
 
@@ -29,16 +30,31 @@ function initializeMap(message) {
     map.zoomControl.remove();
 }
 
-function updateMapMarker(message, latitude, longitude, heading = null) {
+function updateMapMarker(message, latitude, longitude, accuracy) {
+    const latlng = [latitude, longitude];
+
     if (userMarker) {
-        userMarker.setLatLng([latitude, longitude]);
-        userMarker.bindPopup(message);
-        const currentZoom = map.getZoom();
-        map.setView([latitude, longitude], currentZoom); // Mueve el mapa a la posición actual
-        /*if (heading !== null) {
-            userMarker.setRotationAngle(heading); // Rotar el marcador según el heading
-        }*/
+        userMarker.setLatLng(latlng);  // Actualizar la posición del marcador del usuario
+        userMarker.bindPopup(message).openPopup();  // Mostrar el mensaje actualizado
+    } else {
+        userMarker = L.marker(latlng).addTo(map)
+            .bindPopup(message)
+            .openPopup();
     }
+
+    if (userCircle) {
+        userCircle.setLatLng(latlng).setRadius(accuracy);  // Actualizar la precisión del círculo
+    } else {
+        userCircle = L.circle(latlng, {
+            color: 'blue',
+            fillColor: '#0000ff',
+            fillOpacity: 0.2,
+            radius: accuracy  // Establecer el radio según la precisión
+        }).addTo(map);
+    }
+
+    const currentZoom = map.getZoom();
+    map.setView(latlng, currentZoom);
 }
 
 function drawGpxOnMap(gpxContent) {
