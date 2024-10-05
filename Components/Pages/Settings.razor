@@ -3,8 +3,23 @@
 @inject NavigationManager Navigation
 @inject TranslationService TranslationService
 
+
+
+<RadzenRow Style="border-bottom: 1px solid #ccc; margin-left:10px; margin-right:10px">
+    <RadzenColumn Size="2">
+        <RadzenButton Text="" ButtonStyle="ButtonStyle.Secondary"
+                      Click="@(() => Navigation.NavigateTo("/"))"
+                      Icon="arrow_back" />
+    </RadzenColumn>
+    <RadzenColumn Size="8">
+        <RadzenText TextStyle="TextStyle.H4" Style="text-align: center;">@TranslationService.Translate("Configuración")</RadzenText>
+    </RadzenColumn>
+    <RadzenColumn Size="2">
+        <RadzenButton Icon="save" Click="@Save" ButtonStyle="ButtonStyle.Secondary" Style="margin-right:20px" />
+    </RadzenColumn>
+</RadzenRow>
+
 <RadzenStack Style="padding: 20px; max-width: 800px; margin: auto;">
-    <RadzenText TextStyle="TextStyle.H3" Style="margin-bottom: 20px;">@TranslationService.Translate("Configuración")</RadzenText>
 
     <label for="language">@TranslationService.Translate("Idioma del sistema"):</label>
     <RadzenDropDown @bind-Value="selectedLanguage"
@@ -22,6 +37,9 @@
     <label for="maxSpeed">@TranslationService.Translate("Velocidad máxima (m/s)"):</label>
     <RadzenNumeric @bind-Value="SettingsService.AppSettings.MaxSpeed" Min="0" Max="10" Step="0.1" />
 
+    <label for="maxSpeed">@TranslationService.Translate("Precisión (m)"):</label>
+    <RadzenNumeric @bind-Value="SettingsService.AppSettings.Accuracy" Min="0" Max="100" Step="1" />
+
     <label for="timerInterval">@TranslationService.Translate("Refresco posición (s)"):</label>
     <RadzenNumeric @bind-Value="SettingsService.AppSettings.TimerInterval" Min="1" Max="60" Step="1" />
 
@@ -34,14 +52,18 @@
     <label for="averageFilterEnabled">@TranslationService.Translate("Filtro de Promedio Móvil")</label>
     <RadzenSwitch @bind-Value="SettingsService.AppSettings.AverageFilterEnabled" />
 
+    <label for="distanceFilterEnabled">@TranslationService.Translate("Filtro de velocidad")</label>
+    <RadzenSwitch @bind-Value="SettingsService.AppSettings.SpeedFilterEnabled" />
+
+    <label for="distanceFilterEnabled">@TranslationService.Translate("Filtro de precisión")</label>
+    <RadzenSwitch @bind-Value="SettingsService.AppSettings.AccuracyFilterEnabled" />
+
     <label for="distanceFilterEnabled">@TranslationService.Translate("Mostrar datos de localización")</label>
     <RadzenSwitch @bind-Value="SettingsService.AppSettings.ShowlocalizationData" />
 
-    <div style="margin-top: 20px; display:flex; justify-content:center">
-        <RadzenButton Text="@TranslationService.Translate("Guardar")" Click="@SaveSettings" ButtonStyle="ButtonStyle.Primary" Style="margin-right:20px" />
-        <RadzenButton Text="@TranslationService.Translate("Cerrar")" Click="@Close" ButtonStyle="ButtonStyle.Secondary" />
-    </div>
 
+    <label for="distanceFilterEnabled">@TranslationService.Translate("Usar geolocalización nativa MAUI")</label>
+    <RadzenSwitch @bind-Value="SettingsService.AppSettings.UseNativeGeolocation" />
 </RadzenStack>
 
 @code {
@@ -70,7 +92,7 @@
         StateHasChanged();
     }
 
-    private async Task SaveSettings()
+    private async Task Save()
     {
         await SettingsService.SaveSettingsAsync();
         Navigation.NavigateTo("/");

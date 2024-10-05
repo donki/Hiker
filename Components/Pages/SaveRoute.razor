@@ -8,8 +8,20 @@
 @inject IFileSaver FileSaver
 @inject TranslationService TranslationService
 
+<RadzenRow Style="border-bottom: 1px solid #ccc; margin-left:10px; margin-right:10px">
+    <RadzenColumn Size="2">
+        <RadzenButton Text="" ButtonStyle="ButtonStyle.Secondary"
+                      Click="@(() => Navigation.NavigateTo("/"))"
+                      Icon="arrow_back" />
+    </RadzenColumn>
+    <RadzenColumn Size="8">
+        <RadzenText TextStyle="TextStyle.H4" Style="text-align: center;">@TranslationService.Translate("Guardar Ruta")</RadzenText>
+    </RadzenColumn>
+    <RadzenColumn Size="2">
+        <RadzenButton Icon="save" Click="@Save" ButtonStyle="ButtonStyle.Secondary" Style="margin-right:20px" />
+    </RadzenColumn>
+</RadzenRow>
 <RadzenStack Style="padding: 20px; max-width: 800px; margin: auto;">
-    <RadzenText TextStyle="TextStyle.H3" Style="margin-bottom: 20px;">@TranslationService.Translate("Guardar Ruta")</RadzenText>
 
 
     <h4>@TranslationService.Translate("Ruta")</h4>
@@ -25,15 +37,6 @@
         <RadzenLegend Position="LegendPosition.Top" />
         <RadzenCategoryAxis Min="0" Max="@totalDistance" Step="@stepDistance" />
     </RadzenChart>
-
-
-    <div style="margin-top: 20px; display:flex; justify-content:center">
-
-        <RadzenButton Text="@TranslationService.Translate("Guardar")" ButtonStyle="ButtonStyle.Primary" Click="Save" Style="margin-right:20px" />
-
-        <RadzenButton Text="@TranslationService.Translate("Cerrar")" ButtonStyle="ButtonStyle.Secondary" Click="Close" />
-    </div>
-
 </RadzenStack>
 
 @if (isLoading)

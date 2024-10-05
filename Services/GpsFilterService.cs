@@ -41,27 +41,26 @@ namespace Hiker.Services
                 kalmanFilter.Process(newLocation.Latitude, newLocation.Longitude, (float)newLocation.Accuracy, DateTime.UtcNow.Ticks);
             }
 
-            // Aplicar el filtro de precisión si está habilitado
-            if (_settingsService.AppSettings.MinAccuracy > 0)
-            {
-                if (newLocation.Accuracy < _settingsService.AppSettings.MinAccuracy)
-                {
-                    newLocation.Accuracy = _settingsService.AppSettings.MinAccuracy;
-                }
-            }
-
             // Verificar si el nuevo punto es válido con el filtro de distancia mínima
-            if (_settingsService.AppSettings.DistanceFilterEnabled && lastLocation != null && !IsDistanceValid(newLocation))
+            if (_settingsService.AppSettings.SpeedFilterEnabled && lastLocation != null && !IsDistanceValid(newLocation))
             {
-                return lastLocation; // Si el punto no es válido, devolvemos el último punto conocido
+                return null; // Si el punto no es válido, devolvemos null
             }
 
-            // Actualizar la última ubicación conocida
-            lastLocation = new Location(kalmanFilter.Latitude, kalmanFilter.Longitude);
-            lastLocation.Altitude = newLocation.Altitude;
-            lastLocation.Accuracy = newLocation.Accuracy;
-            lastLocation.Speed = newLocation.Speed;
-            lastLocation.Course = newLocation.Course;
+            if (_settingsService.AppSettings.AccuracyFilterEnabled && (newLocation.Accuracy > _settingsService.AppSettings.Accuracy))
+            {
+                return null; // Si el punto no es válido, devolvemos null
+            }
+
+            if (_settingsService.AppSettings.KalmanFilterEnabled)
+            {
+                // Actualizar la última ubicación conocida
+                lastLocation = new Location(kalmanFilter.Latitude, kalmanFilter.Longitude);
+                lastLocation.Altitude = newLocation.Altitude;
+                lastLocation.Accuracy = newLocation.Accuracy;
+                lastLocation.Speed = newLocation.Speed;
+                lastLocation.Course = newLocation.Course;
+            }
 
             // Añadir la nueva ubicación filtrada a la ventana del promedio móvil si está habilitado
             if (_settingsService.AppSettings.AverageFilterEnabled)
@@ -76,7 +75,7 @@ namespace Hiker.Services
                 return GetSmoothedLocation();
             }
 
-            return lastLocation; // Si el filtro de promedio móvil no está habilitado, devolver el punto actual
+            return newLocation; // Si el filtro de promedio móvil no está habilitado, devolver el punto actual
         }
 
         // Filtro de distancia mínima

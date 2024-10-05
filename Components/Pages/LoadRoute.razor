@@ -7,10 +7,25 @@
 @inject SettingsService SettingsService
 @inject TranslationService TranslationService
 
-<RadzenStack Style="padding: 20px; max-width: 800px; margin: auto;">
-    <RadzenText TextStyle="TextStyle.H3" Style="margin-bottom: 20px;">@TranslationService.Translate("Cargar Ruta")</RadzenText>
+<RadzenRow Style="border-bottom: 1px solid #ccc; margin-left:10px; margin-right:10px">
+    <RadzenColumn Size="1">
+        <RadzenButton Text="" ButtonStyle="ButtonStyle.Secondary"
+                      Click="@(() => Navigation.NavigateTo("/"))"
+                      Icon="arrow_back" />
+    </RadzenColumn>
+    <RadzenColumn Size="9">
+        <RadzenText TextStyle="TextStyle.H4" Style="text-align: center;">@TranslationService.Translate("Cargar Ruta")</RadzenText>
+    </RadzenColumn>
+    <RadzenColumn Size="2" Style="display: flex; justify-content: flex-end; align-items: center;">
+        <RadzenButton Icon="upload_file" Click="@OpenFileDialog" ButtonStyle="ButtonStyle.Secondary" Style="margin-right:5px" />
+        @if (!string.IsNullOrEmpty(gpxContent))
+        {
+            <RadzenButton Icon="route" Click="@LoadRouteOnMap" ButtonStyle="ButtonStyle.Secondary" Style="margin-right:1px" />
+        }
+    </RadzenColumn>
+</RadzenRow>
 
-    <RadzenButton Text=@TranslationService.Translate("Cargar Ruta") ButtonStyle="ButtonStyle.Primary" Click="@OpenFileDialog" />
+<RadzenStack Style="padding: 20px; max-width: 800px; margin: auto;">
 
     @if (!string.IsNullOrEmpty(gpxContent))
     {
@@ -29,14 +44,6 @@
     }
 
     <InputFile id="gpxFileInput" style="display:none;" OnChange="OnFileSelected" />
-
-    <div style="margin-top: 20px; display:flex; justify-content:center">
-        @if (!string.IsNullOrEmpty(gpxContent))
-        {
-            <RadzenButton Text="@TranslationService.Translate("Al mapa")" ButtonStyle="ButtonStyle.Primary" Click="LoadRouteOnMap" Style="margin-right:20px" />
-        }
-        <RadzenButton Text="@TranslationService.Translate("Cerrar")" ButtonStyle="ButtonStyle.Secondary" Click="CloseDialog" />
-    </div>
 
 </RadzenStack>
 

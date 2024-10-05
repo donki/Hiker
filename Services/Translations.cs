@@ -348,7 +348,55 @@
             { "es", "Puntos:" },
             { "en", "Points:" }
         }
+    },
+    {
+    "Filtro de precisión", new Dictionary<string, string>
+        {
+            { "es", "Filtro de precisión" },
+            { "en", "Accuracy Filter" }
+        }
+    },
+        {
+    "Filtro de velocidad", new Dictionary<string, string>
+        {
+            { "es", "Filtro de velocidad" },
+            { "en", "Speed Filter" }
+        }
+    },
+
+    {
+    "Precisión (m)", new Dictionary<string, string>
+        {
+            { "es", "Precisión (m)" },
+            { "en", "Accuracy (m)" }
+        }
+},
+
+
+    {
+    "Usar geolocalización nativa MAUI", new Dictionary<string, string>
+        {
+            { "es", "Usar geolocalización nativa MAUI" },
+            { "en", "Use native MAUI localization" }
+        }
+    },
+
+
+    {
+    "Agradecimientos a Esteban Sequeira por su iconos de banderas", new Dictionary<string, string>
+        {
+            { "es", "Agradecimientos a Esteban Sequeira por su iconos de banderas" },
+            { "en", "Thanks to Esteban Sequeira for their icons flags" }
+        }
+    },{
+                "y de", new Dictionary<string, string>
+        {
+            { "es", "y de" },
+            { "en", "and" }
+        }
     }
+
+
         };
 
 

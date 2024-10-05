@@ -35,8 +35,10 @@ namespace Hiker.Services
                     DeferLocationUpdates = false,
                     ListenForSignificantChanges = false,
                     PauseLocationUpdatesAutomatically = false,
-                    ShowsBackgroundLocationIndicator = true,
+                    ShowsBackgroundLocationIndicator = true
+
                 });
+                CrossGeolocator.Current.DesiredAccuracy = _settingsService.AppSettings.Accuracy;
 
                 CrossGeolocator.Current.PositionChanged += CrossGeolocator_Current_PositionChanged;
             }
@@ -46,7 +48,7 @@ namespace Hiker.Services
         {
             if (OnLocationChangedDelegate != null)
             {
-                var newLocation = ConverCrossLocationToLocation(e.Position);
+                var newLocation = ConvertCrossLocationToLocation(e.Position);
                 OnLocationChangedDelegate(newLocation);
             }
             else
@@ -108,7 +110,7 @@ namespace Hiker.Services
 
                 var location = await CrossGeolocator.Current.GetPositionAsync(TimeSpan.FromSeconds(_settingsService.AppSettings.TimerInterval), null, true);
 
-                Location reslocation = ConverCrossLocationToLocation(location);
+                Location reslocation = ConvertCrossLocationToLocation(location);
 
                 return reslocation;
             }
@@ -119,13 +121,14 @@ namespace Hiker.Services
             }
         }
 
-        private static Location ConverCrossLocationToLocation(Position location)
+        private static Location ConvertCrossLocationToLocation(Position location)
         {
             var reslocation = new Location();
             reslocation.Latitude = location.Latitude;
             reslocation.Longitude = location.Longitude;
             reslocation.Altitude = location.Altitude;
             reslocation.Course = location.Heading;
+            reslocation.Accuracy = location.Accuracy;
             return reslocation;
         }
 

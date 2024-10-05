@@ -13,10 +13,12 @@ namespace Hiker.Services
             TimerInterval = 1,
             KalmanFilterEnabled = true,
             AverageFilterEnabled = true,
-            DistanceFilterEnabled = false,
+            SpeedFilterEnabled = false,
             WindowSize = 3,
             UseNativeGeolocation = true,
             ShowlocalizationData = true,
+            AccuracyFilterEnabled = true,
+            Accuracy = 10,
             Language = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName
         };
 
@@ -47,7 +49,9 @@ namespace Hiker.Services
         public int TimerInterval { get; set; } = 1;
         public bool KalmanFilterEnabled { get; set; } = true;
         public bool AverageFilterEnabled { get; set; } = true;
-        public bool DistanceFilterEnabled { get; set; } = true;
+        public bool SpeedFilterEnabled { get; set; } = true;
+        public bool AccuracyFilterEnabled { get; set; } = true;
+        public int Accuracy { get; set; } = 10;
         public int WindowSize { get; set; } = 3;
         public bool UseNativeGeolocation { get; set; } = true;
         public bool ShowlocalizationData { get; set; } = false;

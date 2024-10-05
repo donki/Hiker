@@ -40,8 +40,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <FileVersion>1.9.198</FileVersion>
-    <AssemblyVersion>1.9.198</AssemblyVersion>
+    <FileVersion>1.9.236</FileVersion>
+    <AssemblyVersion>1.9.236</AssemblyVersion>
     <Version>1.9.176</Version>
   </PropertyGroup>
 
@@ -96,8 +96,10 @@
     <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.0-rc.1.24453.9" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="9.0.0-rc.1.24453.9" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0-rc.1.24431.7" />
+    <PackageReference Include="Microsoft.Maui.Essentials" Version="9.0.0-rc.1.24453.9" />
     <PackageReference Include="Microsoft.XmlSerializer.Generator" Version="9.0.0-rc.1.24431.7" />
     <PackageReference Include="Radzen.Blazor" Version="5.2.2" />
+
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
