@@ -8,17 +8,18 @@
 @inject IFileSaver FileSaver
 @inject TranslationService TranslationService
 
-<RadzenRow Style="border-bottom: 1px solid #ccc; margin-left:10px; margin-right:10px">
+<RadzenRow Style="border-bottom: 1px solid #ccc; margin-left:5px; margin-right:5px;">
     <RadzenColumn Size="2">
         <RadzenButton Text="" ButtonStyle="ButtonStyle.Secondary"
                       Click="@(() => Navigation.NavigateTo("/"))"
-                      Icon="arrow_back" />
+                      Icon="arrow_back"
+                      Style="height: 98% !important;width:100%;" />
     </RadzenColumn>
     <RadzenColumn Size="8">
         <RadzenText TextStyle="TextStyle.H4" Style="text-align: center;">@TranslationService.Translate("Guardar Ruta")</RadzenText>
     </RadzenColumn>
     <RadzenColumn Size="2">
-        <RadzenButton Icon="save" Click="@Save" ButtonStyle="ButtonStyle.Secondary" Style="margin-right:20px" />
+        <RadzenButton Icon="save" Click="@Save" ButtonStyle="ButtonStyle.Secondary" Style="height: 98% !important;width:100%;margin-right:20px" />
     </RadzenColumn>
 </RadzenRow>
 <RadzenStack Style="padding: 20px; max-width: 800px; margin: auto;">

@@ -147,6 +147,12 @@
                 }
             },
             {
+    "Cargar", new Dictionary<string, string>
+                {
+                    { "es", "Cargar" },
+                    { "en", "Load" }
+                }
+            },            {
     "Cargar Ruta", new Dictionary<string, string>
                 {
                     { "es", "Cargar Ruta" },
