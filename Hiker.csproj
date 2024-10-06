@@ -40,8 +40,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <FileVersion>1.9.247</FileVersion>
-    <AssemblyVersion>1.9.247</AssemblyVersion>
+    <FileVersion>1.9.267</FileVersion>
+    <AssemblyVersion>1.9.267</AssemblyVersion>
     <Version>1.9.176</Version>
   </PropertyGroup>
 
@@ -117,6 +117,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Platforms\Android\Resources\values-night\" />
     <Folder Include="Platforms\Android\Resources\values\" />
     <Folder Include="wwwroot\icons\" />
   </ItemGroup>

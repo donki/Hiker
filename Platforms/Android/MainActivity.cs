@@ -2,10 +2,11 @@
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
+using Android.Views;
 using Hiker.Services;
 namespace Hiker
 {
-    [Activity(Theme = "@style/Maui.SplashTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
+    [Activity(Theme = "@style/AppTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
     public class MainActivity : MauiAppCompatActivity
     {
         private TranslationService _translationService;
@@ -15,6 +16,9 @@ namespace Hiker
             _translationService = MauiApplication.Current.Services.GetService<TranslationService>();
 
             base.OnCreate(savedInstanceState);
+
+            Window.DecorView.SystemUiVisibility = (StatusBarVisibility)SystemUiFlags.Fullscreen;
+            SupportActionBar?.Hide();
             ShowEnergySettingsDialog();
             ShowBackgroundSettingsDialog();
 
@@ -63,7 +67,7 @@ namespace Hiker
                     .SetPositiveButton(yesButton, (sender, e) =>
                     {
                         // Intent para acceder a la configuración de optimización de batería
-                        Intent intent = new Intent(Android.Provider.Settings.ActionIgnoreBatteryOptimizationSettings);
+                        Intent intent = new Intent(Android.Provider.Settings.ActionBatterySaverSettings);
                         StartActivity(intent);
                     })
                     .SetNegativeButton(noButton, (sender, e) => { /* No hacer nada */ })

@@ -6,9 +6,18 @@
              BackgroundColor="{DynamicResource PageBackgroundColor}">
 
 
-    <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html">
-        <BlazorWebView.RootComponents>
-            <RootComponent Selector="#app" ComponentType="{x:Type local:Components.Routes}" />
-        </BlazorWebView.RootComponents>
-    </BlazorWebView>
+    <Grid>
+        <!-- Imagen que se muestra inicialmente -->
+        <Image x:Name="splashImage" Source="splash.png"
+               HorizontalOptions="Center"
+               VerticalOptions="Center"
+               IsVisible="True" />
+
+        <!-- BlazorWebView que se mostrará después de 5 segundos -->
+        <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html" IsVisible="False">
+            <BlazorWebView.RootComponents>
+                <RootComponent Selector="#app" ComponentType="{x:Type local:Components.Routes}" />
+            </BlazorWebView.RootComponents>
+        </BlazorWebView>
+    </Grid>
 </ContentPage>
