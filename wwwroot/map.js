@@ -7,6 +7,7 @@ let polyline;
 
 
 function initializeMap(message) {
+    //if (!map) {
     map = L.map('map').setView([0, 0], 19); // Coordenadas iniciales (0,0) antes de obtener la ubicación real
 
     /*    icon: new L.Icon({
@@ -28,6 +29,7 @@ function initializeMap(message) {
         .bindPopup(message)
         .openPopup();
     map.zoomControl.remove();
+    //}
 }
 
 function updateMapMarker(message, latitude, longitude, accuracy) {
@@ -43,15 +45,14 @@ function updateMapMarker(message, latitude, longitude, accuracy) {
     }
 
     if (userCircle) {
-        userCircle.setLatLng(latlng).setRadius(accuracy);  // Actualizar la precisión del círculo
-    } else {
-        userCircle = L.circle(latlng, {
-            color: 'blue',
-            fillColor: '#0000ff',
-            fillOpacity: 0.2,
-            radius: accuracy  // Establecer el radio según la precisión
-        }).addTo(map);
-    }
+        userCircle.remove();
+    };
+    userCircle = L.circle(latlng, {
+        color: 'blue',
+        fillColor: '#0000ff',
+        fillOpacity: 0.2,
+        radius: accuracy  // Establecer el radio según la precisión
+    }).addTo(map);
 
     const currentZoom = map.getZoom();
     map.setView(latlng, currentZoom);

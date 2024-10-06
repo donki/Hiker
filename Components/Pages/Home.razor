@@ -19,78 +19,78 @@
 
 @if (SettingsService.AppSettings.ShowlocalizationData)
 {
-                        <div id="coordinatesDiv" class="floating-coordinates">
+    <div id="coordinatesDiv" class="floating-coordinates">
         @TranslationService.Translate("Lat:") @currentLatitude, @TranslationService.Translate("Lon:") @currentLongitude ,
         @TranslationService.Translate("Accu:") @accuracy
-                        </div>
+    </div>
 }
 @if (isNavMenuOpen)
 {
-                        <nav class="hamburger-menu flex-column">
-                            <div class="nav-item px-3">
-                                <NavLink class="nav-link bi bi-cloud-upload-fill" href="loadroute">
-                                    <span class="me-2"></span> @TranslationService.Translate("Cargar Ruta")
-                                </NavLink>
-                            </div>
-                            <div class="nav-item px-3">
-                                <NavLink href="#" class="nav-link" @onclick="StartUpdatingPosition">
+    <nav class="hamburger-menu flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link bi bi-cloud-upload-fill" href="loadroute">
+                <span class="me-2"></span> @TranslationService.Translate("Cargar Ruta")
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink href="#" class="nav-link" @onclick="ToggleUpdatingPosition">
 
-                                    <span style="display: inline-flex; align-items: center; line-height: 1;">
+                <span style="display: inline-flex; align-items: center; line-height: 1;">
                     @if (ModoRuta)
                     {
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="lime" class="bi bi-geo-alt-fill" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 4px;">
-                                                                    <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6" />
-                                                                </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="lime" class="bi bi-geo-alt-fill" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 4px;">
+                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6" />
+                        </svg>
 
                     }
                     else
                     {
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="gray" class="bi bi-geo-alt-fill" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 4px;">
-                                                                    <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6" />
-                                                                </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="gray" class="bi bi-geo-alt-fill" viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 4px;">
+                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6" />
+                        </svg>
 
                     }
                     @TranslationService.Translate("Modo Ruta")
-                                    </span>
-                                </NavLink>
-                            </div>
-                            <div class="nav-item px-3">
-                                <NavLink href="#" class="nav-link" @onclick="ToggleRecordingMode">
+                </span>
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink href="#" class="nav-link" @onclick="ToggleRecordingMode">
 
-                                    <span style="display: inline-flex; align-items: center; line-height: 1;">
+                <span style="display: inline-flex; align-items: center; line-height: 1;">
                     @if (ModoGrabacion)
                     {
-                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16" style="vertical-align: middle; margin-right: 4px;">
-                                                                    <circle cx="256" cy="256" r="256" fill="red" />
-                                                                </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16" style="vertical-align: middle; margin-right: 4px;">
+                            <circle cx="256" cy="256" r="256" fill="red" />
+                        </svg>
 
                     }
                     else
                     {
-                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16" style="vertical-align: middle; margin-right: 4px;">
-                                                                    <circle cx="256" cy="256" r="256" fill="gray" />
-                                                                </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16" style="vertical-align: middle; margin-right: 4px;">
+                            <circle cx="256" cy="256" r="256" fill="gray" />
+                        </svg>
 
                     }
                     @TranslationService.Translate("Modo Grabación")
-                                    </span>
-                                </NavLink>
-                                <InputFile id="gpxFileInput" OnChange="HandleFileSelected" style="display:none;" />
-                            </div>
-                            <div class="nav-item px-3">
-                                <NavLink class="nav-link bi bi-gear-fill" @onclick="OpenSettings">
-                                    <span class="me-2"></span> @TranslationService.Translate("Configuración")
-                                </NavLink>
-                            </div>
-                            <div class="nav-item px-3">
-                                <NavLink class="nav-link bi bi-info-circle-fill" Match="NavLinkMatch.All" @onclick="OpenAbout">
-                                    <span class="me-2"></span> @TranslationService.Translate("Acerca de...")
-                                </NavLink>
-                            </div>
+                </span>
+            </NavLink>
+            <InputFile id="gpxFileInput" OnChange="HandleFileSelected" style="display:none;" />
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link bi bi-gear-fill" @onclick="OpenSettings">
+                <span class="me-2"></span> @TranslationService.Translate("Configuración")
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link bi bi-info-circle-fill" Match="NavLinkMatch.All" @onclick="OpenAbout">
+                <span class="me-2"></span> @TranslationService.Translate("Acerca de...")
+            </NavLink>
+        </div>
 
 
 
-                        </nav>
+    </nav>
 
 }
 
@@ -346,7 +346,7 @@
     }
 
     #region TRACK ROUTE
-    private async Task StartUpdatingPosition()
+    private async Task ToggleUpdatingPosition()
     {
         isNavMenuOpen = false;
 
