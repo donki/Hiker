@@ -12,16 +12,18 @@
         <RadzenButton Text="" ButtonStyle="ButtonStyle.Secondary"
                       Click="@(() => Navigation.NavigateTo("/"))"
                       Icon="arrow_back"
-                      Style="height: 98% !important; width:100%;" />
+                      Style="height: 98% !important; width: 100%; background-color: white; color: #33acff;" />
     </RadzenColumn>
     <RadzenColumn Size="8">
         <RadzenText TextStyle="TextStyle.H4" Style="text-align: center;">@TranslationService.Translate("Cargar")</RadzenText>
     </RadzenColumn>
     <RadzenColumn Size="2" Style="display: flex; justify-content: flex-end; align-items: center;">
-        <RadzenButton Icon="upload_file" Click="@OpenFileDialog" ButtonStyle="ButtonStyle.Secondary" Style="height: 98% !important;width:100%;margin-right:2px" />
+        <RadzenButton Icon="upload_file" Click="@OpenFileDialog" ButtonStyle="ButtonStyle.Secondary"
+                      Style="height: 98% !important; width: 100%; background-color: white; color: #33acff; margin-right:2px" />
         @if (!string.IsNullOrEmpty(gpxContent))
         {
-            <RadzenButton Icon="route" Click="@LoadRouteOnMap" ButtonStyle="ButtonStyle.Secondary" Style="height: 98% !important;width:100%;margin-right:1px" />
+            <RadzenButton Icon="route" Click="@LoadRouteOnMap" ButtonStyle="ButtonStyle.Secondary"
+                          Style="height: 98% !important; width: 100%; background-color: white; color: #33acff; margin-right:2px" />
         }
     </RadzenColumn>
 </RadzenRow>

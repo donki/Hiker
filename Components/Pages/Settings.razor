@@ -10,13 +10,14 @@
         <RadzenButton Text="" ButtonStyle="ButtonStyle.Secondary"
                       Click="@(() => Navigation.NavigateTo("/"))"
                       Icon="arrow_back"
-                      Style="height: 98% !important; width:100%;" />
+                      Style="height: 98% !important; width: 100%; background-color: white; color: #33acff;"  />
     </RadzenColumn>
     <RadzenColumn Size="8">
         <RadzenText TextStyle="TextStyle.H4" Style="text-align: center;">@TranslationService.Translate("Configuración")</RadzenText>
     </RadzenColumn>
     <RadzenColumn Size="2">
-        <RadzenButton Icon="save" Click="@Save" ButtonStyle="ButtonStyle.Secondary" Style="height: 98% !important; width:100%;margin-right:20px" />
+        <RadzenButton Icon="save" Click="@Save" ButtonStyle="ButtonStyle.Secondary" 
+                      Style="height: 98% !important; width: 100%; background-color: white; color: #33acff;"  />
     </RadzenColumn>
 </RadzenRow>
 
@@ -35,41 +36,50 @@
         </Template>
     </RadzenDropDown>
 
-    <label for="maxSpeed">@TranslationService.Translate("Velocidad máxima (m/s)"):</label>
-    <RadzenNumeric @bind-Value="SettingsService.AppSettings.MaxSpeed" Min="0" Max="10" Step="0.1" />
+
 
     <label for="maxSpeed">@TranslationService.Translate("Precisión (m)"):</label>
     <RadzenNumeric @bind-Value="SettingsService.AppSettings.Accuracy" Min="0" Max="100" Step="1" />
 
-    <label for="timerInterval">@TranslationService.Translate("Refresco posición (s)"):</label>
-    <RadzenNumeric @bind-Value="SettingsService.AppSettings.TimerInterval" Min="1" Max="60" Step="1" />
-
-    <label for="windowSize">@TranslationService.Translate("Elementos para el promedio móvil"):</label>
-    <RadzenNumeric @bind-Value="SettingsService.AppSettings.WindowSize" Min="1" Max="10" Step="1" />
-
-    <label for="kalmanEnabled">@TranslationService.Translate("Filtro de Kalman")</label>
-    <RadzenSwitch @bind-Value="SettingsService.AppSettings.KalmanFilterEnabled" />
-
-    <label for="averageFilterEnabled">@TranslationService.Translate("Filtro de Promedio Móvil")</label>
-    <RadzenSwitch @bind-Value="SettingsService.AppSettings.AverageFilterEnabled" />
-
-    <label for="distanceFilterEnabled">@TranslationService.Translate("Filtro de velocidad")</label>
-    <RadzenSwitch @bind-Value="SettingsService.AppSettings.SpeedFilterEnabled" />
-
-    <label for="distanceFilterEnabled">@TranslationService.Translate("Filtro de precisión")</label>
-    <RadzenSwitch @bind-Value="SettingsService.AppSettings.AccuracyFilterEnabled" />
-
-    <label for="distanceFilterEnabled">@TranslationService.Translate("Mostrar datos de localización")</label>
-    <RadzenSwitch @bind-Value="SettingsService.AppSettings.ShowlocalizationData" />
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+      <RadzenLabel Text="@TranslationService.Translate("Filtro de precisión")" Component="Accurancy" />
+      <RadzenSwitch Text= @bind-Value="SettingsService.AppSettings.AccuracyFilterEnabled" Name="Accurancy"/>
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+      <RadzenLabel Text="@TranslationService.Translate("Mostrar datos de localización")" Component="ShowlocalizationData" />
+      <RadzenSwitch Text= @bind-Value="SettingsService.AppSettings.ShowlocalizationData" Name="ShowlocalizationData"/>
+    </RadzenStack>
 
 
-    <label for="distanceFilterEnabled">@TranslationService.Translate("Usar geolocalización nativa MAUI")</label>
-    <RadzenSwitch @bind-Value="SettingsService.AppSettings.UseNativeGeolocation" />
+    @if (AdvancedSettings)
+    {
+        <label for="maxSpeed">@TranslationService.Translate("Velocidad máxima (m/s)"):</label>
+        <RadzenNumeric @bind-Value="SettingsService.AppSettings.MaxSpeed" Min="0" Max="10" Step="0.1" />
+
+        <label for="timerInterval">@TranslationService.Translate("Refresco posición (s)"):</label>
+        <RadzenNumeric @bind-Value="SettingsService.AppSettings.TimerInterval" Min="1" Max="60" Step="1" />
+
+        <label for="windowSize">@TranslationService.Translate("Elementos para el promedio móvil"):</label>
+        <RadzenNumeric @bind-Value="SettingsService.AppSettings.WindowSize" Min="1" Max="10" Step="1" />
+
+        <label for="kalmanEnabled">@TranslationService.Translate("Filtro de Kalman")</label>
+        <RadzenSwitch @bind-Value="SettingsService.AppSettings.KalmanFilterEnabled" />
+
+        <label for="averageFilterEnabled">@TranslationService.Translate("Filtro de Promedio Móvil")</label>
+        <RadzenSwitch @bind-Value="SettingsService.AppSettings.AverageFilterEnabled" />
+
+        <label for="distanceFilterEnabled">@TranslationService.Translate("Filtro de velocidad")</label>
+        <RadzenSwitch @bind-Value="SettingsService.AppSettings.SpeedFilterEnabled" />
+
+        <label for="distanceFilterEnabled">@TranslationService.Translate("Usar geolocalización nativa MAUI")</label>
+        <RadzenSwitch @bind-Value="SettingsService.AppSettings.UseNativeGeolocation" />
+    }
 </RadzenStack>
 
 @code {
     private string selectedLanguage;
     private List<Language> languages;
+    private Boolean AdvancedSettings = false;
 
     protected override async Task OnInitializedAsync()
     {
