@@ -4,15 +4,15 @@
 
 <!-- Encabezado con Título y Botón de Salir -->
 
-<RadzenRow Style="border-bottom: 1px solid #ccc; margin-left:5px; margin-right:5px;">
+<RadzenRow Style="background-color:#007bff;">
     <RadzenColumn Size="2">
         <RadzenButton Text="" ButtonStyle="ButtonStyle.Secondary"
                       Click="@(() => Navigation.NavigateTo("/"))"
                       Icon="arrow_back"
-                      Style="height: 98% !important; width: 100%; background-color: white; color: #33acff;" />
+                      Style="height: 98% !important; width: 100%; background-color: #007bff; color: white;" />
     </RadzenColumn>
     <RadzenColumn Size="8">
-        <RadzenText TextStyle="TextStyle.H4" Style="text-align: center;">Hiker</RadzenText>
+        <RadzenText TextStyle="TextStyle.H4" Style="text-align: center; color: white;">Hiker</RadzenText>
     </RadzenColumn>
     <RadzenColumn Size="2">
     </RadzenColumn>
@@ -20,7 +20,7 @@
 
 <RadzenStack Style="padding: 20px; max-width: 800px; margin: auto; ">
 
-    <RadzenText TextStyle="TextStyle.H4" Style="margin-bottom: 10px;" Text="@TranslationService.Translate("Acerca de esta aplicación")" />
+    <RadzenText TextStyle="TextStyle.H4" Style="margin-bottom: 10px;" Text="@TranslationService.Translate("Acerca de...")" />
 
     <RadzenText TextStyle="TextStyle.H6" Style="margin-bottom: 20px;" Text="@TranslationService.Translate("Esta aplicación ha sido desarrollada por Organic Coating para ayudar a los usuarios a rastrear y mapear sus rutas.")" />
 
