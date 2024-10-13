@@ -40,8 +40,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <FileVersion>1.9.326</FileVersion>
-    <AssemblyVersion>1.9.326</AssemblyVersion>
+    <FileVersion>1.9.351</FileVersion>
+    <AssemblyVersion>1.9.351</AssemblyVersion>
     <Version>1.9.326</Version>
   </PropertyGroup>
 
@@ -90,7 +90,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Translations.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Translations.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CommunityToolkit.Maui" Version="9.0.3" />
+    <PackageReference Include="CsvHelper" Version="33.0.1" />
     <PackageReference Include="Geolocator.Plugin" Version="1.0.2" />
     <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.0-rc.1.24453.9" />
     <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.0-rc.1.24453.9" />
