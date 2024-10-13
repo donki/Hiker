@@ -5,6 +5,145 @@
         // Diccionario que contiene las frases nativas y sus traducciones por idioma
         public static Dictionary<string, Dictionary<string, string>> TranslationDict = new Dictionary<string, Dictionary<string, string>>
         {
+                        {  "gpxstudio",
+    new Dictionary<string, string>
+    {
+        { "es", "Para crear y editar tus rutas usa <a href=\"https://gpx.studio/\" target=\"_blank\">GPX Studio</a>. Es Gratuito!!! " },
+        { "en", "Create and edit your routes with <a href=\"https://gpx.studio/\" target=\"_blank\">GPX Studio</a>. It's Free!!!" }
+    } },
+
+            {  "Sabías qué...",
+    new Dictionary<string, string>
+    {
+        { "es", "Sabías qué... " },
+        { "en", "You know that..." }
+    }
+},
+            {
+    "GPSSignal",
+    new Dictionary<string, string>
+    {
+        { "es", "La cobertura GPS puede ser limitada en zonas montañosas o bosques densos." },
+        { "en", "GPS coverage may be limited in mountainous areas or dense forests." }
+    }
+},
+{
+    "GPSSignal2",
+    new Dictionary<string, string>
+    {
+        { "es", "En áreas urbanas con edificios altos, la señal GPS puede verse afectada." },
+        { "en", "In urban areas with tall buildings, the GPS signal may be affected." }
+    }
+},
+{
+    "GPSSignal3",
+    new Dictionary<string, string>
+    {
+        { "es", "Para obtener una mejor precisión, espera unos minutos después de activar el GPS." },
+        { "en", "To achieve better accuracy, wait a few minutes after activating GPS." }
+    }
+},
+{
+    "Battery",
+    new Dictionary<string, string>
+    {
+        { "es", "Asegúrate de que tu dispositivo tenga suficiente batería antes de iniciar la ruta." },
+        { "en", "Ensure your device has enough battery before starting the route." }
+    }
+},
+{
+    "GPSSignal4",
+    new Dictionary<string, string>
+    {
+        { "es", "El clima puede afectar la precisión del GPS; tenlo en cuenta." },
+        { "en", "Weather can affect GPS accuracy; keep this in mind." }
+    }
+},
+{
+    "GPSSignal5",
+    new Dictionary<string, string>
+    {
+        { "es", "Evita confiar únicamente en el GPS; presta atención al entorno." },
+        { "en", "Avoid relying solely on GPS; pay attention to your surroundings." }
+    }
+},
+{
+    "GPSSignal6",
+    new Dictionary<string, string>
+    {
+        { "es", "En áreas remotas, considera llevar un dispositivo GPS dedicado." },
+        { "en", "In remote areas, consider carrying a dedicated GPS device." }
+    }
+},
+{
+    "InformToAll",
+    new Dictionary<string, string>
+    {
+        { "es", "Recuerda informar a alguien sobre tu ruta antes de salir." },
+        { "en", "Remember to inform someone about your route before leaving." }
+    }
+},
+{
+    "GetWater",
+    new Dictionary<string, string>
+    {
+        { "es", "Lleva contigo equipo de emergencia y suficiente agua." },
+        { "en", "Carry emergency equipment and enough water with you." }
+    }
+},
+{
+    "CheckWeatherNew",
+    new Dictionary<string, string>
+    {
+        { "es", "Verifica las condiciones meteorológicas antes de iniciar tu ruta." },
+        { "en", "Check the weather conditions before starting your route." }
+    }
+},
+{
+    "SaveNature",
+    new Dictionary<string, string>
+    {
+        { "es", "Sé consciente de tu entorno y respeta la naturaleza." },
+        { "en", "Be aware of your surroundings and respect nature." }
+    }
+},
+
+{
+    "Settings",
+    new Dictionary<string, string>
+    {
+        { "es", "Para cambiar la configuración de la aplicación, pulsa el botón <i class='bi bi-gear-fill'></i> en la pantalla de inicio. Desde la pantalla de configuración podrás configurar el idioma." },
+        { "en", "To change the application's settings, tap the <i class='bi bi-gear-fill'></i> button on the home screen. From the settings screen, you can configure the language." }
+    }
+},
+
+            {
+    "FollowRoute",
+    new Dictionary<string, string>
+    {
+        { "es", "Para seguir una ruta que ya has cargado, selecciona la opción <i class='bi bi-geo-alt-fill'></i> Seguir Ruta, podrás ver tu ubicación actual en tiempo real con un marcador <i class='bi bi-geo-alt-fill text-success'></i>. Cuando quieras parar vuelve a apretar el botón <i class='bi bi-geo-alt-fill'></i>." },
+        { "en", "To follow a route you've already loaded, select the <i class='bi bi-geo-alt-fill'></i> Follow route option; you can see your current location in real-time with a <i class='bi bi-geo-alt-fill text-success'></i> marker. When you want to stop, press the <i class='bi bi-geo-alt-fill'></i> button again." }
+    }
+},
+
+            {
+    "RecordRoute",
+    new Dictionary<string, string>
+    {
+        { "es", "Para grabar una ruta en la pantalla de inicio, selecciona la opción <i class='bi bi-record-fill text-danger'></i> Grabar Ruta. Déja abierta la app mientras recorres la ruta. Al finalizar, selecciona la opción <i class='bi bi-record-fill text-danger'></i> Grabar Ruta para guardar la ruta en tu dispositivo." },
+        { "en", "To record a route on the home screen, select the <i class='bi bi-record-fill text-danger'></i> Record Route option. Leave the app open while you traverse the route. At the end, select the <i class='bi bi-record-fill text-danger'></i> Record Route option to save the route to your device." }
+    }
+},
+
+            {
+    "LoadRoute",
+    new Dictionary<string, string>
+    {
+        { "es", "Para cargar una ruta, selecciona la opción <i class='bi bi-cloud-upload-fill'></i> Cargar Ruta. En la siguiente pantalla, selecciona la opción <i class='upload_file'></i> Cargar Ruta. Aparecerá un selector de archivos, selecciona el fichero de ruta que deseas cargar. Finalmente, pulsa el botón <i class='route'></i> para visualizar la ruta en el mapa." },
+        { "en", "To load a route, select the <i class='bi bi-cloud-upload-fill'></i> Load Route option. Select the <i class='upload_file'></i> Load Route option. A file selector will appear; select the route file you wish to load. After loading the file, tap the <i class='route'></i> button to display the route on the map." }
+    }
+},
+
             // Frases de Ejecución en segundo plano
             { "Ejecución en segundo plano", new Dictionary<string, string>
                 {
@@ -51,10 +190,10 @@
                 }
             },            
             // Frases del componente Acerca de
-            { "Acerca de esta aplicación", new Dictionary<string, string>
+            { "Acerca de...", new Dictionary<string, string>
                 {
-                    { "es", "Acerca de esta aplicación" },
-                    { "en", "About this application" }
+                    { "es", "Acerca de..." },
+                    { "en", "About..." }
                 }
             },
             { "Esta aplicación ha sido desarrollada por Organic Coating para ayudar a los usuarios a rastrear y mapear sus rutas.", new Dictionary<string, string>
@@ -160,10 +299,10 @@
                 }
             },
             {
-    "Modo Ruta", new Dictionary<string, string>
+    "Seguir Ruta", new Dictionary<string, string>
                 {
-                    { "es", "Modo Ruta" },
-                    { "en", "Route Mode" }
+                    { "es", "Seguir Ruta" },
+                    { "en", "Follow Route" }
                 }
             },
             {
@@ -178,13 +317,6 @@
                 {
                     { "es", "Configuración" },
                     { "en", "Settings" }
-                }
-            },
-            {
-    "Acerca de...", new Dictionary<string, string>
-                {
-                    { "es", "Acerca de..." },
-                    { "en", "About..." }
                 }
             },
             {

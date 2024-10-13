@@ -17,6 +17,7 @@ namespace Hiker
 
             base.OnCreate(savedInstanceState);
 
+
             Window.DecorView.SystemUiVisibility = (StatusBarVisibility)SystemUiFlags.Fullscreen;
             SupportActionBar?.Hide();
             ShowEnergySettingsDialog();

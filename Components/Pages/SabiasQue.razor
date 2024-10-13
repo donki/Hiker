@@ -1,17 +1,35 @@
-﻿@if (IsVisible)
+﻿@inject TranslationService TranslationService;
+
+@if (IsVisible)
 {
-    <div class="overlay" style="display:block;">
-        <div class="overlay-content">
-            @if (!string.IsNullOrEmpty(Content))
-            {
-                <p>@Content</p>
-            }
-            else
-            {
-                <p>Contenido del overlay...</p>
-            }
-        </div>
+    <div class="overlay">
+        <RadzenCard Style="background-color: white; max-width: 300px; width: 100%; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+            <RadzenRow>
+                <RadzenColumn Size="11">
+                    <RadzenText TextStyle="TextStyle.H5" Style="font-weight: bold; text-align:center">
+                        <RadzenIcon Icon="school" Style="color:#007bff" /> @TranslationService.Translate("Sabías qué...")
+                    </RadzenText>
+                </RadzenColumn>
+                <RadzenColumn Size="1">
+                    <RadzenButton Icon="close" Style="position:relative; right:10px; top:-20px; background-color: transparent; color: #007bff;" Click="@Close" />
+                </RadzenColumn>
+            </RadzenRow>
+
+
+            <RadzenHtmlEditor Style="margin-top: 20px; height: 200px; width: 100%;" @bind-Value="tips[currentTipIndex]" Disabled="true" ShowToolbar="false" />
+
+            <RadzenRow Style="margin-top: 20px;">
+                <RadzenColumn Size="6">
+                    <RadzenButton Icon="arrow_back" Click="@ShowPreviousTip" Disabled="@(@currentTipIndex == 0)" Style="width: 100%; background-color:white; color:#007bff;" />
+                </RadzenColumn>
+                <RadzenColumn Size="6">
+                    <RadzenButton Icon="arrow_forward" Click="@ShowNextTip" Disabled="@(@currentTipIndex == tips.Count - 1)" Style="width: 100%; background-color:white; color:#007bff;" />
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenCard>
     </div>
+
+
 }
 <style>
     /* Overlay que cubre toda la pantalla */
@@ -37,15 +55,63 @@
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
         text-align: center;
     }
-
 </style>
 
 @code {
-    [Parameter]
-    public string Content { get; set; }
 
     [Parameter]
     public bool IsVisible { get; set; } = false;
+    private int currentTipIndex = 0;
+    public List<String> tips = new List<String>()
+                    {
+                    "GPSSignal",
+                    "GPSSignal2",
+                    "GPSSignal3",
+                    "GPSSignal4",
+                    "GPSSignal5",
+                    "GPSSignal6",
+                    "InformToAll",
+                    "GetWater",
+                    "CheckWeatherNew",
+                    "SaveNature",
+                    "Settings",
+                    "FollowRoute",
+                    "RecordRoute",
+                    "LoadRoute"
+
+                    };
+    private Random random = new Random();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        currentTipIndex = random.Next(0, tips.Count);
+        for (int i = 0; i < tips.Count; i++)
+        {
+            tips[i] = TranslationService.Translate(tips[i]);
+        }
+
+    }
 
 
+    private void ShowPreviousTip()
+    {
+        if (currentTipIndex > 0)
+        {
+            currentTipIndex--;
+        }
+    }
+
+    private void ShowNextTip()
+    {
+        if (currentTipIndex < tips.Count - 1)
+        {
+            currentTipIndex++;
+        }
+    }
+
+    private void Close()
+    {
+        IsVisible = false;
+    }
 }
