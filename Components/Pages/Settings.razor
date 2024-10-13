@@ -82,8 +82,9 @@
     {
         languages = new List<Language>
         {
-            new Language { Code = "es", Name = "Castellano", FlagUrl = "images/spain-flag.png" },
-            new Language { Code = "en", Name = "English", FlagUrl = "images/uk-flag.png" }
+            new Language { Code = "es", Name = TranslationService.Translate("Castellano"), FlagUrl = "images/spain-flag.png" },
+            new Language { Code = "en", Name = TranslationService.Translate("English"), FlagUrl = "images/uk-flag.png" },
+            new Language { Code = "ca", Name = TranslationService.Translate("Catalan"), FlagUrl = "images/catalan-flag.png" }
         };
 
         // Obtener el idioma guardado de la configuración o asignar por defecto

@@ -28,10 +28,7 @@ namespace Hiker.Services
 
             if (!string.IsNullOrEmpty(json))
             {
-                AppSettings = JsonSerializer.Deserialize<Settings>(json) ?? new Settings
-                {
-                    Language = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName
-                };
+                AppSettings = JsonSerializer.Deserialize<Settings>(json);
             }
         }
 

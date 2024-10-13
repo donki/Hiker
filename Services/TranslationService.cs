@@ -6,15 +6,21 @@ namespace Hiker.Services
     public class TranslationService
     {
 
-        private string _currentLanguage;
+        private string _currentLanguage = null;
+
+        public SettingsService SettingsService { get; }
 
         public TranslationService(SettingsService SettingsService)
         {
-            _currentLanguage = SettingsService.AppSettings.Language;
+            this.SettingsService = SettingsService;
         }
 
         public string Translate(string nativeWord)
         {
+            if (_currentLanguage == null)
+            {
+                _currentLanguage = SettingsService.AppSettings.Language;
+            }
 
             return Translations.Translate(nativeWord, _currentLanguage);
 
