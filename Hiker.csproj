@@ -40,9 +40,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <FileVersion>1.9.355</FileVersion>
-    <AssemblyVersion>1.9.355</AssemblyVersion>
-    <Version>1.9.326</Version>
+    <FileVersion>1.9.363</FileVersion>
+    <AssemblyVersion>1.9.363</AssemblyVersion>
+    <Version>1.9.362</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
@@ -74,6 +74,9 @@
   <ItemGroup>
     <!-- App Icon -->
     <MauiIcon Include="Resources\AppIcon\hiker.png" Color="#FFFFFF" />
+    <MauiIcon Include="wwwroot\favicon.png">
+      <Color>#FFFFFF</Color>
+    </MauiIcon>
     <MauiIcon Include="wwwroot\images\hikermenu.png" Color="#FFFFFF" />
     <!-- Splash Screen -->
     <MauiSplashScreen Include="Resources\AppIcon\hikersplash.png" Color="white" />
@@ -87,6 +90,10 @@
 
     <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
     <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot\favicon.png" />
   </ItemGroup>
 
   <ItemGroup>
