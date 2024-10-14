@@ -22,8 +22,14 @@
     <RadzenText TextStyle="TextStyle.H5" Style="margin-bottom: 20px;" Text="@TranslationService.Translate("ThaksForYourSupport")" />
 
     <div style="text-align: center; margin-top: 20px;">
-        <a href="https://ko-fi.com/josepsola" target="_blank">
-            <RadzenImage Style="border:0px;height:45px;" Path="images/kofi1.png" />
-        </a>
+        <RadzenImage Style="border:0px;height:45px;" Path="/images/kofi1.png" @onclick="OpenLink" />
     </div>
 </RadzenStack>
+
+@code {
+    private void OpenLink()
+    {
+        // Se abre el enlace de Ko-Fi
+        Navigation.NavigateTo("https://ko-fi.com/josepsola", true);
+    }
+}
