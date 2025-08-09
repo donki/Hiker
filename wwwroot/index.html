@@ -1,18 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>Hiker</title>
+    <meta name="theme-color" content="#4CAF50" />
+    <meta name="description" content="Hiker - Tu compañero de aventuras para rutas de senderismo y GPS" />
+    <title>Hiker - Tu compañero de aventuras</title>
     <base href="/" />
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="css/app.css" as="style" />
+    <link rel="preload" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" as="style" />
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="icons/bootstrap-icons.css">
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
     <link rel="stylesheet" href="Hiker.styles.css" />
     <link rel="stylesheet" href="_content/Radzen.Blazor/css/default.css">
-
-    <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+    <!-- Icons and PWA -->
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="apple-touch-icon" href="favicon.png" />
+    
+    <!-- Scripts -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/gpx.min.js"></script>
     <script src="https://unpkg.com/leaflet-rotatedmarker/leaflet.rotatedMarker.js"></script>

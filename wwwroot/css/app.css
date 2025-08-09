@@ -1,19 +1,46 @@
 ﻿html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: #f8f9fa;
+}
+
+* {
+    box-sizing: border-box;
 }
 
 a, .btn-link {
-    color: #006bb7;
+    color: #4CAF50;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover, .btn-link:hover {
+    color: #2E7D32;
+    text-decoration: none;
 }
 
 .btn-primary {
     color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+    background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+    outline: none;
 }
 
 .content {
@@ -87,35 +114,37 @@ h1:focus {
 
 
 
-/********    menu *******/
+/********    MENU MODERNO *******/
 .nav-scrollable {
     position: fixed;
     top: 10px;
-    right: 0; /* El menú sale desde la derecha */
-    width: 250px;
-    background-color: #007bff; /* Azul */
-    color: #ffffff; /* Texto blanco */
-    border-radius: 10px; /* Bordes redondeados */
-    padding: 10px;
-    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; /* Transición de deslizamiento y visibilidad */
-    z-index: 1000; /* Asegura que esté por encima del contenido */
-    height: auto; /* Ajusta automáticamente a las opciones visibles */
-    max-height: 100vh; /* Limita la altura máxima a la altura de la pantalla */
-    overflow-y: auto; /* Permite desplazamiento si el contenido excede la altura */
-    opacity: 0; /* Oculto por defecto */
-    pointer-events: none; /* Desactivar interacciones cuando está oculto */
+    right: 0;
+    width: 280px;
+    background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+    color: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    height: auto;
+    max-height: 90vh;
+    overflow-y: auto;
+    opacity: 0;
+    pointer-events: none;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
 }
 
 .closed {
-    transform: translateX(100%); /* Esconde el menú fuera de la pantalla a la derecha */
-    opacity: 0; /* Oculto */
-    pointer-events: none; /* Evita clics */
+    transform: translateX(100%);
+    opacity: 0;
+    pointer-events: none;
 }
 
 .open {
-    transform: translateX(0); /* Muestra el menú */
-    opacity: 1; /* Totalmente visible */
-    pointer-events: all; /* Habilita interacciones */
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: all;
 }
 
 nav ul {
@@ -124,21 +153,34 @@ nav ul {
     margin: 0;
 }
 
-    nav ul li {
-        margin-bottom: 15px;
-    }
-
-.nav-link {
-    color: #ffffff; /* Texto blanco */
-    text-decoration: none;
-    font-size: 16px;
+nav ul li {
+    margin-bottom: 8px;
 }
 
-    .nav-link:hover {
-        background-color: #0056b3; /* Un tono más oscuro al hacer hover */
-        padding: 5px;
-        border-radius: 4px;
-    }
+.nav-link {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1);
+    margin-bottom: 8px;
+}
+
+.nav-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.nav-link svg, .nav-link .bi {
+    margin-right: 12px;
+    opacity: 0.9;
+}
 
 /* Estilo del banner para que esté superpuesto al mapa */
 .ad-banner {
@@ -155,4 +197,255 @@ nav ul {
     display: inline-block;
     width: 100%;
     height: 50px; /* Altura del banner */
+}
+
+/********    SETTINGS PAGE STYLES *******/
+.modern-header {
+    background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+    box-shadow: 0 4px 16px rgba(76, 175, 80, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.settings-container {
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    min-height: calc(100vh - 64px);
+}
+
+.settings-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    padding: 24px;
+    max-width: 800px;
+    margin: 0 auto;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.setting-group {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.setting-group:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.setting-group-title {
+    color: #2E7D32;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.setting-group-title::before {
+    content: '';
+    width: 4px;
+    height: 24px;
+    background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+    border-radius: 2px;
+    margin-right: 12px;
+}
+
+.setting-item {
+    margin-bottom: 20px;
+    padding: 16px;
+    background: #fafafa;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.setting-item:hover {
+    background: #f5f5f5;
+    border-color: #4CAF50;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.1);
+}
+
+.setting-label {
+    font-weight: 600;
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.setting-description {
+    font-size: 13px;
+    color: #666;
+    margin-top: 4px;
+    font-style: italic;
+}
+
+.advanced-settings {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 100%);
+    border-radius: 16px;
+    padding: 24px;
+    border: 2px solid #4CAF50;
+    position: relative;
+}
+
+.advanced-settings::before {
+    content: '⚙️';
+    position: absolute;
+    top: -12px;
+    right: 20px;
+    background: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filters-section {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 2px dashed #4CAF50;
+}
+
+.filter-title {
+    color: #2E7D32;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.filter-title::before {
+    content: '🔧';
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .settings-container {
+        padding: 12px;
+    }
+    
+    .settings-card {
+        padding: 16px;
+        border-radius: 12px;
+    }
+    
+    .setting-group-title {
+        font-size: 18px;
+    }
+    
+    .modern-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+    }
+    
+    .settings-container {
+        margin-top: 64px;
+        min-height: calc(100vh - 128px);
+    }
+}
+
+/* Radzen component overrides */
+.rz-dropdown {
+    border-radius: 12px !important;
+    border: 2px solid #e0e0e0 !important;
+    transition: all 0.3s ease !important;
+}
+
+.rz-dropdown:focus-within {
+    border-color: #4CAF50 !important;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1) !important;
+}
+
+.rz-numeric {
+    border-radius: 12px !important;
+    border: 2px solid #e0e0e0 !important;
+    transition: all 0.3s ease !important;
+}
+
+.rz-numeric:focus-within {
+    border-color: #4CAF50 !important;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1) !important;
+}
+
+.rz-switch {
+    --rz-switch-color: #4CAF50 !important;
+}/**
+******    ANIMATIONS *******/
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}/**
+******    RESPONSIVE STYLES FOR TIPS *******/
+@media (max-width: 480px) {
+    .modern-overlay {
+        padding: 12px;
+    }
+    
+    .tip-card {
+        max-width: none;
+        margin: 0;
+    }
+    
+    .tip-header {
+        padding: 16px;
+    }
+    
+    .tip-title {
+        font-size: 18px;
+    }
+    
+    .tip-content {
+        padding: 20px;
+        min-height: 100px;
+    }
+    
+    .tip-text {
+        font-size: 15px;
+    }
 }

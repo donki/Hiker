@@ -2,59 +2,198 @@
 
 @if (IsVisible)
 {
-                                                            <div class="overlay">
-                                                                <RadzenCard Style="background-color: white; max-width: 300px; width: 100%; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-                                                                    <RadzenRow>
-                                                                        <RadzenColumn Size="11">
-                                                                            <RadzenText TextStyle="TextStyle.H5" Style="font-weight: bold; text-align:center">
-                                                                                <RadzenIcon Icon="school" Style="color:#007bff" /> @TranslationService.Translate("Sabías qué...")
-                                                                            </RadzenText>
-                                                                        </RadzenColumn>
-                                                                        <RadzenColumn Size="1">
-                                                                            <RadzenButton Icon="close" Style="position:relative; right:10px; top:-20px; background-color: transparent; color: #007bff;" Click="@Close" />
-                                                                        </RadzenColumn>
-                                                                    </RadzenRow>
-
-
-                                                                    <RadzenHtmlEditor Style="margin-top: 20px; height: 200px; width: 100%;" @bind-Value="tips[currentTipIndex]" Disabled="true" ShowToolbar="false" />
-
-                                                                    <RadzenRow Style="margin-top: 20px;">
-                                                                        <RadzenColumn Size="6">
-                                                                            <RadzenButton Icon="arrow_back" Click="@ShowPreviousTip" Disabled="@(@currentTipIndex == 0)" Style="width: 100%; background-color:white; color:#007bff;" />
-                                                                        </RadzenColumn>
-                                                                        <RadzenColumn Size="6">
-                                                                            <RadzenButton Icon="arrow_forward" Click="@ShowNextTip" Disabled="@(@currentTipIndex == tips.Count - 1)" Style="width: 100%; background-color:white; color:#007bff;" />
-                                                                        </RadzenColumn>
-                                                                    </RadzenRow>
-                                                                </RadzenCard>
-                                                            </div>
-
-
+    <div class="modern-overlay" @onclick="@Close">
+        <div class="tip-card" @onclick:stopPropagation="true">
+            <div class="tip-header">
+                <div class="tip-icon">💡</div>
+                <h3 class="tip-title">@TranslationService.Translate("Sabías qué...")</h3>
+                <button class="close-btn" @onclick="@Close">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="tip-content">
+                <div class="tip-text">
+                    @((MarkupString)tips[currentTipIndex])
+                </div>
+            </div>
+            
+            <div class="tip-navigation">
+                <button class="nav-btn prev-btn" @onclick="@ShowPreviousTip" disabled="@(currentTipIndex == 0)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15,18 9,12 15,6"></polyline>
+                    </svg>
+                </button>
+                
+                <div class="tip-counter">
+                    <span class="current-tip">@(currentTipIndex + 1)</span>
+                    <span class="tip-separator">/</span>
+                    <span class="total-tips">@tips.Count</span>
+                </div>
+                
+                <button class="nav-btn next-btn" @onclick="@ShowNextTip" disabled="@(currentTipIndex == tips.Count - 1)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9,18 15,12 9,6"></polyline>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
 }
 <style>
-    /* Overlay que cubre toda la pantalla */
-    .overlay {
+    .modern-overlay {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.7); /* Fondo semitransparente */
-        z-index: 999; /* Asegura que esté por encima de otros elementos */
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(8px);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        animation: fadeIn 0.3s ease-out;
     }
 
-    /* Contenido centrado del overlay */
-    .overlay-content {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: white;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-        text-align: center;
+
+
+    .tip-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 400px;
+        width: 100%;
+        overflow: hidden;
+        animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
     }
+
+
+
+    .tip-header {
+        background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+        color: white;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        position: relative;
+    }
+
+    .tip-icon {
+        font-size: 28px;
+        margin-right: 12px;
+        animation: pulse 2s infinite;
+    }
+
+
+
+    .tip-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin: 0;
+        flex: 1;
+    }
+
+    .close-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: white;
+    }
+
+    .close-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: rotate(90deg);
+    }
+
+    .tip-content {
+        padding: 24px;
+        min-height: 120px;
+        display: flex;
+        align-items: center;
+    }
+
+    .tip-text {
+        font-size: 16px;
+        line-height: 1.6;
+        color: #333;
+        text-align: center;
+        width: 100%;
+    }
+
+    .tip-navigation {
+        padding: 16px 24px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .nav-btn {
+        background: #f8f9fa;
+        border: 2px solid #e9ecef;
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: #4CAF50;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+        background: #4CAF50;
+        color: white;
+        border-color: #4CAF50;
+        transform: scale(1.1);
+    }
+
+    .nav-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .tip-counter {
+        display: flex;
+        align-items: center;
+        font-weight: 600;
+        color: #666;
+        background: #f8f9fa;
+        padding: 8px 16px;
+        border-radius: 20px;
+        border: 2px solid #e9ecef;
+    }
+
+    .current-tip {
+        color: #4CAF50;
+        font-size: 18px;
+    }
+
+    .tip-separator {
+        margin: 0 8px;
+        color: #ccc;
+    }
+
+    .total-tips {
+        color: #999;
+    }
+
+    /* Responsive styles moved to app.css */
 </style>
 
 @code {
