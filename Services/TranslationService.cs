@@ -2,40 +2,98 @@
 
 namespace Hiker.Services
 {
-
     public class TranslationService
     {
-
-        private string _currentLanguage = null;
-
+        private string? _currentLanguage = null;
         public SettingsService SettingsService { get; }
 
-        public TranslationService(SettingsService SettingsService)
+        public TranslationService(SettingsService settingsService)
         {
-            this.SettingsService = SettingsService;
+            this.SettingsService = settingsService;
+            // Inicializar automáticamente con el idioma del sistema
+            InitializeLanguage();
+        }
+
+        private void InitializeLanguage()
+        {
+            // Intentar obtener el idioma guardado en configuración
+            var savedLanguage = SettingsService.GetSetting("Language");
+            
+            if (!string.IsNullOrEmpty(savedLanguage))
+            {
+                _currentLanguage = savedLanguage;
+            }
+            else
+            {
+                // Si no hay idioma guardado, usar el del sistema
+                _currentLanguage = GetSupportedLanguage();
+                // Guardar la selección automática
+                SettingsService.SaveSetting("Language", _currentLanguage);
+            }
         }
 
         public string Translate(string nativeWord)
         {
             if (_currentLanguage == null)
             {
-                _currentLanguage = SettingsService.AppSettings.Language;
+                _currentLanguage = GetSupportedLanguage();
             }
-
             return Translations.Translate(nativeWord, _currentLanguage);
-
         }
 
         public void SetLanguage(string language)
         {
             _currentLanguage = language;
+            // Guardar el idioma seleccionado
+            SettingsService.SaveSetting("Language", language);
+        }
+
+        public string GetCurrentLanguage()
+        {
+            return _currentLanguage ?? GetSupportedLanguage();
         }
 
         private string GetSystemLanguage()
         {
-            var culture = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
-            return culture;
+            try
+            {
+                var culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+                return culture.ToLowerInvariant();
+            }
+            catch
+            {
+                return "en"; // Fallback a inglés si hay error
+            }
+        }
+
+        private string GetSupportedLanguage()
+        {
+            var systemLang = GetSystemLanguage();
+            // Idiomas soportados por la aplicación
+            var supported = new[] { "es", "en", "ca", "fr", "de", "it", "pt" };
+            return supported.Contains(systemLang) ? systemLang : "en";
+        }
+
+        public string[] GetSupportedLanguages()
+        {
+            return new[] { "es", "en", "ca", "fr", "de", "it", "pt" };
+        }
+
+        public string GetLanguageName(string code)
+        {
+            return code switch
+            {
+                "es" => "Español",
+                "en" => "English",
+                "ca" => "Català",
+                "fr" => "Français",
+                "de" => "Deutsch",
+                "it" => "Italiano",
+                "pt" => "Português",
+                _ => "English"
+            };
         }
     }
-
 }
+
+

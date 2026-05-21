@@ -1,4 +1,4 @@
-﻿namespace Hiker.Data
+﻿namespace Hiker.Models
 {
     public class ElevationPoint
     {

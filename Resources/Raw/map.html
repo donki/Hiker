@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiker Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a;
+        }
+        #map {
+            height: 100vh;
+            width: 100vw;
+        }
+        .leaflet-control-container {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Inicializar mapa centrado en Madrid
+        var map = L.map('map').setView([40.4168, -3.7038], 13);
+        
+        // Usar OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+        
+        // Variables para tracking
+        var currentLocationMarker = null;
+        var routePolyline = null;
+        var routePoints = [];
+        
+        // Función para actualizar ubicación actual
+        function updateLocation(lat, lng, accuracy) {
+            if (currentLocationMarker) {
+                map.removeLayer(currentLocationMarker);
+            }
+            
+            // Crear marcador de ubicación actual
+            currentLocationMarker = L.circleMarker([lat, lng], {
+                color: '#4CAF50',
+                fillColor: '#4CAF50',
+                fillOpacity: 0.8,
+                radius: 8
+            }).addTo(map);
+            
+            // Círculo de precisión
+            L.circle([lat, lng], {
+                color: '#4CAF50',
+                fillColor: '#4CAF50',
+                fillOpacity: 0.1,
+                radius: accuracy
+            }).addTo(map);
+            
+            // Centrar mapa en la ubicación
+            map.setView([lat, lng], map.getZoom());
+        }
+        
+        // Función para agregar punto a la ruta
+        function addRoutePoint(lat, lng) {
+            routePoints.push([lat, lng]);
+            
+            if (routePolyline) {
+                map.removeLayer(routePolyline);
+            }
+            
+            if (routePoints.length > 1) {
+                routePolyline = L.polyline(routePoints, {
+                    color: '#F44336',
+                    weight: 4,
+                    opacity: 0.8
+                }).addTo(map);
+            }
+        }
+        
+        // Función para limpiar ruta
+        function clearRoute() {
+            if (routePolyline) {
+                map.removeLayer(routePolyline);
+                routePolyline = null;
+            }
+            routePoints = [];
+        }
+        
+        // Función para centrar en ubicación
+        function centerOnLocation(lat, lng, zoom) {
+            map.setView([lat, lng], zoom || 15);
+        }
+        
+        // Exponer funciones globalmente para que C# pueda llamarlas
+        window.updateLocation = updateLocation;
+        window.addRoutePoint = addRoutePoint;
+        window.clearRoute = clearRoute;
+        window.centerOnLocation = centerOnLocation;
+        
+        // Notificar que el mapa está listo
+        window.mapReady = true;
+    </script>
+</body>
+</html>

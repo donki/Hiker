@@ -1,4 +1,4 @@
-using Hiker.Data;
+using Hiker.Models;
 using Hiker.Helpers;
 using System.Text;
 
@@ -141,7 +141,7 @@ namespace Hiker.Services
             if (track != null)
             {
                 Console.WriteLine($"Nombre de la ruta: {track.Name}");
-                Console.WriteLine($"N�mero de segmentos: {track.Segments.Count}");
+                Console.WriteLine($"N�mero de segmentos: {track.Segments.Count}");
 
 
             }
@@ -232,6 +232,39 @@ namespace Hiker.Services
                 totalDistance = totalDistance,
                 routeName = routeName
             };
+        }
+
+        public async Task<List<RouteData>> GetAllRoutesAsync()
+        {
+            // Implementación básica - devuelve rutas guardadas
+            var routes = new List<RouteData>();
+            
+            try
+            {
+                // Aquí implementarías la lógica para cargar rutas guardadas
+                // Por ahora devolvemos una lista vacía
+                return routes;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading routes: {ex.Message}");
+                return routes;
+            }
+        }
+
+        public async Task DeleteRouteAsync(string routeName)
+        {
+            try
+            {
+                // Implementación básica para eliminar ruta
+                // Aquí implementarías la lógica para eliminar la ruta del almacenamiento
+                System.Diagnostics.Debug.WriteLine($"Deleting route: {routeName}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error deleting route: {ex.Message}");
+                throw;
+            }
         }
 
     }
