@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Hiker.Pages.HomePage"
+             Title="GPS Tracker"
+             BackgroundColor="#1a1a1a">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Panel de información GPS -->
+        <Frame Grid.Row="0" BackgroundColor="#2E7D32" Margin="10,5" CornerRadius="10" HasShadow="True">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                
+                <StackLayout Grid.Column="0" Orientation="Vertical">
+                    <Label x:Name="locationLabel" 
+                           Text="Obteniendo ubicación..." 
+                           TextColor="White" 
+                           FontSize="14" />
+                    <Label x:Name="accuracyLabel" 
+                           Text="Precisión: --" 
+                           TextColor="#E8F5E8" 
+                           FontSize="12" />
+                    <Label x:Name="speedLabel" 
+                           Text="Velocidad: -- km/h" 
+                           TextColor="#E8F5E8" 
+                           FontSize="12" />
+                </StackLayout>
+                
+                <Button Grid.Column="1" 
+                        x:Name="gpsButton"
+                        Text="📍" 
+                        BackgroundColor="#4CAF50" 
+                        TextColor="White" 
+                        WidthRequest="50" 
+                        HeightRequest="50" 
+                        CornerRadius="25"
+                        Clicked="OnGpsButtonClicked" />
+            </Grid>
+        </Frame>
+
+        <!-- Mapa OpenStreetMap con WebView -->
+        <WebView x:Name="mapWebView" 
+                 Grid.Row="1" 
+                 BackgroundColor="#1a1a1a" />
+
+        <!-- Panel de controles -->
+        <Frame Grid.Row="2" BackgroundColor="#2E7D32" Margin="10,5" CornerRadius="10" HasShadow="True">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                
+                <Button Grid.Column="0" 
+                        x:Name="startTrackingButton"
+                        Text="▶️ Iniciar" 
+                        BackgroundColor="#4CAF50" 
+                        TextColor="White" 
+                        FontSize="12"
+                        Clicked="OnStartTrackingClicked" />
+                
+                <Button Grid.Column="1" 
+                        x:Name="stopTrackingButton"
+                        Text="⏹️ Parar" 
+                        BackgroundColor="#F44336" 
+                        TextColor="White" 
+                        FontSize="12"
+                        IsEnabled="False"
+                        Clicked="OnStopTrackingClicked" />
+                
+                <Button Grid.Column="2" 
+                        x:Name="saveRouteButton"
+                        Text="💾 Guardar" 
+                        BackgroundColor="#FF9800" 
+                        TextColor="White" 
+                        FontSize="12"
+                        IsEnabled="False"
+                        Clicked="OnSaveRouteClicked" />
+                
+                <Button Grid.Column="3" 
+                        x:Name="clearButton"
+                        Text="🗑️ Limpiar" 
+                        BackgroundColor="#9C27B0" 
+                        TextColor="White" 
+                        FontSize="12"
+                        Clicked="OnClearClicked" />
+            </Grid>
+        </Frame>
+    </Grid>
+</ContentPage>

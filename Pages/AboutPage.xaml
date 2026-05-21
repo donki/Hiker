@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Hiker.Pages.AboutPage"
+             Title="Acerca de"
+             BackgroundColor="#1a1a1a">
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="20">
+            
+            <!-- App Logo and Title -->
+            <Frame BackgroundColor="#2E7D32" CornerRadius="15" HasShadow="True">
+                <StackLayout Spacing="15" HorizontalOptions="Center">
+                    <Image Source="splash.png" 
+                           WidthRequest="100" 
+                           HeightRequest="100" />
+                    
+                    <Label Text="HIKER" 
+                           FontSize="32" 
+                           FontAttributes="Bold" 
+                           TextColor="White" 
+                           HorizontalOptions="Center" />
+                    
+                    <Label Text="Tu compañero de aventuras" 
+                           FontSize="16" 
+                           TextColor="#E8F5E8" 
+                           HorizontalOptions="Center" />
+                    
+                    <Label x:Name="versionLabel"
+                           Text="Versión 2.0.0 - MAUI Nativo" 
+                           FontSize="14" 
+                           TextColor="#E8F5E8" 
+                           HorizontalOptions="Center" />
+                </StackLayout>
+            </Frame>
+
+            <!-- Features -->
+            <Frame BackgroundColor="#2E7D32" CornerRadius="10" HasShadow="True">
+                <StackLayout Spacing="10">
+                    <Label Text="Características" 
+                           FontSize="18" 
+                           FontAttributes="Bold" 
+                           TextColor="White" />
+                    
+                    <Label Text="• GPS en tiempo real con alta precisión" 
+                           TextColor="#E8F5E8" 
+                           FontSize="14" />
+                    <Label Text="• Grabación y seguimiento de rutas" 
+                           TextColor="#E8F5E8" 
+                           FontSize="14" />
+                    <Label Text="• Mapas nativos integrados" 
+                           TextColor="#E8F5E8" 
+                           FontSize="14" />
+                    <Label Text="• Filtros GPS avanzados (Kalman)" 
+                           TextColor="#E8F5E8" 
+                           FontSize="14" />
+                    <Label Text="• Soporte para archivos GPX" 
+                           TextColor="#E8F5E8" 
+                           FontSize="14" />
+                    <Label Text="• Interfaz nativa optimizada" 
+                           TextColor="#E8F5E8" 
+                           FontSize="14" />
+                </StackLayout>
+            </Frame>
+
+            <!-- Technical Info -->
+            <Frame BackgroundColor="#2E7D32" CornerRadius="10" HasShadow="True">
+                <StackLayout Spacing="10">
+                    <Label Text="Información Técnica" 
+                           FontSize="18" 
+                           FontAttributes="Bold" 
+                           TextColor="White" />
+                    
+                    <Label Text="• Desarrollado con .NET 9 MAUI" 
+                           TextColor="#E8F5E8" 
+                           FontSize="14" />
+                    <Label Text="• Interfaz 100% nativa" 
+                           TextColor="#E8F5E8" 
+                           FontSize="14" />
+                    <Label Text="• Optimizado para Windows y Android" 
+                           TextColor="#E8F5E8" 
+                           FontSize="14" />
+                    <Label Text="• GPS de alta frecuencia (hasta 10Hz)" 
+                           TextColor="#E8F5E8" 
+                           FontSize="14" />
+                    <Label Text="• Gestión avanzada de memoria" 
+                           TextColor="#E8F5E8" 
+                           FontSize="14" />
+                </StackLayout>
+            </Frame>
+
+            <!-- System Info -->
+            <Frame BackgroundColor="#2E7D32" CornerRadius="10" HasShadow="True">
+                <StackLayout Spacing="10">
+                    <Label Text="Información del Sistema" 
+                           FontSize="18" 
+                           FontAttributes="Bold" 
+                           TextColor="White" />
+                    
+                    <Label x:Name="platformLabel"
+                           Text="Plataforma: --" 
+                           TextColor="#E8F5E8" 
+                           FontSize="14" />
+                    <Label x:Name="deviceLabel"
+                           Text="Dispositivo: --" 
+                           TextColor="#E8F5E8" 
+                           FontSize="14" />
+                    <Label x:Name="osVersionLabel"
+                           Text="Versión OS: --" 
+                           TextColor="#E8F5E8" 
+                           FontSize="14" />
+                </StackLayout>
+            </Frame>
+
+            <!-- Action Buttons -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                
+                <Button Grid.Column="0" 
+                        Text="📧 Contacto" 
+                        BackgroundColor="#4CAF50" 
+                        TextColor="White" 
+                        Margin="5"
+                        Clicked="OnContactClicked" />
+                
+                <Button Grid.Column="1" 
+                        Text="⭐ Valorar" 
+                        BackgroundColor="#FF9800" 
+                        TextColor="White" 
+                        Margin="5"
+                        Clicked="OnRateClicked" />
+            </Grid>
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

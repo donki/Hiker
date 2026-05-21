@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Hiker.Pages.SettingsPage"
+             Title="Configuración"
+             BackgroundColor="#1a1a1a">
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="15">
+            
+            <!-- GPS Settings -->
+            <Frame BackgroundColor="#2E7D32" CornerRadius="10" HasShadow="True">
+                <StackLayout Spacing="10">
+                    <Label Text="Configuración GPS" 
+                           TextColor="White" 
+                           FontSize="18" 
+                           FontAttributes="Bold" />
+                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" 
+                               Text="Usar GPS Nativo" 
+                               TextColor="White" 
+                               VerticalOptions="Center" />
+                        <Switch Grid.Column="1" 
+                                x:Name="nativeGpsSwitch"
+                                OnColor="#4CAF50" />
+                    </Grid>
+                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="100" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" 
+                               Text="Intervalo de actualización (seg)" 
+                               TextColor="White" 
+                               VerticalOptions="Center" />
+                        <Entry Grid.Column="1" 
+                               x:Name="intervalEntry"
+                               Text="1"
+                               Keyboard="Numeric"
+                               BackgroundColor="White" />
+                    </Grid>
+                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="100" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" 
+                               Text="Precisión mínima (m)" 
+                               TextColor="White" 
+                               VerticalOptions="Center" />
+                        <Entry Grid.Column="1" 
+                               x:Name="accuracyEntry"
+                               Text="10"
+                               Keyboard="Numeric"
+                               BackgroundColor="White" />
+                    </Grid>
+                </StackLayout>
+            </Frame>
+
+            <!-- Filter Settings -->
+            <Frame BackgroundColor="#2E7D32" CornerRadius="10" HasShadow="True">
+                <StackLayout Spacing="10">
+                    <Label Text="Filtros GPS" 
+                           TextColor="White" 
+                           FontSize="18" 
+                           FontAttributes="Bold" />
+                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" 
+                               Text="Filtro Kalman" 
+                               TextColor="White" 
+                               VerticalOptions="Center" />
+                        <Switch Grid.Column="1" 
+                                x:Name="kalmanSwitch"
+                                OnColor="#4CAF50" />
+                    </Grid>
+                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" 
+                               Text="Filtro de velocidad" 
+                               TextColor="White" 
+                               VerticalOptions="Center" />
+                        <Switch Grid.Column="1" 
+                                x:Name="speedFilterSwitch"
+                                OnColor="#4CAF50" />
+                    </Grid>
+                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="100" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" 
+                               Text="Velocidad máxima (m/s)" 
+                               TextColor="White" 
+                               VerticalOptions="Center" />
+                        <Entry Grid.Column="1" 
+                               x:Name="maxSpeedEntry"
+                               Text="50"
+                               Keyboard="Numeric"
+                               BackgroundColor="White" />
+                    </Grid>
+                </StackLayout>
+            </Frame>
+
+            <!-- Language Settings -->
+            <Frame BackgroundColor="#2E7D32" CornerRadius="10" HasShadow="True">
+                <StackLayout Spacing="10">
+                    <Label Text="Idioma" 
+                           TextColor="White" 
+                           FontSize="18" 
+                           FontAttributes="Bold" />
+                    
+                    <Picker x:Name="languagePicker"
+                            BackgroundColor="White"
+                            Title="Seleccionar idioma">
+                        <Picker.Items>
+                            <x:String>Español</x:String>
+                            <x:String>English</x:String>
+                        </Picker.Items>
+                    </Picker>
+                </StackLayout>
+            </Frame>
+
+            <!-- Action Buttons -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                
+                <Button Grid.Column="0" 
+                        x:Name="saveButton"
+                        Text="💾 Guardar" 
+                        BackgroundColor="#4CAF50" 
+                        TextColor="White" 
+                        Margin="5"
+                        Clicked="OnSaveClicked" />
+                
+                <Button Grid.Column="1" 
+                        x:Name="resetButton"
+                        Text="🔄 Restablecer" 
+                        BackgroundColor="#F44336" 
+                        TextColor="White" 
+                        Margin="5"
+                        Clicked="OnResetClicked" />
+            </Grid>
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

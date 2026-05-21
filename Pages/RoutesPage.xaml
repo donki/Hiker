@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Hiker.Pages.RoutesPage"
+             Title="Rutas Guardadas"
+             BackgroundColor="#1a1a1a">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Frame Grid.Row="0" BackgroundColor="#2E7D32" Margin="10,5" CornerRadius="10" HasShadow="True">
+            <Label Text="Gestión de Rutas" 
+                   TextColor="White" 
+                   FontSize="18" 
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center" />
+        </Frame>
+
+        <!-- Lista de rutas -->
+        <CollectionView Grid.Row="1" 
+                        x:Name="routesCollectionView"
+                        Margin="10"
+                        BackgroundColor="Transparent">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Padding="10" Margin="5">
+                        <Frame BackgroundColor="#2E7D32" CornerRadius="10" HasShadow="True">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                
+                                <StackLayout Grid.Column="0" Orientation="Vertical">
+                                    <Label Text="{Binding Name}" 
+                                           TextColor="White" 
+                                           FontSize="16" 
+                                           FontAttributes="Bold" />
+                                    <Label Text="{Binding Distance, StringFormat='Distancia: {0:F2} km'}" 
+                                           TextColor="#E8F5E8" 
+                                           FontSize="12" />
+                                    <Label Text="{Binding CreatedDate, StringFormat='Fecha: {0:dd/MM/yyyy}'}" 
+                                           TextColor="#E8F5E8" 
+                                           FontSize="12" />
+                                </StackLayout>
+                                
+                                <Button Grid.Column="1" 
+                                        Text="📍" 
+                                        BackgroundColor="#4CAF50" 
+                                        TextColor="White" 
+                                        WidthRequest="40" 
+                                        HeightRequest="40" 
+                                        CornerRadius="20"
+                                        Margin="5,0"
+                                        Command="{Binding Source={x:Reference routesCollectionView}, Path=BindingContext.LoadRouteCommand}"
+                                        CommandParameter="{Binding .}" />
+                                
+                                <Button Grid.Column="2" 
+                                        Text="🗑️" 
+                                        BackgroundColor="#F44336" 
+                                        TextColor="White" 
+                                        WidthRequest="40" 
+                                        HeightRequest="40" 
+                                        CornerRadius="20"
+                                        Command="{Binding Source={x:Reference routesCollectionView}, Path=BindingContext.DeleteRouteCommand}"
+                                        CommandParameter="{Binding .}" />
+                            </Grid>
+                        </Frame>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Botones de acción -->
+        <Frame Grid.Row="2" BackgroundColor="#2E7D32" Margin="10,5" CornerRadius="10" HasShadow="True">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                
+                <Button Grid.Column="0" 
+                        x:Name="loadGpxButton"
+                        Text="📁 Cargar GPX" 
+                        BackgroundColor="#4CAF50" 
+                        TextColor="White" 
+                        Margin="5"
+                        Clicked="OnLoadGpxClicked" />
+                
+                <Button Grid.Column="1" 
+                        x:Name="refreshButton"
+                        Text="🔄 Actualizar" 
+                        BackgroundColor="#FF9800" 
+                        TextColor="White" 
+                        Margin="5"
+                        Clicked="OnRefreshClicked" />
+            </Grid>
+        </Frame>
+    </Grid>
+</ContentPage>

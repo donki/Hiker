@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:local="clr-namespace:Hiker.Pages"
+       x:Class="Hiker.AppShell"
+       Title="Hiker"
+       BackgroundColor="#4CAF50">
+
+    <Shell.Resources>
+        <ResourceDictionary>
+            <Style x:Key="BaseStyle" TargetType="Element">
+                <Setter Property="Shell.BackgroundColor" Value="#4CAF50" />
+                <Setter Property="Shell.ForegroundColor" Value="White" />
+                <Setter Property="Shell.TitleColor" Value="White" />
+                <Setter Property="Shell.DisabledColor" Value="#B4B4B4" />
+                <Setter Property="Shell.UnselectedColor" Value="#95FFFFFF" />
+                <Setter Property="Shell.TabBarBackgroundColor" Value="#4CAF50" />
+                <Setter Property="Shell.TabBarForegroundColor" Value="White"/>
+                <Setter Property="Shell.TabBarUnselectedColor" Value="#95FFFFFF"/>
+                <Setter Property="Shell.TabBarTitleColor" Value="White"/>
+            </Style>
+        </ResourceDictionary>
+    </Shell.Resources>
+
+    <TabBar>
+        <ShellContent Title="GPS"
+                      Icon="location.png"
+                      ContentTemplate="{DataTemplate local:HomePage}" />
+        
+        <ShellContent Title="Rutas"
+                      Icon="map.png"
+                      ContentTemplate="{DataTemplate local:RoutesPage}" />
+        
+        <ShellContent Title="Configuración"
+                      Icon="settings.png"
+                      ContentTemplate="{DataTemplate local:SettingsPage}" />
+        
+        <ShellContent Title="Acerca de"
+                      Icon="info.png"
+                      ContentTemplate="{DataTemplate local:AboutPage}" />
+    </TabBar>
+
+</Shell>

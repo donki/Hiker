@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Storage;
 using Hiker.Services;
-using Radzen;
+using Microsoft.Extensions.Logging;
 
 namespace Hiker
 {
@@ -10,34 +10,87 @@ namespace Hiker
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
-            builder
-                .UseMauiApp<App>()
-                .UseMauiCommunityToolkit()
-                .ConfigureFonts(fonts =>
+            
+            try
+            {
+                builder
+                    .UseMauiApp<App>()
+                    .UseMauiCommunityToolkit()
+                    .ConfigureFonts(fonts =>
+                    {
+                        fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                        fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                    });
+
+                // Servicios optimizados para .NET 9 - MAUI Nativo
+                builder.Services.AddSingleton<SettingsService>();
+                builder.Services.AddSingleton<TranslationService>();
+                
+                // Registrar servicio de geolocalización principal
+                builder.Services.AddScoped<GeolocationService>();
+                builder.Services.AddScoped<FallbackGeolocationService>();
+                
+                builder.Services.AddScoped<RouteService>();
+                builder.Services.AddScoped<GpsFilterService>();
+
+                // Servicios de CommunityToolkit
+                try
                 {
-                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                });
+                    builder.Services.AddSingleton<IFileSaver>(FileSaver.Default);
+                }
+                catch (Exception fileSaverEx)
+                {
+                    System.Diagnostics.Debug.WriteLine(
+                        $"IFileSaver registration failed, using MockFileSaver fallback: {fileSaverEx}");
+                    builder.Services.AddSingleton<IFileSaver>(provider => new MockFileSaver());
+                }
 
-            builder.Services.AddMauiBlazorWebView();
-            builder.Services.AddSingleton<GeolocationService>();
-            builder.Services.AddSingleton<SettingsService>();
-            builder.Services.AddSingleton<RouteService>();
-            builder.Services.AddSingleton<GpsFilterService>();
-            builder.Services.AddSingleton<TranslationService>();
-
-            builder.Services.AddSingleton<IFileSaver>(FileSaver.Default);
-            builder.Services.AddSingleton<IDialogService, Hiker.Services.DialogService>();
-            builder.Services.AddRadzenComponents();
-
-
-
+                // Registrar páginas para navegación
+                builder.Services.AddTransient<Pages.HomePage>();
+                builder.Services.AddTransient<Pages.RoutesPage>();
+                builder.Services.AddTransient<Pages.SettingsPage>();
+                builder.Services.AddTransient<Pages.AboutPage>();
 
 #if DEBUG
-            builder.Services.AddBlazorWebViewDeveloperTools();
-
+                builder.Logging.AddDebug();
 #endif
 
-            return builder.Build();
+                return builder.Build();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error initializing MAUI app: {ex.Message}");
+                throw;
+            }
+        }
+    }
+
+    // Mock FileSaver para casos donde no esté disponible
+    public class MockFileSaver : IFileSaver
+    {
+        public Task<FileSaverResult> SaveAsync(string fileName, Stream stream, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new FileSaverResult("", new Exception("FileSaver not available")));
+        }
+
+        public Task<FileSaverResult> SaveAsync(string defaultFileName, Stream stream, string contentType, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new FileSaverResult("", new Exception("FileSaver not available")));
+        }
+
+        public Task<FileSaverResult> SaveAsync(string fileName, string filePath, Stream stream, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new FileSaverResult("", new Exception("FileSaver not available")));
+        }
+
+        public Task<FileSaverResult> SaveAsync(string fileName, string filePath, Stream stream, IProgress<double> progress, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new FileSaverResult("", new Exception("FileSaver not available")));
+        }
+
+        public Task<FileSaverResult> SaveAsync(string fileName, Stream stream, IProgress<double> progress, CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(new FileSaverResult("", new Exception("FileSaver not available")));
         }
     }
 }
