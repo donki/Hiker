@@ -1,8 +1,18 @@
 
 .vs/
+.vscode/
+.claude/
 
 bin/
-
 obj/
 
 *.user
+*.log
+
+# Local secrets and signing material (constitution compliance)
+*.keystore
+*.jks
+keystore.password.txt
+keystore.password.local.txt
+hiker-*.json
+*-service-account*.json
