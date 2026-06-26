@@ -22,9 +22,15 @@ Carpetas y proposito estandar:
 - Pages/: interfaces de usuario en XAML/C#.
 - Services/: logica de negocio e integraciones.
 - Models/: clases de datos y entidades.
+- Helpers/: utilidades puras y reutilizables sin estado (formato, parseo, ficheros, algoritmos). No deben contener logica de plataforma ni dependencias de UI.
 - Platforms/Android/: codigo Android nativo, manifiestos, recursos especificos.
-- Resources/: iconos, imagenes, estilos, fuentes.
+- Resources/: iconos, imagenes, estilos, fuentes, traducciones, assets crudos.
 - Properties/: configuracion del proyecto (launchSettings.json).
+
+Plataformas secundarias de desarrollo:
+- Se permite habilitar plataformas adicionales (por ejemplo Windows) como objetivo secundario de desarrollo y depuracion.
+- El objetivo de publicacion y soporte sigue siendo Android; las plataformas secundarias no relajan ninguna regla de esta constitucion.
+- Codigo especifico de una plataforma secundaria debe encapsularse en su carpeta Platforms/ correspondiente.
 
 Reglas de dependencia obligatorias:
 - La logica de negocio reside en Services, no en interfaz.
@@ -47,6 +53,11 @@ Convención de identificador de paquete (Package Name):
   - Revisar AndroidManifest.xml antes de cada publicacion.
   - Justificar cada permiso solicitado en documentacion.
   - Aplicar principio de minimo privilegio.
+  - Acotar con `android:maxSdkVersion` los permisos que solo son necesarios en versiones antiguas de Android (por ejemplo almacenamiento externo cuando el almacenamiento con alcance ya cubre el caso). No solicitar en Android moderno permisos que las APIs actuales no requieren.
+- Registros y diagnostico:
+  - Nunca registrar datos sensibles del usuario ni credenciales en logs.
+  - Los ficheros de log (`*.log`) no se versionan: deben estar en .gitignore y mantenerse fuera del control de versiones.
+  - Preferir logging condicionado a compilacion (`#if DEBUG`) o niveles de severidad para no filtrar detalle interno en release.
 - Metadata de Play:
   - Mantener descripciones, titulos y notas de lanzamiento precisos y veridicos.
   - Evitar promesas no cumplidas o contenido enganoso.
@@ -139,3 +150,18 @@ Politica de revision y optimizacion:
   - Incluir validacion manual en dispositivo antes de merge.
   - Documentarse en CHANGELOG como "mejora tecnica" o "refactorizacion".
 - Si una mejora requiere cambios mayores, planificar como feature independiente en version futura.
+
+## 14. Internacionalizacion (i18n)
+Gobernanza de idiomas dentro de la aplicacion:
+- Todo texto visible al usuario debe externalizarse (recurso, CSV o catalogo de traducciones). No se permite texto de UI escrito directamente en codigo o XAML.
+- Definir un idioma por defecto y garantizar fallback a el cuando falte una traduccion; nunca mostrar la clave interna al usuario.
+- Mantener la lista de idiomas declarados en codigo sincronizada con las traducciones realmente disponibles. Si un idioma se anuncia pero no esta traducido, debe completarse o retirarse de la lista de soportados.
+- La seleccion de idioma debe persistirse en los ajustes del usuario y respetar el idioma del sistema en el primer arranque.
+- Coherencia con la ficha de Play: los idiomas soportados en la app deben alinearse con la metadata publicada (ver secciones 5 y 8).
+
+## 15. Documentos de Gobernanza y Submodulos
+- Esta constitucion es el documento de gobernanza de referencia y puede compartirse entre proyectos del mismo stack como repositorio independiente.
+- Cuando se consuma como submodulo Git, el submodulo es la fuente canonica de solo lectura: no se edita en el proyecto consumidor.
+- La copia operativa del proyecto (la que enlazan README y scripts) debe mantenerse sincronizada con la canonica; cualquier extension especifica del proyecto debe marcarse como tal y, si es de utilidad general, proponerse aguas arriba al repositorio canonico.
+- Los submodulos deben fijarse a un commit concreto y actualizarse de forma deliberada y documentada (no de forma automatica e implicita).
+- Registrar en CHANGELOG la incorporacion o actualizacion de submodulos de gobernanza.
