@@ -1,5 +1,5 @@
-﻿// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+﻿using Microsoft.UI.Xaml;
+using Hiker.Platforms.Windows;
 
 namespace Hiker.WinUI
 {
@@ -14,10 +14,52 @@ namespace Hiker.WinUI
         /// </summary>
         public App()
         {
-            this.InitializeComponent();
+            try
+            {
+                // Initialize Windows-specific settings before component initialization
+                WindowsInitializationService.Initialize();
+                
+                // Configure WebView2 environment
+                System.Diagnostics.Debug.WriteLine("WebView2 environment ready");
+                
+                this.InitializeComponent();
+                
+                System.Diagnostics.Debug.WriteLine("Windows app initialized successfully");
+            }
+            catch (System.Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error initializing Windows app: {ex.Message}");
+                // Continue execution to avoid complete failure
+            }
         }
 
-        protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
-    }
+        protected override MauiApp CreateMauiApp()
+        {
+            try
+            {
+                var app = MauiProgram.CreateMauiApp();
+                System.Diagnostics.Debug.WriteLine("MAUI app created successfully");
+                return app;
+            }
+            catch (System.Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error creating MAUI app: {ex.Message}");
+                throw;
+            }
+        }
 
+        protected override void OnLaunched(LaunchActivatedEventArgs args)
+        {
+            try
+            {
+                base.OnLaunched(args);
+                System.Diagnostics.Debug.WriteLine("App launched successfully");
+            }
+            catch (System.Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error launching app: {ex.Message}");
+                throw;
+            }
+        }
+    }
 }

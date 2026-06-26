@@ -6,19 +6,21 @@
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   IgnorableNamespaces="uap rescap">
 
-  <Identity Name="maui-package-name-placeholder" Publisher="CN=User Name" Version="0.0.0.0" />
+  <Identity Name="com.socratic.hiker" Publisher="CN=sOCratic" Version="1.9.326.0" />
 
   <mp:PhoneIdentity PhoneProductId="3E0262FC-F868-48F2-9834-B045F41DA433" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>$placeholder$</DisplayName>
-    <PublisherDisplayName>User Name</PublisherDisplayName>
-    <Logo>$placeholder$.png</Logo>
+    <DisplayName>Hiker</DisplayName>
+    <PublisherDisplayName>sOCratic</PublisherDisplayName>
+    <Logo>hiker.png</Logo>
   </Properties>
 
   <Dependencies>
-    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
-    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26100.0" />
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26100.0" />
+    <PackageDependency Name="Microsoft.VCLibs.140.00" MinVersion="14.0.33519.0" Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US" />
+    <PackageDependency Name="Microsoft.VCLibs.140.00.UWPDesktop" MinVersion="14.0.33519.0" Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US" />
   </Dependencies>
 
   <Resources>
@@ -28,13 +30,13 @@
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="$placeholder$"
-        Description="$placeholder$"
-        Square150x150Logo="$placeholder$.png"
-        Square44x44Logo="$placeholder$.png"
-        BackgroundColor="transparent">
-        <uap:DefaultTile Square71x71Logo="$placeholder$.png" Wide310x150Logo="$placeholder$.png" Square310x310Logo="$placeholder$.png" />
-        <uap:SplashScreen Image="$placeholder$.png" />
+        DisplayName="Hiker"
+        Description="Tu compañero de aventuras - Aplicación de senderismo y GPS"
+        Square150x150Logo="hiker.png"
+        Square44x44Logo="hiker.png"
+        BackgroundColor="#4CAF50">
+        <uap:DefaultTile Square71x71Logo="hiker.png" Wide310x150Logo="hiker.png" Square310x310Logo="hiker.png" />
+        <uap:SplashScreen Image="hikersplash.png" BackgroundColor="#4CAF50" />
         <uap:InitialRotationPreference>
           <uap:Rotation Preference="portrait"/></uap:InitialRotationPreference>
       </uap:VisualElements>
@@ -44,6 +46,13 @@
   <Capabilities>
     <rescap:Capability Name="runFullTrust" />
     <DeviceCapability Name="location"/>
+    <DeviceCapability Name="microphone"/>
+    <Capability Name="internetClient"/>
+    <Capability Name="internetClientServer"/>
+    <Capability Name="privateNetworkClientServer"/>
+    <Capability Name="documentsLibrary"/>
+    <Capability Name="removableStorage"/>
+    <uap:Capability Name="userAccountInformation"/>
   </Capabilities>
 
 </Package>

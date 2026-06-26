@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
-    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
+    <TargetFrameworks>net9.0-android</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0</TargetFrameworks>
     <!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
     <!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen</TargetFrameworks> -->
 
@@ -18,66 +18,30 @@
     <UseMaui>true</UseMaui>
     <SingleProject>true</SingleProject>
     <ImplicitUsings>enable</ImplicitUsings>
-    <EnableDefaultCssItems>false</EnableDefaultCssItems>
+
     <Nullable>enable</Nullable>
 
     <!-- Display name -->
     <ApplicationTitle>Hiker</ApplicationTitle>
 
     <!-- App Identifier -->
-    <ApplicationId>com.organiccoating.hiker</ApplicationId>
+    <ApplicationId>com.socratic.hiker</ApplicationId>
 
-    <!-- Versions -->
+    <!-- Versions: ApplicationVersion debe ser entero incremental (constitucion seccion 6).
+         Convencion: yyyyMMddR (R=rev del dia, empieza en 0). Mantener en sincronia con
+         ApplicationDisplayVersion antes de cada publicacion. -->
     <ApplicationDisplayVersion>1.9.326</ApplicationDisplayVersion>
-    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationVersion>202605210</ApplicationVersion>
 
-    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
-    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">14.0</SupportedOSPlatformVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
     <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <FileVersion>1.9.368</FileVersion>
-    <AssemblyVersion>1.9.368</AssemblyVersion>
-    <Version>1.9.362</Version>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
-    <ShouldCreateLogs>True</ShouldCreateLogs>
-    <AdvancedSettingsExpanded>False</AdvancedSettingsExpanded>
-    <UpdateAssemblyVersion>True</UpdateAssemblyVersion>
-    <UpdateAssemblyFileVersion>True</UpdateAssemblyFileVersion>
-    <UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
-    <AssemblyVersionSettings>None.None.Increment.None</AssemblyVersionSettings>
-    <UpdatePackageVersion>False</UpdatePackageVersion>
-    <AssemblyInfoVersionType>SettingsVersion</AssemblyInfoVersionType>
-    <InheritWinAppVersionFrom>None</InheritWinAppVersionFrom>
-    <AssemblyFileVersionSettings>None.None.Increment.None</AssemblyFileVersionSettings>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|AnyCPU'">
-    <ShouldCreateLogs>True</ShouldCreateLogs>
-    <AdvancedSettingsExpanded>False</AdvancedSettingsExpanded>
-    <UpdateAssemblyVersion>True</UpdateAssemblyVersion>
-    <UpdateAssemblyFileVersion>True</UpdateAssemblyFileVersion>
-    <UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
-    <AssemblyVersionSettings>None.None.Increment.None</AssemblyVersionSettings>
-    <UpdatePackageVersion>False</UpdatePackageVersion>
-    <AssemblyInfoVersionType>SettingsVersion</AssemblyInfoVersionType>
-    <InheritWinAppVersionFrom>None</InheritWinAppVersionFrom>
-    <AssemblyFileVersionSettings>None.None.Increment.None</AssemblyFileVersionSettings>
-  </PropertyGroup>
-
   <ItemGroup>
     <!-- App Icon -->
     <MauiIcon Include="Resources\AppIcon\hiker.png" Color="#FFFFFF" />
-    <MauiIcon Include="wwwroot\favicon.png">
-      <Color>#FFFFFF</Color>
-    </MauiIcon>
-    <MauiIcon Include="wwwroot\images\hikermenu.png" Color="#FFFFFF" />
     <!-- Splash Screen -->
     <MauiSplashScreen Include="Resources\AppIcon\hikersplash.png" Color="white" />
 
@@ -92,9 +56,7 @@
     <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Remove="wwwroot\favicon.png" />
-  </ItemGroup>
+
 
   <ItemGroup>
     <None Remove="Resources\Translations.csv" />
@@ -107,16 +69,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Maui" Version="9.0.3" />
+    <PackageReference Include="CommunityToolkit.Maui" Version="9.1.0" />
     <PackageReference Include="CsvHelper" Version="33.0.1" />
-    <PackageReference Include="Geolocator.Plugin" Version="1.0.2" />
-    <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.0-rc.1.24453.9" />
-    <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.0-rc.1.24453.9" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="9.0.0-rc.1.24453.9" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0-rc.1.24431.7" />
-    <PackageReference Include="Microsoft.Maui.Essentials" Version="9.0.0-rc.1.24453.9" />
-    <PackageReference Include="Microsoft.XmlSerializer.Generator" Version="9.0.0-rc.1.24431.7" />
-    <PackageReference Include="Radzen.Blazor" Version="5.2.2" />
+    <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.21" />
+    <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.21" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Maui.Essentials" Version="9.0.21" />
+    <PackageReference Include="System.Text.Json" Version="9.0.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
 
   </ItemGroup>
   <ItemGroup>
@@ -137,7 +97,6 @@
   <ItemGroup>
     <Folder Include="Platforms\Android\Resources\values-night\" />
     <Folder Include="Platforms\Android\Resources\values\" />
-    <Folder Include="wwwroot\icons\" />
   </ItemGroup>
   <PropertyGroup>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
@@ -145,5 +104,11 @@
 
   <PropertyGroup>
     <AndroidLinkMode>None</AndroidLinkMode>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
+    <ApplicationManifest>Platforms\Windows\app.manifest</ApplicationManifest>
+    <UseWinUI>true</UseWinUI>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
   </PropertyGroup>
 </Project>
