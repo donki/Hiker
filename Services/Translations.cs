@@ -58,12 +58,17 @@ namespace Hiker.Services
 
         public static string Translate(string nativePhrase, string currentLanguage)
         {
-            if (TranslationDict.ContainsKey(nativePhrase) && TranslationDict[nativePhrase].ContainsKey(currentLanguage))
+            if (TranslationDict.TryGetValue(nativePhrase, out var byLang) &&
+                byLang.TryGetValue(currentLanguage, out var translation) &&
+                !string.IsNullOrWhiteSpace(translation))
             {
-                return TranslationDict[nativePhrase][currentLanguage];
+                return translation;
             }
 
-            return nativePhrase + "...wo Translation";
+            // Fallback sin fugas (constitucion, seccion 8): la frase nativa ya esta en el idioma
+            // base (español), asi que se devuelve tal cual. Nunca se muestra un marcador tecnico
+            // como "...wo Translation" al usuario.
+            return nativePhrase;
         }
     }
 }

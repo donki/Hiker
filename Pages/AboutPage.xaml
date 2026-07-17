@@ -7,75 +7,103 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
 
-            <!-- Logo y titulo -->
+            <!-- Cabecera -->
             <Border Style="{StaticResource Card}">
-                <VerticalStackLayout Padding="20" Spacing="15" HorizontalOptions="Center">
-                    <Image Source="splash.png" WidthRequest="100" HeightRequest="100" />
+                <VerticalStackLayout Padding="30,25" Spacing="12">
+                    <Label Text="🏔️" FontSize="60" HorizontalOptions="Center" />
 
-                    <Label Text="HIKER"
-                           FontSize="32"
+                    <Label Text="Hiker"
+                           FontSize="28"
                            FontAttributes="Bold"
-                           TextColor="{StaticResource Primary}"
+                           TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
                            HorizontalOptions="Center" />
 
-                    <Label Text="Tu compañero de aventuras"
-                           Style="{StaticResource BodyText}"
+                    <Label x:Name="VersionLabel"
+                           Style="{StaticResource HintText}"
+                           FontSize="16"
                            HorizontalOptions="Center" />
 
-                    <Label x:Name="versionLabel"
-                           Text="Versión 1.9.326"
+                    <Label x:Name="DescriptionLabel"
+                           Style="{StaticResource HintText}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center" />
+
+                    <Label Text="Socratic"
+                           Style="{StaticResource HintText}"
+                           HorizontalOptions="Center"
+                           Margin="0,10,0,0" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Contacto -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Padding="25,20" Spacing="15">
+                    <Label x:Name="ContactTitleLabel" Style="{StaticResource CardTitle}" />
+
+                    <Button x:Name="ContactButton"
+                            Text="support@hiker.app"
+                            Style="{StaticResource OutlineButton}"
+                            LineBreakMode="WordWrap"
+                            Padding="12,10"
+                            Clicked="OnContactClicked"
+                            HorizontalOptions="Fill" />
+
+                    <Label x:Name="ContactInstructionLabel"
                            Style="{StaticResource HintText}"
                            HorizontalOptions="Center" />
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Caracteristicas -->
+            <!-- Aviso legal -->
             <Border Style="{StaticResource Card}">
-                <VerticalStackLayout Padding="16" Spacing="10">
-                    <Label Text="Características" Style="{StaticResource CardTitle}" />
-                    <Label Text="• GPS en tiempo real con alta precisión" Style="{StaticResource BodyText}" />
-                    <Label Text="• Grabación y seguimiento de rutas" Style="{StaticResource BodyText}" />
-                    <Label Text="• Mapas nativos integrados" Style="{StaticResource BodyText}" />
-                    <Label Text="• Filtros GPS avanzados (Kalman)" Style="{StaticResource BodyText}" />
-                    <Label Text="• Soporte para archivos GPX" Style="{StaticResource BodyText}" />
-                    <Label Text="• Interfaz nativa optimizada" Style="{StaticResource BodyText}" />
+                <VerticalStackLayout Padding="25,20" Spacing="15">
+                    <Label x:Name="LegalTitleLabel"
+                           Style="{StaticResource CardTitle}"
+                           TextColor="{StaticResource Danger}" />
+
+                    <Border StrokeThickness="0"
+                            Padding="15"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource PageBackgroundLight}, Dark={StaticResource PageBackgroundDark}}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8" />
+                        </Border.StrokeShape>
+                        <VerticalStackLayout Spacing="10">
+                            <Label x:Name="LegalTextLabel"
+                                   Style="{StaticResource BodyText}"
+                                   FontSize="13"
+                                   LineHeight="1.4" />
+                            <Label x:Name="LicenseLabel"
+                                   Style="{StaticResource HintText}" />
+                        </VerticalStackLayout>
+                    </Border>
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Info tecnica -->
+            <!-- Idioma -->
             <Border Style="{StaticResource Card}">
-                <VerticalStackLayout Padding="16" Spacing="10">
-                    <Label Text="Información Técnica" Style="{StaticResource CardTitle}" />
-                    <Label Text="• Desarrollado con .NET 9 MAUI" Style="{StaticResource BodyText}" />
-                    <Label Text="• Interfaz 100% nativa" Style="{StaticResource BodyText}" />
-                    <Label Text="• Optimizado para Windows y Android" Style="{StaticResource BodyText}" />
-                    <Label Text="• GPS de alta frecuencia (hasta 10Hz)" Style="{StaticResource BodyText}" />
-                    <Label Text="• Gestión avanzada de memoria" Style="{StaticResource BodyText}" />
+                <VerticalStackLayout Padding="25,20" Spacing="15">
+                    <Label x:Name="LanguageTitleLabel" Style="{StaticResource CardTitle}" />
+
+                    <Picker x:Name="LanguagePicker"
+                            FontSize="14"
+                            TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
+                            SelectedIndexChanged="OnLanguagePickerChanged" />
+
+                    <Label x:Name="LanguageInstructionLabel"
+                           Style="{StaticResource HintText}"
+                           HorizontalOptions="Center" />
                 </VerticalStackLayout>
             </Border>
 
             <!-- Info del sistema -->
             <Border Style="{StaticResource Card}">
-                <VerticalStackLayout Padding="16" Spacing="10">
-                    <Label Text="Información del Sistema" Style="{StaticResource CardTitle}" />
-                    <Label x:Name="platformLabel" Text="Plataforma: --" Style="{StaticResource BodyText}" />
-                    <Label x:Name="deviceLabel" Text="Dispositivo: --" Style="{StaticResource BodyText}" />
-                    <Label x:Name="osVersionLabel" Text="Versión OS: --" Style="{StaticResource BodyText}" />
+                <VerticalStackLayout Padding="25,20" Spacing="10">
+                    <Label x:Name="SystemTitleLabel" Style="{StaticResource CardTitle}" />
+                    <Label x:Name="platformLabel" Style="{StaticResource HintText}" />
+                    <Label x:Name="deviceLabel" Style="{StaticResource HintText}" />
+                    <Label x:Name="osVersionLabel" Style="{StaticResource HintText}" />
                 </VerticalStackLayout>
             </Border>
-
-            <!-- Acciones -->
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
-                <Button Grid.Column="0"
-                        Text="📧 Contacto"
-                        Style="{StaticResource PrimaryButton}"
-                        Clicked="OnContactClicked" />
-
-                <Button Grid.Column="1"
-                        Text="⭐ Valorar"
-                        Style="{StaticResource AccentButton}"
-                        Clicked="OnRateClicked" />
-            </Grid>
 
         </VerticalStackLayout>
     </ScrollView>

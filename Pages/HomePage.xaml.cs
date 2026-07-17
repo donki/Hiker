@@ -8,6 +8,7 @@ public partial class HomePage : ContentPage
     private GeolocationService? _geolocationService;
     private GpsFilterService? _gpsFilterService;
     private SettingsService? _settingsService;
+    private RouteService? _routeService;
     private readonly ObservableCollection<Location> _recordedLocations = new();
     private bool _isTracking = false;
     private bool _mapReady = false;
@@ -30,6 +31,7 @@ public partial class HomePage : ContentPage
             _geolocationService = Handler.MauiContext.Services.GetService<GeolocationService>();
             _gpsFilterService = Handler.MauiContext.Services.GetService<GpsFilterService>();
             _settingsService = Handler.MauiContext.Services.GetService<SettingsService>();
+            _routeService = Handler.MauiContext.Services.GetService<RouteService>();
             
             if (_geolocationService != null)
             {
@@ -37,11 +39,20 @@ public partial class HomePage : ContentPage
                 await StartLocationUpdates();
             }
         }
+
+        // Si venimos de la pantalla de Rutas con una ruta seleccionada, la pintamos en el mapa.
+        await LoadPendingRouteAsync();
     }
 
     protected override async void OnDisappearing()
     {
         base.OnDisappearing();
+
+        // Si se esta grabando una ruta, NO se detiene el GPS al cambiar de pestaña: antes, salir
+        // de esta pagina cortaba la captura y podia perderse la traza en curso.
+        if (_isTracking)
+            return;
+
         if (_geolocationService != null)
         {
             await _geolocationService.ListeningStopAsync();
@@ -260,6 +271,37 @@ public partial class HomePage : ContentPage
         }
     }
 
+    /// <summary>Dibuja una ruta guardada completa en el mapa y encuadra para verla entera.</summary>
+    private async Task DrawSavedRouteAsync(List<Location> points)
+    {
+        if (!_mapReady || points.Count == 0)
+            return;
+
+        var ci = System.Globalization.CultureInfo.InvariantCulture;
+        var coords = string.Join(",", points.Select(p =>
+            $"[{p.Latitude.ToString(ci)},{p.Longitude.ToString(ci)}]"));
+        await mapWebView.EvaluateJavaScriptAsync($"drawRoute([{coords}]);");
+    }
+
+    /// <summary>Si la pantalla de Rutas pidió abrir una ruta, la carga y la pinta.</summary>
+    private async Task LoadPendingRouteAsync()
+    {
+        var name = RouteService.PendingRouteToLoad;
+        if (string.IsNullOrEmpty(name) || _routeService is null)
+            return;
+
+        RouteService.PendingRouteToLoad = null;
+        try
+        {
+            var points = await _routeService.LoadRouteLocationsAsync(name);
+            await DrawSavedRouteAsync(points);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error loading pending route: {ex.Message}");
+        }
+    }
+
     private async void OnGpsButtonClicked(object sender, EventArgs e)
     {
         try
@@ -284,11 +326,15 @@ public partial class HomePage : ContentPage
     {
         _isTracking = true;
         _recordedLocations.Clear();
-        
+
+        // Se reinicia el filtro para no arrastrar el estado del Kalman de una grabacion anterior,
+        // que sesgaba los primeros puntos de la nueva ruta.
+        _gpsFilterService?.Reset();
+
         startTrackingButton.IsEnabled = false;
         stopTrackingButton.IsEnabled = true;
         saveRouteButton.IsEnabled = false;
-        
+
         // Limpiar mapa
         await ClearMapRoute();
     }
@@ -315,7 +361,14 @@ public partial class HomePage : ContentPage
             var routeName = await DisplayPromptAsync("Guardar Ruta", "Nombre de la ruta:", "Guardar", "Cancelar");
             if (!string.IsNullOrWhiteSpace(routeName))
             {
-                // Aquí implementarías la lógica para guardar la ruta
+                if (_routeService is null)
+                {
+                    await DisplayAlert("Error", "El servicio de rutas no está disponible.", "OK");
+                    return;
+                }
+
+                // Guardado real: escribe la ruta como GPX en el almacenamiento de la app.
+                await _routeService.SaveRouteAsync(_recordedLocations.ToList(), routeName);
                 await DisplayAlert("Éxito", $"Ruta '{routeName}' guardada correctamente", "OK");
                 saveRouteButton.IsEnabled = false;
             }

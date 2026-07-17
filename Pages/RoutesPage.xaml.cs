@@ -44,14 +44,14 @@ public partial class RoutesPage : ContentPage
             if (_routeService == null) return;
             
             var routes = await _routeService.GetAllRoutesAsync();
-            
+
             foreach (var route in routes)
             {
                 Routes.Add(new RouteInfo
                 {
                     Name = route.routeName,
-                    Distance = CalculateDistance(route.locations),
-                    CreatedDate = DateTime.Now, // Aquí deberías usar la fecha real de la ruta
+                    Distance = route.totalDistance, // ProcessData ya calcula la distancia en km
+                    CreatedDate = _routeService.GetRouteDate(route.routeName),
                     Route = route
                 });
             }
@@ -82,10 +82,9 @@ public partial class RoutesPage : ContentPage
     {
         try
         {
-            // Navegar a la página principal y cargar la ruta
+            // Se marca la ruta a dibujar y se salta al mapa; HomePage la carga al aparecer.
+            RouteService.PendingRouteToLoad = routeInfo.Name;
             await Shell.Current.GoToAsync("//GPS");
-            // Aquí implementarías la lógica para mostrar la ruta en el mapa
-            await DisplayAlert("Información", $"Ruta '{routeInfo.Name}' cargada", "OK");
         }
         catch (Exception ex)
         {
@@ -97,14 +96,13 @@ public partial class RoutesPage : ContentPage
     {
         try
         {
-            var confirm = await DisplayAlert("Confirmar", 
+            var confirm = await DisplayAlert("Confirmar",
                 $"¿Eliminar la ruta '{routeInfo.Name}'?", "Sí", "No");
-            
+
             if (confirm && _routeService != null)
             {
-                await _routeService.DeleteRouteAsync(routeInfo.Route.routeName);
+                await _routeService.DeleteRouteAsync(routeInfo.Name);
                 Routes.Remove(routeInfo);
-                await DisplayAlert("Éxito", "Ruta eliminada correctamente", "OK");
             }
         }
         catch (Exception ex)
@@ -117,6 +115,9 @@ public partial class RoutesPage : ContentPage
     {
         try
         {
+            if (_routeService is null)
+                return;
+
             var result = await FilePicker.PickAsync(new PickOptions
             {
                 PickerTitle = "Seleccionar archivo GPX",
@@ -132,16 +133,43 @@ public partial class RoutesPage : ContentPage
                 using var stream = await result.OpenReadAsync();
                 using var reader = new StreamReader(stream);
                 var gpxContent = await reader.ReadToEndAsync();
-                
-                // Aquí implementarías la lógica para procesar el GPX
-                await DisplayAlert("Éxito", $"Archivo GPX '{result.FileName}' cargado", "OK");
+
+                // Importar = parsear el GPX y guardarlo como una ruta mas de la app, con el nombre
+                // del fichero. Asi aparece en la lista y se puede abrir en el mapa como el resto.
+                var name = Path.GetFileNameWithoutExtension(result.FileName);
+                var data = await _routeService.SetRoute(gpxContent);
+                var points = await ExtractLocations(gpxContent);
+                if (points.Count == 0)
+                {
+                    await DisplayAlert("Aviso", "El archivo GPX no contiene puntos.", "OK");
+                    return;
+                }
+
+                await _routeService.SaveRouteAsync(points, name);
                 await LoadRoutes();
+                await DisplayAlert("Éxito", $"Ruta '{name}' importada.", "OK");
             }
         }
         catch (Exception ex)
         {
             await DisplayAlert("Error", $"Error cargando GPX: {ex.Message}", "OK");
         }
+    }
+
+    private static async Task<List<Location>> ExtractLocations(string gpxContent)
+    {
+        var points = new List<Location>();
+        await Task.Run(() =>
+        {
+            var gpx = Helpers.GPXFileHelper.FromXML(gpxContent);
+            foreach (var seg in gpx.Tracks.SelectMany(t => t.Segments))
+                foreach (var p in seg.TrackPoints)
+                    points.Add(new Location((double)p.Latitude, (double)p.Longitude, new DateTimeOffset(p.Time))
+                    {
+                        Altitude = (double)p.Elevation
+                    });
+        });
+        return points;
     }
 
     private async void OnRefreshClicked(object sender, EventArgs e)

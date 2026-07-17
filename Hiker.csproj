@@ -40,8 +40,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- App Icon -->
-    <MauiIcon Include="Resources\AppIcon\hiker.png" Color="#FFFFFF" />
+    <!-- App Icon: fondo verde de marca + montaña, mismo patron que el resto de apps. -->
+    <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#2E7D32" />
     <!-- Splash Screen -->
     <MauiSplashScreen Include="Resources\AppIcon\hikersplash.png" Color="white" />
 

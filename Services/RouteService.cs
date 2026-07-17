@@ -137,13 +137,11 @@ namespace Hiker.Services
         private async Task<RouteData> ProcessData(GPXFileHelper gpxFile)
         {
             var track = gpxFile.Tracks.FirstOrDefault();
-
-            if (track != null)
+            if (track is null)
             {
-                Console.WriteLine($"Nombre de la ruta: {track.Name}");
-                Console.WriteLine($"N�mero de segmentos: {track.Segments.Count}");
-
-
+                // GPX vacio o invalido: se devuelve una ruta neutra en vez de reventar con
+                // NullReferenceException al desreferenciar el track.
+                return new RouteData { routeName = string.Empty, elevationData = new List<ElevationPoint>() };
             }
 
             routeName = track.Name;
@@ -234,31 +232,110 @@ namespace Hiker.Services
             };
         }
 
+        // --- Persistencia real de rutas -----------------------------------------------------
+        // Las rutas se guardan como ficheros GPX en el almacenamiento privado de la app. Antes
+        // estos metodos eran stubs que no escribian ni borraban nada (el guardado "mentia").
+
+        /// <summary>Carpeta privada donde viven los GPX guardados. Se crea si no existe.</summary>
+        public static string RoutesDirectory
+        {
+            get
+            {
+                var dir = Path.Combine(FileSystem.AppDataDirectory, "routes");
+                Directory.CreateDirectory(dir);
+                return dir;
+            }
+        }
+
+        private static string RoutePath(string routeName)
+            => Path.Combine(RoutesDirectory, FileHelper.NormalizeFileName(routeName) + ".gpx");
+
+        /// <summary>Nombre de la ruta que la pantalla de Rutas pide dibujar en el mapa de GPS.</summary>
+        public static string? PendingRouteToLoad { get; set; }
+
+        /// <summary>Fecha de guardado de una ruta (fecha de escritura de su fichero GPX).</summary>
+        public DateTime GetRouteDate(string routeName)
+        {
+            var path = RoutePath(routeName);
+            return File.Exists(path) ? File.GetLastWriteTime(path) : DateTime.Now;
+        }
+
+        /// <summary>Escribe la ruta grabada como GPX en disco. Devuelve la ruta del fichero.</summary>
+        public async Task<string> SaveRouteAsync(List<Location> points, string routeName)
+        {
+            if (points is null || points.Count == 0)
+                throw new InvalidOperationException("No hay puntos que guardar.");
+
+            var gpx = CreateGPXFileHelper(points, routeName);
+            var path = RoutePath(routeName);
+            await File.WriteAllTextAsync(path, gpx.ToXML());
+            return path;
+        }
+
+        /// <summary>Lista las rutas guardadas, parseando cada GPX para sus metricas.</summary>
         public async Task<List<RouteData>> GetAllRoutesAsync()
         {
-            // Implementación básica - devuelve rutas guardadas
             var routes = new List<RouteData>();
-            
+
             try
             {
-                // Aquí implementarías la lógica para cargar rutas guardadas
-                // Por ahora devolvemos una lista vacía
-                return routes;
+                foreach (var file in Directory.EnumerateFiles(RoutesDirectory, "*.gpx"))
+                {
+                    try
+                    {
+                        var xml = await File.ReadAllTextAsync(file);
+                        var data = await ProcessGpxData(xml);
+                        if (data is not null)
+                        {
+                            // El nombre visible es el del fichero: es el que el usuario puso al guardar.
+                            data.routeName = Path.GetFileNameWithoutExtension(file);
+                            routes.Add(data);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Ruta ilegible {file}: {ex.Message}");
+                    }
+                }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error loading routes: {ex.Message}");
-                return routes;
+                System.Diagnostics.Debug.WriteLine($"Error listing routes: {ex.Message}");
             }
+
+            return routes;
+        }
+
+        /// <summary>Devuelve los puntos (lat/lon) de una ruta guardada, para dibujarla en el mapa.</summary>
+        public async Task<List<Location>> LoadRouteLocationsAsync(string routeName)
+        {
+            var result = new List<Location>();
+            var path = RoutePath(routeName);
+            if (!File.Exists(path))
+                return result;
+
+            var gpx = GPXFileHelper.FromXML(await File.ReadAllTextAsync(path));
+            foreach (var segment in gpx.Tracks.SelectMany(t => t.Segments))
+            {
+                foreach (var p in segment.TrackPoints)
+                {
+                    result.Add(new Location((double)p.Latitude, (double)p.Longitude, new DateTimeOffset(p.Time))
+                    {
+                        Altitude = (double)p.Elevation
+                    });
+                }
+            }
+            return result;
         }
 
         public async Task DeleteRouteAsync(string routeName)
         {
             try
             {
-                // Implementación básica para eliminar ruta
-                // Aquí implementarías la lógica para eliminar la ruta del almacenamiento
-                System.Diagnostics.Debug.WriteLine($"Deleting route: {routeName}");
+                var path = RoutePath(routeName);
+                if (File.Exists(path))
+                    File.Delete(path);
+                await Task.CompletedTask;
             }
             catch (Exception ex)
             {

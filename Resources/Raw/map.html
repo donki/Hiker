@@ -6,103 +6,115 @@
     <title>Hiker Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #1a1a1a;
-        }
-        #map {
-            height: 100vh;
-            width: 100vw;
-        }
-        .leaflet-control-container {
-            font-size: 14px;
-        }
+        body { margin: 0; padding: 0; background-color: #1a1a1a; }
+        #map { height: 100vh; width: 100vw; }
+        .leaflet-control-container { font-size: 14px; }
     </style>
 </head>
 <body>
     <div id="map"></div>
-    
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Inicializar mapa centrado en Madrid
-        var map = L.map('map').setView([40.4168, -3.7038], 13);
-        
-        // Usar OpenStreetMap tiles
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors',
-            maxZoom: 19
+        var map = L.map('map', { zoomControl: true }).setView([40.4168, -3.7038], 13);
+
+        // Capas base gratuitas. OpenTopoMap es topografico (curvas de nivel, senderos): lo mejor
+        // para una app de senderismo. Se deja OSM estandar y vista satelite (Esri) como alternativas.
+        var topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenTopoMap (CC-BY-SA) · © OpenStreetMap',
+            maxZoom: 17
         }).addTo(map);
-        
-        // Variables para tracking
+        var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap', maxZoom: 19
+        });
+        var satelite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Imagenes © Esri', maxZoom: 19
+        });
+        L.control.layers(
+            { 'Topográfico': topo, 'Callejero': osm, 'Satélite': satelite },
+            null, { position: 'topright' }
+        ).addTo(map);
+
+        // Capas persistentes: se crean una vez y se actualizan, no se recrean en cada punto.
         var currentLocationMarker = null;
+        var accuracyCircle = null;
         var routePolyline = null;
-        var routePoints = [];
-        
-        // Función para actualizar ubicación actual
+        var followUser = true;
+
+        // Si el usuario arrastra el mapa, dejamos de recentrar automaticamente hasta que pulse el
+        // boton de centrar. Asi la traza no le "roba" el gesto.
+        map.on('dragstart', function () { followUser = false; });
+
         function updateLocation(lat, lng, accuracy) {
-            if (currentLocationMarker) {
-                map.removeLayer(currentLocationMarker);
-            }
-            
-            // Crear marcador de ubicación actual
-            currentLocationMarker = L.circleMarker([lat, lng], {
-                color: '#4CAF50',
-                fillColor: '#4CAF50',
-                fillOpacity: 0.8,
-                radius: 8
-            }).addTo(map);
-            
-            // Círculo de precisión
-            L.circle([lat, lng], {
-                color: '#4CAF50',
-                fillColor: '#4CAF50',
-                fillOpacity: 0.1,
-                radius: accuracy
-            }).addTo(map);
-            
-            // Centrar mapa en la ubicación
-            map.setView([lat, lng], map.getZoom());
-        }
-        
-        // Función para agregar punto a la ruta
-        function addRoutePoint(lat, lng) {
-            routePoints.push([lat, lng]);
-            
-            if (routePolyline) {
-                map.removeLayer(routePolyline);
-            }
-            
-            if (routePoints.length > 1) {
-                routePolyline = L.polyline(routePoints, {
-                    color: '#F44336',
-                    weight: 4,
-                    opacity: 0.8
+            var pos = [lat, lng];
+
+            if (!currentLocationMarker) {
+                currentLocationMarker = L.circleMarker(pos, {
+                    color: '#ffffff', weight: 2, fillColor: '#4CAF50', fillOpacity: 1, radius: 8
                 }).addTo(map);
+            } else {
+                currentLocationMarker.setLatLng(pos);
+            }
+
+            if (!accuracyCircle) {
+                accuracyCircle = L.circle(pos, {
+                    color: '#4CAF50', fillColor: '#4CAF50', fillOpacity: 0.1, weight: 1, radius: accuracy
+                }).addTo(map);
+            } else {
+                accuracyCircle.setLatLng(pos);
+                accuracyCircle.setRadius(accuracy);
+            }
+
+            if (followUser) {
+                map.setView(pos, map.getZoom());
             }
         }
-        
-        // Función para limpiar ruta
+
+        // Anade un punto a la traza SIN redibujarla entera: crea la polyline una vez y luego solo
+        // le agrega vertices. Antes se recreaba toda la linea en cada punto (lag creciente).
+        function addRoutePoint(lat, lng) {
+            var pos = [lat, lng];
+            if (!routePolyline) {
+                routePolyline = L.polyline([pos], { color: '#F44336', weight: 4, opacity: 0.85 }).addTo(map);
+            } else {
+                routePolyline.addLatLng(pos);
+            }
+        }
+
+        // Dibuja una ruta completa (al cargar un GPX) y ajusta el encuadre para verla entera.
+        function drawRoute(coords) {
+            if (routePolyline) { map.removeLayer(routePolyline); routePolyline = null; }
+            if (!coords || coords.length === 0) return;
+            routePolyline = L.polyline(coords, { color: '#F44336', weight: 4, opacity: 0.85 }).addTo(map);
+            followUser = false;
+            map.fitBounds(routePolyline.getBounds(), { padding: [30, 30] });
+        }
+
         function clearRoute() {
-            if (routePolyline) {
-                map.removeLayer(routePolyline);
-                routePolyline = null;
-            }
-            routePoints = [];
+            if (routePolyline) { map.removeLayer(routePolyline); routePolyline = null; }
         }
-        
-        // Función para centrar en ubicación
+
+        // Quita el ultimo vertice de la traza en curso (deshacer punto erroneo).
+        function removeLastPoint() {
+            if (!routePolyline) return;
+            var pts = routePolyline.getLatLngs();
+            if (pts.length <= 1) { clearRoute(); return; }
+            pts.pop();
+            routePolyline.setLatLngs(pts);
+        }
+
         function centerOnLocation(lat, lng, zoom) {
+            followUser = true;
             map.setView([lat, lng], zoom || 15);
         }
-        
-        // Exponer funciones globalmente para que C# pueda llamarlas
+
         window.updateLocation = updateLocation;
         window.addRoutePoint = addRoutePoint;
+        window.drawRoute = drawRoute;
         window.clearRoute = clearRoute;
+        window.removeLastPoint = removeLastPoint;
         window.centerOnLocation = centerOnLocation;
-        
-        // Notificar que el mapa está listo
+
         window.mapReady = true;
     </script>
 </body>
