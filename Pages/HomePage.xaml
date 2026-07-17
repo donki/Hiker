@@ -2,100 +2,93 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Hiker.Pages.HomePage"
-             Title="GPS Tracker"
-             BackgroundColor="#1a1a1a">
+             Title="GPS Tracker">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <Grid RowDefinitions="Auto,*,Auto">
 
-        <!-- Panel de información GPS -->
-        <Frame Grid.Row="0" BackgroundColor="#2E7D32" Margin="10,5" CornerRadius="10" HasShadow="True">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                
-                <StackLayout Grid.Column="0" Orientation="Vertical">
-                    <Label x:Name="locationLabel" 
-                           Text="Obteniendo ubicación..." 
-                           TextColor="White" 
+        <!-- Panel de informacion GPS -->
+        <Border Grid.Row="0"
+                BackgroundColor="{StaticResource PrimaryDark}"
+                StrokeThickness="0"
+                Margin="10,5">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="10" />
+            </Border.StrokeShape>
+            <Grid Padding="12" ColumnDefinitions="*,Auto">
+                <VerticalStackLayout Grid.Column="0">
+                    <Label x:Name="locationLabel"
+                           Text="Obteniendo ubicación..."
+                           TextColor="{StaticResource White}"
                            FontSize="14" />
-                    <Label x:Name="accuracyLabel" 
-                           Text="Precisión: --" 
-                           TextColor="#E8F5E8" 
+                    <Label x:Name="accuracyLabel"
+                           Text="Precisión: --"
+                           TextColor="#DDF3DD"
                            FontSize="12" />
-                    <Label x:Name="speedLabel" 
-                           Text="Velocidad: -- km/h" 
-                           TextColor="#E8F5E8" 
+                    <Label x:Name="speedLabel"
+                           Text="Velocidad: -- km/h"
+                           TextColor="#DDF3DD"
                            FontSize="12" />
-                </StackLayout>
-                
-                <Button Grid.Column="1" 
+                </VerticalStackLayout>
+
+                <Button Grid.Column="1"
                         x:Name="gpsButton"
-                        Text="📍" 
-                        BackgroundColor="#4CAF50" 
-                        TextColor="White" 
-                        WidthRequest="50" 
-                        HeightRequest="50" 
+                        Text="📍"
+                        BackgroundColor="{StaticResource Primary}"
+                        TextColor="{StaticResource White}"
+                        WidthRequest="50"
+                        HeightRequest="50"
                         CornerRadius="25"
+                        Padding="0"
                         Clicked="OnGpsButtonClicked" />
             </Grid>
-        </Frame>
+        </Border>
 
-        <!-- Mapa OpenStreetMap con WebView -->
-        <WebView x:Name="mapWebView" 
-                 Grid.Row="1" 
-                 BackgroundColor="#1a1a1a" />
+        <!-- Mapa OpenStreetMap -->
+        <WebView x:Name="mapWebView"
+                 Grid.Row="1"
+                 BackgroundColor="#1A1A1A" />
 
         <!-- Panel de controles -->
-        <Frame Grid.Row="2" BackgroundColor="#2E7D32" Margin="10,5" CornerRadius="10" HasShadow="True">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                
-                <Button Grid.Column="0" 
+        <Border Grid.Row="2"
+                BackgroundColor="{StaticResource PrimaryDark}"
+                StrokeThickness="0"
+                Margin="10,5">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="10" />
+            </Border.StrokeShape>
+            <Grid Padding="8" ColumnDefinitions="*,*,*,*" ColumnSpacing="6">
+                <Button Grid.Column="0"
                         x:Name="startTrackingButton"
-                        Text="▶️ Iniciar" 
-                        BackgroundColor="#4CAF50" 
-                        TextColor="White" 
+                        Text="▶️ Iniciar"
+                        Style="{StaticResource PrimaryButton}"
                         FontSize="12"
                         Clicked="OnStartTrackingClicked" />
-                
-                <Button Grid.Column="1" 
+
+                <Button Grid.Column="1"
                         x:Name="stopTrackingButton"
-                        Text="⏹️ Parar" 
-                        BackgroundColor="#F44336" 
-                        TextColor="White" 
+                        Text="⏹️ Parar"
+                        Style="{StaticResource DangerButton}"
                         FontSize="12"
                         IsEnabled="False"
                         Clicked="OnStopTrackingClicked" />
-                
-                <Button Grid.Column="2" 
+
+                <Button Grid.Column="2"
                         x:Name="saveRouteButton"
-                        Text="💾 Guardar" 
-                        BackgroundColor="#FF9800" 
-                        TextColor="White" 
+                        Text="💾 Guardar"
+                        Style="{StaticResource AccentButton}"
                         FontSize="12"
                         IsEnabled="False"
                         Clicked="OnSaveRouteClicked" />
-                
-                <Button Grid.Column="3" 
+
+                <Button Grid.Column="3"
                         x:Name="clearButton"
-                        Text="🗑️ Limpiar" 
-                        BackgroundColor="#9C27B0" 
-                        TextColor="White" 
+                        Text="🗑️ Limpiar"
+                        Style="{StaticResource OutlineButton}"
+                        TextColor="{StaticResource White}"
+                        BorderColor="{StaticResource White}"
                         FontSize="12"
                         Clicked="OnClearClicked" />
             </Grid>
-        </Frame>
+        </Border>
     </Grid>
 </ContentPage>

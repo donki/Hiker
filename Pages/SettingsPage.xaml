@@ -2,165 +2,95 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Hiker.Pages.SettingsPage"
-             Title="Configuración"
-             BackgroundColor="#1a1a1a">
+             Title="Configuración">
 
     <ScrollView>
-        <StackLayout Padding="20" Spacing="15">
-            
-            <!-- GPS Settings -->
-            <Frame BackgroundColor="#2E7D32" CornerRadius="10" HasShadow="True">
-                <StackLayout Spacing="10">
-                    <Label Text="Configuración GPS" 
-                           TextColor="White" 
-                           FontSize="18" 
-                           FontAttributes="Bold" />
-                    
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Column="0" 
-                               Text="Usar GPS Nativo" 
-                               TextColor="White" 
-                               VerticalOptions="Center" />
-                        <Switch Grid.Column="1" 
-                                x:Name="nativeGpsSwitch"
-                                OnColor="#4CAF50" />
-                    </Grid>
-                    
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="100" />
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Column="0" 
-                               Text="Intervalo de actualización (seg)" 
-                               TextColor="White" 
-                               VerticalOptions="Center" />
-                        <Entry Grid.Column="1" 
-                               x:Name="intervalEntry"
-                               Text="1"
-                               Keyboard="Numeric"
-                               BackgroundColor="White" />
-                    </Grid>
-                    
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="100" />
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Column="0" 
-                               Text="Precisión mínima (m)" 
-                               TextColor="White" 
-                               VerticalOptions="Center" />
-                        <Entry Grid.Column="1" 
-                               x:Name="accuracyEntry"
-                               Text="10"
-                               Keyboard="Numeric"
-                               BackgroundColor="White" />
-                    </Grid>
-                </StackLayout>
-            </Frame>
+        <VerticalStackLayout Padding="20" Spacing="15">
 
-            <!-- Filter Settings -->
-            <Frame BackgroundColor="#2E7D32" CornerRadius="10" HasShadow="True">
-                <StackLayout Spacing="10">
-                    <Label Text="Filtros GPS" 
-                           TextColor="White" 
-                           FontSize="18" 
-                           FontAttributes="Bold" />
-                    
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Column="0" 
-                               Text="Filtro Kalman" 
-                               TextColor="White" 
-                               VerticalOptions="Center" />
-                        <Switch Grid.Column="1" 
-                                x:Name="kalmanSwitch"
-                                OnColor="#4CAF50" />
-                    </Grid>
-                    
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Column="0" 
-                               Text="Filtro de velocidad" 
-                               TextColor="White" 
-                               VerticalOptions="Center" />
-                        <Switch Grid.Column="1" 
-                                x:Name="speedFilterSwitch"
-                                OnColor="#4CAF50" />
-                    </Grid>
-                    
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="100" />
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Column="0" 
-                               Text="Velocidad máxima (m/s)" 
-                               TextColor="White" 
-                               VerticalOptions="Center" />
-                        <Entry Grid.Column="1" 
-                               x:Name="maxSpeedEntry"
-                               Text="50"
-                               Keyboard="Numeric"
-                               BackgroundColor="White" />
-                    </Grid>
-                </StackLayout>
-            </Frame>
+            <!-- GPS -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Padding="16" Spacing="10">
+                    <Label Text="Configuración GPS" Style="{StaticResource CardTitle}" />
 
-            <!-- Language Settings -->
-            <Frame BackgroundColor="#2E7D32" CornerRadius="10" HasShadow="True">
-                <StackLayout Spacing="10">
-                    <Label Text="Idioma" 
-                           TextColor="White" 
-                           FontSize="18" 
-                           FontAttributes="Bold" />
-                    
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="Usar GPS Nativo" Style="{StaticResource BodyText}" VerticalOptions="Center" />
+                        <Switch Grid.Column="1" x:Name="nativeGpsSwitch" OnColor="{StaticResource Primary}" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,100">
+                        <Label Grid.Column="0" Text="Intervalo de actualización (seg)" Style="{StaticResource BodyText}" VerticalOptions="Center" />
+                        <Border Grid.Column="1" Style="{StaticResource Card}" Padding="4">
+                            <Entry x:Name="intervalEntry" Text="1" Keyboard="Numeric" BackgroundColor="Transparent"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                        </Border>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,100">
+                        <Label Grid.Column="0" Text="Precisión mínima (m)" Style="{StaticResource BodyText}" VerticalOptions="Center" />
+                        <Border Grid.Column="1" Style="{StaticResource Card}" Padding="4">
+                            <Entry x:Name="accuracyEntry" Text="10" Keyboard="Numeric" BackgroundColor="Transparent"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                        </Border>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Filtros -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Padding="16" Spacing="10">
+                    <Label Text="Filtros GPS" Style="{StaticResource CardTitle}" />
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="Filtro Kalman" Style="{StaticResource BodyText}" VerticalOptions="Center" />
+                        <Switch Grid.Column="1" x:Name="kalmanSwitch" OnColor="{StaticResource Primary}" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="Filtro de velocidad" Style="{StaticResource BodyText}" VerticalOptions="Center" />
+                        <Switch Grid.Column="1" x:Name="speedFilterSwitch" OnColor="{StaticResource Primary}" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,100">
+                        <Label Grid.Column="0" Text="Velocidad máxima (m/s)" Style="{StaticResource BodyText}" VerticalOptions="Center" />
+                        <Border Grid.Column="1" Style="{StaticResource Card}" Padding="4">
+                            <Entry x:Name="maxSpeedEntry" Text="50" Keyboard="Numeric" BackgroundColor="Transparent"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                        </Border>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Idioma -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Padding="16" Spacing="10">
+                    <Label Text="Idioma" Style="{StaticResource CardTitle}" />
+
                     <Picker x:Name="languagePicker"
-                            BackgroundColor="White"
-                            Title="Seleccionar idioma">
+                            Title="Seleccionar idioma"
+                            TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}">
                         <Picker.Items>
                             <x:String>Español</x:String>
                             <x:String>English</x:String>
                         </Picker.Items>
                     </Picker>
-                </StackLayout>
-            </Frame>
+                </VerticalStackLayout>
+            </Border>
 
-            <!-- Action Buttons -->
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                
-                <Button Grid.Column="0" 
+            <!-- Acciones -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                <Button Grid.Column="0"
                         x:Name="saveButton"
-                        Text="💾 Guardar" 
-                        BackgroundColor="#4CAF50" 
-                        TextColor="White" 
-                        Margin="5"
+                        Text="💾 Guardar"
+                        Style="{StaticResource PrimaryButton}"
                         Clicked="OnSaveClicked" />
-                
-                <Button Grid.Column="1" 
+
+                <Button Grid.Column="1"
                         x:Name="resetButton"
-                        Text="🔄 Restablecer" 
-                        BackgroundColor="#F44336" 
-                        TextColor="White" 
-                        Margin="5"
+                        Text="🔄 Restablecer"
+                        Style="{StaticResource DangerButton}"
                         Clicked="OnResetClicked" />
             </Grid>
 
-        </StackLayout>
+        </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

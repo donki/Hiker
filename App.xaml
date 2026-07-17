@@ -1,73 +1,14 @@
-﻿<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:Hiker"
              x:Class="Hiker.App">
     <Application.Resources>
         <ResourceDictionary>
-
-            <!-- Colores del tema -->
-            <Color x:Key="Primary">#4CAF50</Color>
-            <Color x:Key="PrimaryDark">#2E7D32</Color>
-            <Color x:Key="PrimaryLight">#81C784</Color>
-            <Color x:Key="Secondary">#FF9800</Color>
-            <Color x:Key="SecondaryDark">#F57C00</Color>
-            <Color x:Key="Accent">#03DAC6</Color>
-            <Color x:Key="Surface">#FFFFFF</Color>
-            <Color x:Key="Background">#F5F5F5</Color>
-            <Color x:Key="Error">#F44336</Color>
-            <Color x:Key="OnPrimary">#FFFFFF</Color>
-            <Color x:Key="OnSecondary">#000000</Color>
-            <Color x:Key="OnSurface">#000000</Color>
-            <Color x:Key="OnBackground">#000000</Color>
-            <Color x:Key="OnError">#FFFFFF</Color>
-            
-            <!-- Colores legacy para compatibilidad -->
-            <Color x:Key="PageBackgroundColor">#F5F5F5</Color>
-            <Color x:Key="PrimaryTextColor">#000000</Color>
-
-            <!-- Estilos modernos para Labels -->
-            <Style TargetType="Label">
-                <Setter Property="TextColor" Value="{DynamicResource OnSurface}" />
-                <Setter Property="FontFamily" Value="OpenSansRegular" />
-                <Setter Property="FontSize" Value="16" />
-            </Style>
-
-            <!-- Estilos modernos para Buttons -->
-            <Style TargetType="Button">
-                <Setter Property="TextColor" Value="{DynamicResource OnPrimary}" />
-                <Setter Property="FontFamily" Value="OpenSansRegular" />
-                <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
-                <Setter Property="Padding" Value="16,12" />
-                <Setter Property="CornerRadius" Value="8" />
-                <Setter Property="FontSize" Value="16" />
-                <Setter Property="FontAttributes" Value="Bold" />
-            </Style>
-
-            <!-- Estilo para botones secundarios -->
-            <Style x:Key="SecondaryButton" TargetType="Button">
-                <Setter Property="TextColor" Value="{DynamicResource OnSecondary}" />
-                <Setter Property="FontFamily" Value="OpenSansRegular" />
-                <Setter Property="BackgroundColor" Value="{DynamicResource Secondary}" />
-                <Setter Property="Padding" Value="16,12" />
-                <Setter Property="CornerRadius" Value="8" />
-                <Setter Property="FontSize" Value="16" />
-                <Setter Property="FontAttributes" Value="Bold" />
-            </Style>
-
-            <!-- Estilo para botones de contorno -->
-            <Style x:Key="OutlineButton" TargetType="Button">
-                <Setter Property="TextColor" Value="{DynamicResource Primary}" />
-                <Setter Property="FontFamily" Value="OpenSansRegular" />
-                <Setter Property="BackgroundColor" Value="Transparent" />
-                <Setter Property="BorderColor" Value="{DynamicResource Primary}" />
-                <Setter Property="BorderWidth" Value="2" />
-                <Setter Property="Padding" Value="16,12" />
-                <Setter Property="CornerRadius" Value="8" />
-                <Setter Property="FontSize" Value="16" />
-                <Setter Property="FontAttributes" Value="Bold" />
-            </Style>
-
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

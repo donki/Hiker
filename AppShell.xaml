@@ -4,20 +4,20 @@
        xmlns:local="clr-namespace:Hiker.Pages"
        x:Class="Hiker.AppShell"
        Title="Hiker"
-       BackgroundColor="#4CAF50">
+       BackgroundColor="{StaticResource Primary}">
 
     <Shell.Resources>
         <ResourceDictionary>
             <Style x:Key="BaseStyle" TargetType="Element">
-                <Setter Property="Shell.BackgroundColor" Value="#4CAF50" />
-                <Setter Property="Shell.ForegroundColor" Value="White" />
-                <Setter Property="Shell.TitleColor" Value="White" />
+                <Setter Property="Shell.BackgroundColor" Value="{StaticResource Primary}" />
+                <Setter Property="Shell.ForegroundColor" Value="{StaticResource White}" />
+                <Setter Property="Shell.TitleColor" Value="{StaticResource White}" />
                 <Setter Property="Shell.DisabledColor" Value="#B4B4B4" />
                 <Setter Property="Shell.UnselectedColor" Value="#95FFFFFF" />
-                <Setter Property="Shell.TabBarBackgroundColor" Value="#4CAF50" />
-                <Setter Property="Shell.TabBarForegroundColor" Value="White"/>
+                <Setter Property="Shell.TabBarBackgroundColor" Value="{StaticResource Primary}" />
+                <Setter Property="Shell.TabBarForegroundColor" Value="{StaticResource White}"/>
                 <Setter Property="Shell.TabBarUnselectedColor" Value="#95FFFFFF"/>
-                <Setter Property="Shell.TabBarTitleColor" Value="White"/>
+                <Setter Property="Shell.TabBarTitleColor" Value="{StaticResource White}"/>
             </Style>
         </ResourceDictionary>
     </Shell.Resources>
