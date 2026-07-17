@@ -32,9 +32,8 @@
 
                 <Button Grid.Column="1"
                         x:Name="gpsButton"
-                        Text="📍"
+                        ImageSource="location.png"
                         BackgroundColor="{StaticResource Primary}"
-                        TextColor="{StaticResource White}"
                         WidthRequest="50"
                         HeightRequest="50"
                         CornerRadius="25"
@@ -59,14 +58,18 @@
             <Grid Padding="8" ColumnDefinitions="*,*,*,*" ColumnSpacing="6">
                 <Button Grid.Column="0"
                         x:Name="startTrackingButton"
-                        Text="▶️ Iniciar"
+                        Text="Iniciar"
+                        ImageSource="ic_play.png"
+                        ContentLayout="Top,4"
                         Style="{StaticResource PrimaryButton}"
                         FontSize="12"
                         Clicked="OnStartTrackingClicked" />
 
                 <Button Grid.Column="1"
                         x:Name="stopTrackingButton"
-                        Text="⏹️ Parar"
+                        Text="Parar"
+                        ImageSource="ic_stop.png"
+                        ContentLayout="Top,4"
                         Style="{StaticResource DangerButton}"
                         FontSize="12"
                         IsEnabled="False"
@@ -74,7 +77,9 @@
 
                 <Button Grid.Column="2"
                         x:Name="saveRouteButton"
-                        Text="💾 Guardar"
+                        Text="Guardar"
+                        ImageSource="ic_save.png"
+                        ContentLayout="Top,4"
                         Style="{StaticResource AccentButton}"
                         FontSize="12"
                         IsEnabled="False"
@@ -82,7 +87,9 @@
 
                 <Button Grid.Column="3"
                         x:Name="clearButton"
-                        Text="🗑️ Limpiar"
+                        Text="Limpiar"
+                        ImageSource="ic_trash.png"
+                        ContentLayout="Top,4"
                         Style="{StaticResource OutlineButton}"
                         TextColor="{StaticResource White}"
                         BorderColor="{StaticResource White}"

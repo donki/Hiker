@@ -7,10 +7,13 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
 
-            <!-- Cabecera -->
+            <!-- Cabecera: icono real de la app -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="30,25" Spacing="12">
-                    <Label Text="🏔️" FontSize="60" HorizontalOptions="Center" />
+                    <Image Source="app_logo.png"
+                           WidthRequest="96"
+                           HeightRequest="96"
+                           HorizontalOptions="Center" />
 
                     <Label Text="Hiker"
                            FontSize="28"
@@ -41,7 +44,7 @@
                     <Label x:Name="ContactTitleLabel" Style="{StaticResource CardTitle}" />
 
                     <Button x:Name="ContactButton"
-                            Text="support@hiker.app"
+                            Text="jsoladelarosa@gmail.com"
                             Style="{StaticResource OutlineButton}"
                             LineBreakMode="WordWrap"
                             Padding="12,10"
@@ -51,6 +54,27 @@
                     <Label x:Name="ContactInstructionLabel"
                            Style="{StaticResource HintText}"
                            HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Apoyo (Ko-fi) -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Padding="25,20" Spacing="15">
+                    <Label x:Name="SupportTitleLabel"
+                           Style="{StaticResource CardTitle}"
+                           TextColor="{StaticResource Accent}" />
+
+                    <Button x:Name="DonationButton"
+                            Style="{StaticResource AccentButton}"
+                            LineBreakMode="WordWrap"
+                            Padding="12,10"
+                            Clicked="OnDonationClicked"
+                            HorizontalOptions="Fill" />
+
+                    <Label x:Name="SupportDescLabel"
+                           Style="{StaticResource HintText}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center" />
                 </VerticalStackLayout>
             </Border>
 
@@ -76,32 +100,6 @@
                                    Style="{StaticResource HintText}" />
                         </VerticalStackLayout>
                     </Border>
-                </VerticalStackLayout>
-            </Border>
-
-            <!-- Idioma -->
-            <Border Style="{StaticResource Card}">
-                <VerticalStackLayout Padding="25,20" Spacing="15">
-                    <Label x:Name="LanguageTitleLabel" Style="{StaticResource CardTitle}" />
-
-                    <Picker x:Name="LanguagePicker"
-                            FontSize="14"
-                            TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
-                            SelectedIndexChanged="OnLanguagePickerChanged" />
-
-                    <Label x:Name="LanguageInstructionLabel"
-                           Style="{StaticResource HintText}"
-                           HorizontalOptions="Center" />
-                </VerticalStackLayout>
-            </Border>
-
-            <!-- Info del sistema -->
-            <Border Style="{StaticResource Card}">
-                <VerticalStackLayout Padding="25,20" Spacing="10">
-                    <Label x:Name="SystemTitleLabel" Style="{StaticResource CardTitle}" />
-                    <Label x:Name="platformLabel" Style="{StaticResource HintText}" />
-                    <Label x:Name="deviceLabel" Style="{StaticResource HintText}" />
-                    <Label x:Name="osVersionLabel" Style="{StaticResource HintText}" />
                 </VerticalStackLayout>
             </Border>
 

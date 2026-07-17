@@ -43,9 +43,8 @@
                             </VerticalStackLayout>
 
                             <Button Grid.Column="1"
-                                    Text="📍"
+                                    ImageSource="location.png"
                                     BackgroundColor="{StaticResource Primary}"
-                                    TextColor="{StaticResource White}"
                                     WidthRequest="40"
                                     HeightRequest="40"
                                     CornerRadius="20"
@@ -55,9 +54,8 @@
                                     CommandParameter="{Binding .}" />
 
                             <Button Grid.Column="2"
-                                    Text="🗑️"
+                                    ImageSource="ic_trash.png"
                                     BackgroundColor="{StaticResource Danger}"
-                                    TextColor="{StaticResource White}"
                                     WidthRequest="40"
                                     HeightRequest="40"
                                     CornerRadius="20"
@@ -74,13 +72,17 @@
         <Grid Grid.Row="2" Margin="10,5" ColumnDefinitions="*,*" ColumnSpacing="8">
             <Button Grid.Column="0"
                     x:Name="loadGpxButton"
-                    Text="📁 Cargar GPX"
+                    Text="Cargar GPX"
+                    ImageSource="ic_folder.png"
+                    ContentLayout="Left,6"
                     Style="{StaticResource PrimaryButton}"
                     Clicked="OnLoadGpxClicked" />
 
             <Button Grid.Column="1"
                     x:Name="refreshButton"
-                    Text="🔄 Actualizar"
+                    Text="Actualizar"
+                    ImageSource="ic_refresh.png"
+                    ContentLayout="Left,6"
                     Style="{StaticResource AccentButton}"
                     Clicked="OnRefreshClicked" />
         </Grid>

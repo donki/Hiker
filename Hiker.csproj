@@ -30,8 +30,8 @@
     <!-- Versions: ApplicationVersion debe ser entero incremental (constitucion seccion 6).
          Convencion: yyyyMMddR (R=rev del dia, empieza en 0). Mantener en sincronia con
          ApplicationDisplayVersion antes de cada publicacion. -->
-    <ApplicationDisplayVersion>1.9.326</ApplicationDisplayVersion>
-    <ApplicationVersion>202605210</ApplicationVersion>
+    <ApplicationDisplayVersion>2026.07.17.0</ApplicationDisplayVersion>
+    <ApplicationVersion>202607170</ApplicationVersion>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
