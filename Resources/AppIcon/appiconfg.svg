@@ -10,9 +10,8 @@
   <!-- Montaña trasera -->
   <path d="M150 316 L214 206 L278 316 Z" fill="#FFFFFF" opacity="0.55" />
 
-  <!-- Montaña principal con cima nevada -->
+  <!-- Montaña principal, blanca solida para que destaque sobre el fondo verde -->
   <path d="M196 316 L268 172 L340 316 Z" fill="#FFFFFF" />
-  <path d="M268 172 L245 218 a34 34 0 0 0 46 0 Z" fill="#2E7D32" />
 
   <!-- Suelo -->
   <rect x="140" y="316" width="176" height="14" rx="7" fill="#FFFFFF" />

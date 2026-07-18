@@ -69,14 +69,13 @@ namespace Hiker.Services
         private string GetSupportedLanguage()
         {
             var systemLang = GetSystemLanguage();
-            // Idiomas soportados por la aplicación
-            var supported = new[] { "es", "en", "ca", "fr", "de", "it", "pt" };
-            return supported.Contains(systemLang) ? systemLang : "en";
+            // Idiomas oficiales del proyecto: castellano e inglés (constitucion seccion 8).
+            return systemLang == "es" ? "es" : "en";
         }
 
         public string[] GetSupportedLanguages()
         {
-            return new[] { "es", "en", "ca", "fr", "de", "it", "pt" };
+            return new[] { "es", "en" };
         }
 
         public string GetLanguageName(string code)
@@ -84,12 +83,6 @@ namespace Hiker.Services
             return code switch
             {
                 "es" => "Español",
-                "en" => "English",
-                "ca" => "Català",
-                "fr" => "Français",
-                "de" => "Deutsch",
-                "it" => "Italiano",
-                "pt" => "Português",
                 _ => "English"
             };
         }

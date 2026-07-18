@@ -2,11 +2,19 @@ using Hiker.Services;
 
 namespace Hiker.Pages;
 
+/// <summary>
+/// Pantalla «Acerca de»: informacion de la app, contacto, apoyo (Ko-fi), seleccion de idioma
+/// y las declaraciones de privacidad, licencia y aviso legal. Estructura comun a todo el
+/// repositorio de aplicaciones (ver constitucion, anexo A.9).
+/// </summary>
 public partial class AboutPage : ContentPage
 {
     private const string ContactEmail = "jsoladelarosa@gmail.com";
     private const string KofiUrl = "https://ko-fi.com/josepsola";
     private const string AppVersion = "2026.07.17.0";
+
+    // Verde de marca de Hiker para resaltar el idioma activo.
+    private static readonly Color ActiveLanguage = Color.FromArgb("#2E7D32");
 
     private TranslationService? _translation;
 
@@ -20,11 +28,12 @@ public partial class AboutPage : ContentPage
         base.OnAppearing();
         _translation ??= Handler?.MauiContext?.Services.GetService<TranslationService>();
         UpdateTexts();
+        UpdateLanguageButtons();
     }
 
     /// <summary>
-    /// Resuelve el texto con el servicio de traducción. Si falta la traducción, el servicio
-    /// devuelve la frase nativa (español), sin marcadores técnicos.
+    /// Resuelve el texto con el servicio de traduccion. Si falta la traduccion, el servicio
+    /// devuelve la frase nativa (espanol), sin marcadores tecnicos.
     /// </summary>
     private string T(string nativePhrase) => _translation?.Translate(nativePhrase) ?? nativePhrase;
 
@@ -35,15 +44,51 @@ public partial class AboutPage : ContentPage
         DescriptionLabel.Text = T("Tu compañero de aventuras al aire libre");
 
         ContactTitleLabel.Text = T("Contacto");
-        ContactInstructionLabel.Text = T("Toca para enviar un correo electrónico");
+        ContactHintLabel.Text = T("Toca para enviar un correo electrónico");
 
         SupportTitleLabel.Text = T("Apoya el Desarrollo");
         DonationButton.Text = T("Ko-fi.com - Invítame un café");
-        SupportDescLabel.Text = T("Tu apoyo ayuda a mantener y mejorar la aplicación");
+        SupportHintLabel.Text = T("Tu apoyo ayuda a mantener y mejorar la aplicación");
+
+        LanguageTitleLabel.Text = T("Idioma");
+        LanguageHintLabel.Text = T("Selecciona tu idioma preferido");
+
+        PrivacyTitleLabel.Text = T("Privacidad");
+        PrivacyTextLabel.Text = T("Hiker registra tu ubicación únicamente en tu dispositivo para dibujar y guardar tus rutas. Los mapas se descargan de servidores públicos de OpenStreetMap. No se recopilan ni comparten datos personales.");
+
+        LicenseTitleLabel.Text = T("Licencia");
+        LicenseTextLabel.Text = T("Hiker es software libre distribuido bajo licencia MIT.");
 
         LegalTitleLabel.Text = T("Aviso Legal");
-        LegalTextLabel.Text = T("Hiker se proporciona «tal cual», sin garantías de ningún tipo. El usuario es responsable del uso adecuado de la aplicación y del cumplimiento de las leyes locales.");
-        LicenseLabel.Text = T("Licencia MIT · © 2026 Socratic");
+        LegalText1Label.Text = T("Hiker se proporciona «tal cual», sin garantías de ningún tipo. El usuario es responsable del uso adecuado de la aplicación y del cumplimiento de las leyes locales.");
+        LegalText2Label.Text = T("En ningún caso los autores serán responsables de daños directos, indirectos, incidentales o consecuentes que resulten del uso de este software.");
+        LegalWarningLabel.Text = T("⚠️ Uso bajo su propio riesgo");
+    }
+
+    private void UpdateLanguageButtons()
+    {
+        var spanishActive = (_translation?.GetCurrentLanguage() ?? "es") == "es";
+        StyleLanguageButton(SpanishButton, spanishActive);
+        StyleLanguageButton(EnglishButton, !spanishActive);
+    }
+
+    private static void StyleLanguageButton(Button button, bool active)
+    {
+        button.BackgroundColor = active ? ActiveLanguage : Colors.Transparent;
+        button.TextColor = active ? Colors.White : ActiveLanguage;
+        button.BorderColor = ActiveLanguage;
+        button.BorderWidth = active ? 0 : 1;
+    }
+
+    private void OnSpanishClicked(object? sender, EventArgs e) => SetLanguage("es");
+
+    private void OnEnglishClicked(object? sender, EventArgs e) => SetLanguage("en");
+
+    private void SetLanguage(string languageCode)
+    {
+        _translation?.SetLanguage(languageCode);
+        UpdateTexts();
+        UpdateLanguageButtons();
     }
 
     private async void OnContactClicked(object? sender, EventArgs e)

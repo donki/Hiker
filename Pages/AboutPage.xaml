@@ -5,53 +5,51 @@
              Title="Acerca de">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="20">
+        <VerticalStackLayout Padding="20" Spacing="16">
 
             <!-- Cabecera: icono real de la app -->
             <Border Style="{StaticResource Card}">
-                <VerticalStackLayout Padding="30,25" Spacing="12">
+                <VerticalStackLayout Padding="24" Spacing="8">
                     <Image Source="app_logo.png"
                            WidthRequest="96"
                            HeightRequest="96"
                            HorizontalOptions="Center" />
 
                     <Label Text="Hiker"
-                           FontSize="28"
-                           FontAttributes="Bold"
+                           Style="{StaticResource CardTitle}"
+                           FontSize="26"
                            TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
                            HorizontalOptions="Center" />
 
                     <Label x:Name="VersionLabel"
                            Style="{StaticResource HintText}"
-                           FontSize="16"
                            HorizontalOptions="Center" />
 
                     <Label x:Name="DescriptionLabel"
                            Style="{StaticResource HintText}"
-                           HorizontalOptions="Center"
-                           HorizontalTextAlignment="Center" />
+                           HorizontalTextAlignment="Center"
+                           Margin="0,4,0,0" />
 
                     <Label Text="Socratic"
                            Style="{StaticResource HintText}"
                            HorizontalOptions="Center"
-                           Margin="0,10,0,0" />
+                           Margin="0,6,0,0" />
                 </VerticalStackLayout>
             </Border>
 
             <!-- Contacto -->
             <Border Style="{StaticResource Card}">
-                <VerticalStackLayout Padding="25,20" Spacing="15">
+                <VerticalStackLayout Padding="20,18" Spacing="12">
                     <Label x:Name="ContactTitleLabel" Style="{StaticResource CardTitle}" />
 
-                    <Button x:Name="ContactButton"
-                            Text="jsoladelarosa@gmail.com"
+                    <Button Text="jsoladelarosa@gmail.com"
                             Style="{StaticResource OutlineButton}"
                             LineBreakMode="WordWrap"
                             Padding="12,10"
                             Clicked="OnContactClicked"
                             HorizontalOptions="Fill" />
 
-                    <Label x:Name="ContactInstructionLabel"
+                    <Label x:Name="ContactHintLabel"
                            Style="{StaticResource HintText}"
                            HorizontalOptions="Center" />
                 </VerticalStackLayout>
@@ -59,7 +57,7 @@
 
             <!-- Apoyo (Ko-fi) -->
             <Border Style="{StaticResource Card}">
-                <VerticalStackLayout Padding="25,20" Spacing="15">
+                <VerticalStackLayout Padding="20,18" Spacing="12">
                     <Label x:Name="SupportTitleLabel"
                            Style="{StaticResource CardTitle}"
                            TextColor="{StaticResource Accent}" />
@@ -71,34 +69,81 @@
                             Clicked="OnDonationClicked"
                             HorizontalOptions="Fill" />
 
-                    <Label x:Name="SupportDescLabel"
+                    <Label x:Name="SupportHintLabel"
                            Style="{StaticResource HintText}"
-                           HorizontalOptions="Center"
                            HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Idioma -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Padding="20,18" Spacing="12">
+                    <Label x:Name="LanguageTitleLabel" Style="{StaticResource CardTitle}" />
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <Button Grid.Column="0"
+                                x:Name="SpanishButton"
+                                Text="Español"
+                                FontSize="14"
+                                CornerRadius="10"
+                                HeightRequest="46"
+                                Clicked="OnSpanishClicked" />
+
+                        <Button Grid.Column="1"
+                                x:Name="EnglishButton"
+                                Text="English"
+                                FontSize="14"
+                                CornerRadius="10"
+                                HeightRequest="46"
+                                Clicked="OnEnglishClicked" />
+                    </Grid>
+
+                    <Label x:Name="LanguageHintLabel"
+                           Style="{StaticResource HintText}"
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Privacidad -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Padding="20,18" Spacing="10">
+                    <Label x:Name="PrivacyTitleLabel" Style="{StaticResource CardTitle}" />
+                    <Label x:Name="PrivacyTextLabel" Style="{StaticResource BodyText}" FontSize="13" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Licencia -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Padding="20,18" Spacing="10">
+                    <Label x:Name="LicenseTitleLabel" Style="{StaticResource CardTitle}" />
+                    <Label x:Name="LicenseTextLabel" Style="{StaticResource BodyText}" FontSize="13" />
+                    <Label Text="MIT License · Copyright © 2026 Socratic"
+                           Style="{StaticResource HintText}"
+                           FontSize="11" />
                 </VerticalStackLayout>
             </Border>
 
             <!-- Aviso legal -->
             <Border Style="{StaticResource Card}">
-                <VerticalStackLayout Padding="25,20" Spacing="15">
+                <VerticalStackLayout Padding="20,18" Spacing="12">
                     <Label x:Name="LegalTitleLabel"
                            Style="{StaticResource CardTitle}"
                            TextColor="{StaticResource Danger}" />
 
-                    <Border StrokeThickness="0"
-                            Padding="15"
-                            BackgroundColor="{AppThemeBinding Light={StaticResource PageBackgroundLight}, Dark={StaticResource PageBackgroundDark}}">
+                    <Label x:Name="LegalText1Label" Style="{StaticResource BodyText}" FontSize="13" />
+                    <Label x:Name="LegalText2Label" Style="{StaticResource BodyText}" FontSize="13" />
+
+                    <Border BackgroundColor="{StaticResource Danger}"
+                            StrokeThickness="0"
+                            Padding="12">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="8" />
                         </Border.StrokeShape>
-                        <VerticalStackLayout Spacing="10">
-                            <Label x:Name="LegalTextLabel"
-                                   Style="{StaticResource BodyText}"
-                                   FontSize="13"
-                                   LineHeight="1.4" />
-                            <Label x:Name="LicenseLabel"
-                                   Style="{StaticResource HintText}" />
-                        </VerticalStackLayout>
+                        <Label x:Name="LegalWarningLabel"
+                               FontSize="13"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource White}"
+                               HorizontalOptions="Center" />
                     </Border>
                 </VerticalStackLayout>
             </Border>

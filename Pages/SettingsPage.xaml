@@ -63,16 +63,30 @@
             <!-- Idioma -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="16" Spacing="10">
-                    <Label Text="Idioma" Style="{StaticResource CardTitle}" />
+                    <Label x:Name="languageTitleLabel" Text="Idioma" Style="{StaticResource CardTitle}" />
 
-                    <Picker x:Name="languagePicker"
-                            Title="Seleccionar idioma"
-                            TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}">
-                        <Picker.Items>
-                            <x:String>Español</x:String>
-                            <x:String>English</x:String>
-                        </Picker.Items>
-                    </Picker>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <Button Grid.Column="0"
+                                x:Name="spanishButton"
+                                Text="Español"
+                                FontSize="14"
+                                CornerRadius="10"
+                                HeightRequest="46"
+                                Clicked="OnSpanishClicked" />
+
+                        <Button Grid.Column="1"
+                                x:Name="englishButton"
+                                Text="English"
+                                FontSize="14"
+                                CornerRadius="10"
+                                HeightRequest="46"
+                                Clicked="OnEnglishClicked" />
+                    </Grid>
+
+                    <Label x:Name="languageHintLabel"
+                           Text="Selecciona tu idioma preferido"
+                           Style="{StaticResource HintText}"
+                           HorizontalOptions="Center" />
                 </VerticalStackLayout>
             </Border>
 

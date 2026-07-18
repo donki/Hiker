@@ -4,6 +4,9 @@ namespace Hiker.Pages;
 
 public partial class SettingsPage : ContentPage
 {
+    // Verde de marca de Hiker para resaltar el idioma activo.
+    private static readonly Color ActiveLanguage = Color.FromArgb("#2E7D32");
+
     private SettingsService? _settingsService;
     private TranslationService? _translationService;
 
@@ -39,12 +42,32 @@ public partial class SettingsPage : ContentPage
         speedFilterSwitch.IsToggled = settings.SpeedFilterEnabled;
         maxSpeedEntry.Text = settings.MaxSpeed.ToString();
         
-        // Configurar idioma
-        if (_translationService != null)
-        {
-            var currentLanguage = _translationService.GetCurrentLanguage();
-            languagePicker.SelectedIndex = currentLanguage == "es" ? 0 : 1;
-        }
+        UpdateLanguageButtons();
+    }
+
+    private void UpdateLanguageButtons()
+    {
+        var spanishActive = (_translationService?.GetCurrentLanguage() ?? "es") == "es";
+        StyleLanguageButton(spanishButton, spanishActive);
+        StyleLanguageButton(englishButton, !spanishActive);
+    }
+
+    private static void StyleLanguageButton(Button button, bool active)
+    {
+        button.BackgroundColor = active ? ActiveLanguage : Colors.Transparent;
+        button.TextColor = active ? Colors.White : ActiveLanguage;
+        button.BorderColor = ActiveLanguage;
+        button.BorderWidth = active ? 0 : 1;
+    }
+
+    private void OnSpanishClicked(object? sender, EventArgs e) => ApplyLanguage("es");
+
+    private void OnEnglishClicked(object? sender, EventArgs e) => ApplyLanguage("en");
+
+    private void ApplyLanguage(string languageCode)
+    {
+        _translationService?.SetLanguage(languageCode);
+        UpdateLanguageButtons();
     }
 
     private async void OnSaveClicked(object sender, EventArgs e)
@@ -70,14 +93,9 @@ public partial class SettingsPage : ContentPage
                 settings.MaxSpeed = Math.Max(1, maxSpeed);
 
             await _settingsService.SaveSettingsAsync();
-            
-            // Configurar idioma
-            if (_translationService != null)
-            {
-                var selectedLanguage = languagePicker.SelectedIndex == 0 ? "es" : "en";
-                _translationService.SetLanguage(selectedLanguage);
-            }
-            
+
+            // El idioma se aplica de inmediato al pulsar los botones Español/English.
+
             await DisplayAlert("Éxito", "Configuración guardada correctamente", "OK");
         }
         catch (Exception ex)
