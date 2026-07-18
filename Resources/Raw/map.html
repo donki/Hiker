@@ -4,108 +4,117 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hiker Map</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
     <style>
         body { margin: 0; padding: 0; background-color: #1a1a1a; }
-        #map { height: 100vh; width: 100vw; }
-        .leaflet-control-container { font-size: 14px; }
+        #map { position: absolute; top: 0; bottom: 0; left: 0; right: 0; }
     </style>
 </head>
 <body>
     <div id="map"></div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
     <script>
-        var map = L.map('map', { zoomControl: true }).setView([40.4168, -3.7038], 13);
-
-        // Capas base gratuitas. OpenTopoMap es topografico (curvas de nivel, senderos): lo mejor
-        // para una app de senderismo. Se deja OSM estandar y vista satelite (Esri) como alternativas.
-        var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap', maxZoom: 19
-        }).addTo(map);
-        var topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenTopoMap (CC-BY-SA) · © OpenStreetMap',
-            maxZoom: 17
+        // Mapa con MapLibre GL (nativo del navegador) y teselas vectoriales de OpenFreeMap
+        // (gratis, sin API key). Se mantiene EXACTAMENTE la misma interfaz window.* que
+        // usaba la version anterior con Leaflet, para no tocar el codigo C#.
+        var map = new maplibregl.Map({
+            container: 'map',
+            style: 'https://tiles.openfreemap.org/styles/liberty',
+            center: [-3.7038, 40.4168], // [lng, lat] — OJO: MapLibre usa lng,lat
+            zoom: 13,
+            attributionControl: true
         });
-        var satelite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Imagenes © Esri', maxZoom: 19
-        });
-        L.control.layers(
-            { 'Topográfico': topo, 'Callejero': osm, 'Satélite': satelite },
-            null, { position: 'topright' }
-        ).addTo(map);
+        map.addControl(new maplibregl.NavigationControl(), 'top-right');
 
-        // Capas persistentes: se crean una vez y se actualizan, no se recrean en cada punto.
-        var currentLocationMarker = null;
-        var accuracyCircle = null;
-        var routePolyline = null;
+        // Si el usuario arrastra, dejamos de recentrar hasta que pulse "centrar".
         var followUser = true;
-
-        // Si el usuario arrastra el mapa, dejamos de recentrar automaticamente hasta que pulse el
-        // boton de centrar. Asi la traza no le "roba" el gesto.
         map.on('dragstart', function () { followUser = false; });
 
+        var meMarker = null;
+        var routeCoords = [];   // en formato [lng, lat]
+        var styleReady = false;
+
+        function ensureRouteLayer() {
+            if (map.getSource('route')) return;
+            map.addSource('route', {
+                type: 'geojson',
+                data: { type: 'Feature', geometry: { type: 'LineString', coordinates: routeCoords } }
+            });
+            map.addLayer({
+                id: 'route', type: 'line', source: 'route',
+                layout: { 'line-join': 'round', 'line-cap': 'round' },
+                paint: { 'line-color': '#F44336', 'line-width': 4, 'line-opacity': 0.85 }
+            });
+        }
+
+        map.on('load', function () { styleReady = true; ensureRouteLayer(); });
+
+        // Ejecuta fn cuando el estilo este cargado (las fuentes/capas solo se pueden tocar
+        // despues de 'load'); si aun no lo esta, lo encola.
+        function whenReady(fn) { if (styleReady) fn(); else map.on('load', fn); }
+
+        function setRouteData() {
+            if (map.getSource('route'))
+                map.getSource('route').setData(
+                    { type: 'Feature', geometry: { type: 'LineString', coordinates: routeCoords } });
+        }
+
         function updateLocation(lat, lng, accuracy) {
-            var pos = [lat, lng];
-
-            if (!currentLocationMarker) {
-                currentLocationMarker = L.circleMarker(pos, {
-                    color: '#ffffff', weight: 2, fillColor: '#4CAF50', fillOpacity: 1, radius: 8
-                }).addTo(map);
-            } else {
-                currentLocationMarker.setLatLng(pos);
-            }
-
-            if (!accuracyCircle) {
-                accuracyCircle = L.circle(pos, {
-                    color: '#4CAF50', fillColor: '#4CAF50', fillOpacity: 0.1, weight: 1, radius: accuracy
-                }).addTo(map);
-            } else {
-                accuracyCircle.setLatLng(pos);
-                accuracyCircle.setRadius(accuracy);
-            }
-
-            if (followUser) {
-                map.setView(pos, map.getZoom());
-            }
+            whenReady(function () {
+                var pos = [lng, lat];
+                if (!meMarker) {
+                    var el = document.createElement('div');
+                    el.style.cssText = 'width:16px;height:16px;border-radius:50%;background:#4CAF50;' +
+                        'border:2px solid #ffffff;box-shadow:0 0 5px rgba(0,0,0,.6)';
+                    meMarker = new maplibregl.Marker({ element: el }).setLngLat(pos).addTo(map);
+                } else {
+                    meMarker.setLngLat(pos);
+                }
+                if (followUser) map.easeTo({ center: pos, duration: 500 });
+            });
         }
 
-        // Anade un punto a la traza SIN redibujarla entera: crea la polyline una vez y luego solo
-        // le agrega vertices. Antes se recreaba toda la linea en cada punto (lag creciente).
         function addRoutePoint(lat, lng) {
-            var pos = [lat, lng];
-            if (!routePolyline) {
-                routePolyline = L.polyline([pos], { color: '#F44336', weight: 4, opacity: 0.85 }).addTo(map);
-            } else {
-                routePolyline.addLatLng(pos);
-            }
+            whenReady(function () {
+                routeCoords.push([lng, lat]);
+                ensureRouteLayer();
+                setRouteData();
+            });
         }
 
-        // Dibuja una ruta completa (al cargar un GPX) y ajusta el encuadre para verla entera.
+        // Dibuja una ruta completa (GPX). Los puntos llegan como [lat, lng] desde C#.
         function drawRoute(coords) {
-            if (routePolyline) { map.removeLayer(routePolyline); routePolyline = null; }
-            if (!coords || coords.length === 0) return;
-            routePolyline = L.polyline(coords, { color: '#F44336', weight: 4, opacity: 0.85 }).addTo(map);
-            followUser = false;
-            map.fitBounds(routePolyline.getBounds(), { padding: [30, 30] });
+            whenReady(function () {
+                routeCoords = (coords || []).map(function (c) { return [c[1], c[0]]; });
+                ensureRouteLayer();
+                setRouteData();
+                if (routeCoords.length) {
+                    followUser = false;
+                    var b = new maplibregl.LngLatBounds(routeCoords[0], routeCoords[0]);
+                    for (var i = 1; i < routeCoords.length; i++) b.extend(routeCoords[i]);
+                    map.fitBounds(b, { padding: 40 });
+                }
+            });
         }
 
         function clearRoute() {
-            if (routePolyline) { map.removeLayer(routePolyline); routePolyline = null; }
+            whenReady(function () { routeCoords = []; setRouteData(); });
         }
 
-        // Quita el ultimo vertice de la traza en curso (deshacer punto erroneo).
         function removeLastPoint() {
-            if (!routePolyline) return;
-            var pts = routePolyline.getLatLngs();
-            if (pts.length <= 1) { clearRoute(); return; }
-            pts.pop();
-            routePolyline.setLatLngs(pts);
+            whenReady(function () {
+                if (!routeCoords.length) return;
+                routeCoords.pop();
+                setRouteData();
+            });
         }
 
         function centerOnLocation(lat, lng, zoom) {
-            followUser = true;
-            map.setView([lat, lng], zoom || 15);
+            whenReady(function () {
+                followUser = true;
+                map.easeTo({ center: [lng, lat], zoom: zoom || 15, duration: 600 });
+            });
         }
 
         window.updateLocation = updateLocation;
@@ -114,7 +123,6 @@
         window.clearRoute = clearRoute;
         window.removeLastPoint = removeLastPoint;
         window.centerOnLocation = centerOnLocation;
-
         window.mapReady = true;
     </script>
 </body>

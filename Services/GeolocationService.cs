@@ -77,46 +77,14 @@ namespace Hiker.Services
             }
         }
 
-        private async Task<bool> StartFallbackListeningAsync()
+        // Antes esto SIMULABA estar en Madrid (40.4168, -3.7038) inyectando esa posicion
+        // cada segundo, lo que hacia que la app "se posicionara" en Madrid de forma falsa.
+        // Se elimina la simulacion: si la geolocalizacion nativa no arranca, se informa del
+        // fallo de forma honesta en vez de fingir una ubicacion.
+        private Task<bool> StartFallbackListeningAsync()
         {
-            try
-            {
-                NativeMode = "Fallback";
-                _isListening = true;
-                
-                // Simular ubicaciones para desarrollo
-                _ = Task.Run(async () =>
-                {
-                    var madrid = new Location(40.4168, -3.7038)
-                    {
-                        Accuracy = 10,
-                        Timestamp = DateTimeOffset.Now
-                    };
-
-                    while (_isListening && !_disposed)
-                    {
-                        try
-                        {
-                            if (!_locationWriter.TryWrite(madrid))
-                            {
-                                System.Diagnostics.Debug.WriteLine("Location buffer full");
-                            }
-                            await Task.Delay(1000, _cancellationTokenSource.Token);
-                        }
-                        catch (OperationCanceledException)
-                        {
-                            break;
-                        }
-                    }
-                });
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Fallback geolocation failed: {ex.Message}");
-                return false;
-            }
+            System.Diagnostics.Debug.WriteLine("Geolocalizacion nativa no disponible; sin ubicacion.");
+            return Task.FromResult(false);
         }
 
         private async Task<bool> StartNativeListeningAsync()
@@ -225,26 +193,36 @@ namespace Hiker.Services
 
                 return await Geolocation.GetLocationAsync(request, _cancellationTokenSource.Token);
             }
-            catch (System.Runtime.InteropServices.COMException comEx) when (comEx.HResult == -2147221164)
-            {
-                System.Diagnostics.Debug.WriteLine($"COM error getting location, using fallback: {comEx.Message}");
-                return GetFallbackLocation();
-            }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error getting current location, using fallback: {ex.Message}");
-                return GetFallbackLocation();
+                // Sin fix disponible se devuelve null (antes se fingia Madrid). Como ultimo
+                // recurso se intenta la ultima ubicacion conocida por el sistema.
+                System.Diagnostics.Debug.WriteLine($"Error getting current location: {ex.Message}");
+                try
+                {
+                    return await Geolocation.GetLastKnownLocationAsync();
+                }
+                catch
+                {
+                    return null;
+                }
             }
         }
 
-        private Location GetFallbackLocation()
+        /// <summary>Ultima ubicacion conocida por el sistema, util para centrar el mapa al instante
+        /// mientras llega el primer fix del GPS. Devuelve null si no hay ninguna.</summary>
+        public async Task<Location?> GetLastKnownLocationAsync()
         {
-            // Madrid como ubicación por defecto
-            return new Location(40.4168, -3.7038)
+            if (_disposed) return null;
+            try
             {
-                Accuracy = 1000,
-                Timestamp = DateTimeOffset.Now
-            };
+                return await Geolocation.GetLastKnownLocationAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error getting last known location: {ex.Message}");
+                return null;
+            }
         }
 
         public async ValueTask DisposeAsync()

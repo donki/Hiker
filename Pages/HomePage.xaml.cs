@@ -37,6 +37,9 @@ public partial class HomePage : ContentPage
             {
                 _geolocationService.OnLocationChangedDelegate += OnLocationChanged;
                 await StartLocationUpdates();
+                // Centrado inicial rapido: evita que el mapa se quede en su centro por defecto
+                // esperando al primer fix del GPS (antes parecia "posicionar" en Madrid).
+                await CenterOnInitialLocationAsync();
             }
         }
 
@@ -167,6 +170,51 @@ public partial class HomePage : ContentPage
 </body>
 </html>";
         }
+    }
+
+    /// <summary>
+    /// Centra el mapa cuanto antes: primero con la ultima ubicacion conocida (instantanea) y
+    /// luego con un fix fresco del GPS. Asi la pantalla no se queda en el centro por defecto
+    /// del mapa mientras llega el primer punto.
+    /// </summary>
+    private async Task CenterOnInitialLocationAsync()
+    {
+        if (_geolocationService == null)
+            return;
+
+        // Espera breve (max ~3s) a que el WebView del mapa termine de cargar.
+        for (int i = 0; i < 20 && !_mapReady; i++)
+            await Task.Delay(150);
+        if (!_mapReady)
+            return;
+
+        try
+        {
+            var last = await _geolocationService.GetLastKnownLocationAsync();
+            if (last != null)
+            {
+                UpdateLocationDisplay(last);
+                await CenterMapAsync(last, 15);
+            }
+
+            var current = await _geolocationService.GetCurrentLocationAsync();
+            if (current != null)
+            {
+                UpdateLocationDisplay(current);
+                await CenterMapAsync(current, 16);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error centrando ubicacion inicial: {ex.Message}");
+        }
+    }
+
+    private async Task CenterMapAsync(Location location, int zoom)
+    {
+        var ci = System.Globalization.CultureInfo.InvariantCulture;
+        await mapWebView.EvaluateJavaScriptAsync(
+            $"centerOnLocation({location.Latitude.ToString(ci)}, {location.Longitude.ToString(ci)}, {zoom});");
     }
 
     private async Task StartLocationUpdates()
