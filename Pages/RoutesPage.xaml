@@ -14,7 +14,7 @@
             <Border.StrokeShape>
                 <RoundRectangle CornerRadius="10" />
             </Border.StrokeShape>
-            <Label Text="Gestión de Rutas"
+            <Label x:Name="headerLabel"
                    TextColor="{StaticResource White}"
                    FontSize="18"
                    FontAttributes="Bold"
@@ -72,7 +72,6 @@
         <Grid Grid.Row="2" Margin="10,5" ColumnDefinitions="*,*" ColumnSpacing="8">
             <Button Grid.Column="0"
                     x:Name="loadGpxButton"
-                    Text="Cargar GPX"
                     ImageSource="ic_folder.png"
                     ContentLayout="Left,6"
                     Style="{StaticResource PrimaryButton}"
@@ -80,7 +79,6 @@
 
             <Button Grid.Column="1"
                     x:Name="refreshButton"
-                    Text="Actualizar"
                     ImageSource="ic_refresh.png"
                     ContentLayout="Left,6"
                     Style="{StaticResource AccentButton}"

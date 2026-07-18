@@ -24,7 +24,10 @@ public partial class HomePage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        
+
+        // Textos de UI externalizados (constitucion seccion 8): titulo, panel GPS y botones.
+        TranslateUi();
+
         // Obtener servicios cuando el Handler esté disponible
         if (Handler?.MauiContext?.Services != null)
         {
@@ -60,6 +63,25 @@ public partial class HomePage : ContentPage
         {
             await _geolocationService.ListeningStopAsync();
         }
+    }
+
+    /// <summary>
+    /// Traduce los textos estaticos de la interfaz con TranslationService (clave = frase en
+    /// español). Los valores dinamicos de ubicacion se sobreescriben luego con datos reales.
+    /// </summary>
+    private void TranslateUi()
+    {
+        var translation = Handler?.MauiContext?.Services.GetService<TranslationService>();
+        string L(string phrase) => translation?.Translate(phrase) ?? phrase;
+
+        Title = L("GPS Tracker");
+        locationLabel.Text = L("Obteniendo ubicación...");
+        accuracyLabel.Text = L("Precisión: --");
+        speedLabel.Text = L("Velocidad: -- km/h");
+        startTrackingButton.Text = L("Iniciar");
+        stopTrackingButton.Text = L("Parar");
+        saveRouteButton.Text = L("Guardar");
+        clearButton.Text = L("Limpiar");
     }
 
     private async void InitializeMap()

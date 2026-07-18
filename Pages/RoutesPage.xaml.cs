@@ -7,6 +7,7 @@ namespace Hiker.Pages;
 public partial class RoutesPage : ContentPage
 {
     private RouteService? _routeService;
+    private TranslationService? _translationService;
     public ObservableCollection<RouteInfo> Routes { get; set; } = new();
     
     public ICommand LoadRouteCommand { get; }
@@ -31,9 +32,23 @@ public partial class RoutesPage : ContentPage
         if (Handler?.MauiContext?.Services != null)
         {
             _routeService = Handler.MauiContext.Services.GetService<RouteService>();
+            _translationService = Handler.MauiContext.Services.GetService<TranslationService>();
         }
-        
+
+        TranslateUi();
+
         await LoadRoutes();
+    }
+
+    /// <summary>Textos estaticos externalizados (constitucion seccion 8).</summary>
+    private void TranslateUi()
+    {
+        string L(string phrase) => _translationService?.Translate(phrase) ?? phrase;
+
+        Title = L("Rutas Guardadas");
+        headerLabel.Text = L("Gestión de Rutas");
+        loadGpxButton.Text = L("Cargar GPX");
+        refreshButton.Text = L("Actualizar");
     }
 
     private async Task LoadRoutes()

@@ -27,6 +27,11 @@
     <Color x:Key="White">#FFFFFF</Color>
     <Color x:Key="Black">#000000</Color>
 
+    <!-- Texto atenuado sobre el panel verde de marca (info GPS). -->
+    <Color x:Key="TextOnPrimaryMuted">#DDF3DD</Color>
+    <!-- Fondo del lienzo del mapa mientras carga el WebView. -->
+    <Color x:Key="MapCanvasBackground">#1A1A1A</Color>
+
     <!-- Compatibilidad con estilos heredados que aun referencian estos nombres. -->
     <Color x:Key="Secondary">#FF9800</Color>
     <Color x:Key="OnPrimary">#FFFFFF</Color>

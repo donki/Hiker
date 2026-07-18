@@ -17,16 +17,13 @@
             <Grid Padding="12" ColumnDefinitions="*,Auto">
                 <VerticalStackLayout Grid.Column="0">
                     <Label x:Name="locationLabel"
-                           Text="Obteniendo ubicación..."
                            TextColor="{StaticResource White}"
                            FontSize="14" />
                     <Label x:Name="accuracyLabel"
-                           Text="Precisión: --"
-                           TextColor="#DDF3DD"
+                           TextColor="{StaticResource TextOnPrimaryMuted}"
                            FontSize="12" />
                     <Label x:Name="speedLabel"
-                           Text="Velocidad: -- km/h"
-                           TextColor="#DDF3DD"
+                           TextColor="{StaticResource TextOnPrimaryMuted}"
                            FontSize="12" />
                 </VerticalStackLayout>
 
@@ -45,7 +42,7 @@
         <!-- Mapa OpenStreetMap -->
         <WebView x:Name="mapWebView"
                  Grid.Row="1"
-                 BackgroundColor="#1A1A1A" />
+                 BackgroundColor="{StaticResource MapCanvasBackground}" />
 
         <!-- Panel de controles -->
         <Border Grid.Row="2"
@@ -58,7 +55,6 @@
             <Grid Padding="8" ColumnDefinitions="*,*,*,*" ColumnSpacing="6">
                 <Button Grid.Column="0"
                         x:Name="startTrackingButton"
-                        Text="Iniciar"
                         ImageSource="ic_play.png"
                         ContentLayout="Top,4"
                         Style="{StaticResource PrimaryButton}"
@@ -67,7 +63,6 @@
 
                 <Button Grid.Column="1"
                         x:Name="stopTrackingButton"
-                        Text="Parar"
                         ImageSource="ic_stop.png"
                         ContentLayout="Top,4"
                         Style="{StaticResource DangerButton}"
@@ -77,7 +72,6 @@
 
                 <Button Grid.Column="2"
                         x:Name="saveRouteButton"
-                        Text="Guardar"
                         ImageSource="ic_save.png"
                         ContentLayout="Top,4"
                         Style="{StaticResource AccentButton}"
@@ -87,7 +81,6 @@
 
                 <Button Grid.Column="3"
                         x:Name="clearButton"
-                        Text="Limpiar"
                         ImageSource="ic_trash.png"
                         ContentLayout="Top,4"
                         Style="{StaticResource OutlineButton}"

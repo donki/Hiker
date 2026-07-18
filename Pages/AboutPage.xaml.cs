@@ -11,7 +11,6 @@ public partial class AboutPage : ContentPage
 {
     private const string ContactEmail = "jsoladelarosa@gmail.com";
     private const string KofiUrl = "https://ko-fi.com/josepsola";
-    private const string AppVersion = "2026.07.17.0";
 
     // Verde de marca de Hiker para resaltar el idioma activo.
     private static readonly Color ActiveLanguage = Color.FromArgb("#2E7D32");
@@ -40,7 +39,7 @@ public partial class AboutPage : ContentPage
     private void UpdateTexts()
     {
         Title = T("Acerca de");
-        VersionLabel.Text = $"{T("Versión")} {AppVersion}";
+        VersionLabel.Text = $"{T("Versión")} {AppInfo.Current.VersionString}";
         DescriptionLabel.Text = T("Tu compañero de aventuras al aire libre");
 
         ContactTitleLabel.Text = T("Contacto");
@@ -54,13 +53,13 @@ public partial class AboutPage : ContentPage
         LanguageHintLabel.Text = T("Selecciona tu idioma preferido");
 
         PrivacyTitleLabel.Text = T("Privacidad");
-        PrivacyTextLabel.Text = T("Hiker registra tu ubicación únicamente en tu dispositivo para dibujar y guardar tus rutas. Los mapas se descargan de servidores públicos de OpenStreetMap. No se recopilan ni comparten datos personales.");
+        PrivacyTextLabel.Text = T("Esta aplicación no recopila tus datos personales ni los envía a los desarrolladores. La información se procesa en tu dispositivo para la función propia de la app.");
 
         LicenseTitleLabel.Text = T("Licencia");
-        LicenseTextLabel.Text = T("Hiker es software libre distribuido bajo licencia MIT.");
+        LicenseTextLabel.Text = T("Esta aplicación es software libre distribuido bajo licencia MIT.");
 
         LegalTitleLabel.Text = T("Aviso Legal");
-        LegalText1Label.Text = T("Hiker se proporciona «tal cual», sin garantías de ningún tipo. El usuario es responsable del uso adecuado de la aplicación y del cumplimiento de las leyes locales.");
+        LegalText1Label.Text = T("Este software se proporciona «tal cual», sin garantías de ningún tipo. El usuario es responsable del uso adecuado de la aplicación y del cumplimiento de las leyes locales.");
         LegalText2Label.Text = T("En ningún caso los autores serán responsables de daños directos, indirectos, incidentales o consecuentes que resulten del uso de este software.");
         LegalWarningLabel.Text = T("⚠️ Uso bajo su propio riesgo");
     }

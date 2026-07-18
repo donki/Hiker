@@ -185,13 +185,19 @@ namespace Hiker.Services
 
             try
             {
+                // Para el primer fix se usa precision Media (proveedor de red / fused de Play
+                // Services): en interiores o en tablets wifi consigue la ubicacion en segundos,
+                // mientras que Best (solo GPS) suele agotar el tiempo sin fijar. La precision fina
+                // ya la aporta el listening continuo de Best una vez en marcha. El timeout de 3 s
+                // anterior era demasiado corto y devolvia null casi siempre.
                 var request = new GeolocationRequest
                 {
-                    DesiredAccuracy = GeolocationAccuracy.Best,
-                    Timeout = TimeSpan.FromSeconds(Math.Max(3, _settingsService.AppSettings.TimerInterval))
+                    DesiredAccuracy = GeolocationAccuracy.Medium,
+                    Timeout = TimeSpan.FromSeconds(25)
                 };
 
-                return await Geolocation.GetLocationAsync(request, _cancellationTokenSource.Token);
+                var location = await Geolocation.GetLocationAsync(request, _cancellationTokenSource.Token);
+                return location ?? await Geolocation.GetLastKnownLocationAsync();
             }
             catch (Exception ex)
             {

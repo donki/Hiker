@@ -94,13 +94,17 @@
             <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
                 <Button Grid.Column="0"
                         x:Name="saveButton"
-                        Text="💾 Guardar"
+                        Text="Guardar"
+                        ImageSource="ic_save.png"
+                        ContentLayout="Left,8"
                         Style="{StaticResource PrimaryButton}"
                         Clicked="OnSaveClicked" />
 
                 <Button Grid.Column="1"
                         x:Name="resetButton"
-                        Text="🔄 Restablecer"
+                        Text="Restablecer"
+                        ImageSource="ic_refresh.png"
+                        ContentLayout="Left,8"
                         Style="{StaticResource DangerButton}"
                         Clicked="OnResetClicked" />
             </Grid>
