@@ -68,7 +68,7 @@
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                         <Button Grid.Column="0"
                                 x:Name="spanishButton"
-                                Text="Español"
+                                Text="🇪🇸 Español"
                                 FontSize="14"
                                 CornerRadius="10"
                                 HeightRequest="46"
@@ -76,7 +76,7 @@
 
                         <Button Grid.Column="1"
                                 x:Name="englishButton"
-                                Text="English"
+                                Text="🇺🇸 English"
                                 FontSize="14"
                                 CornerRadius="10"
                                 HeightRequest="46"
