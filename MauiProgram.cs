@@ -26,12 +26,14 @@ namespace Hiker
                 builder.Services.AddSingleton<SettingsService>();
                 builder.Services.AddSingleton<TranslationService>();
                 
-                // Registrar servicio de geolocalización principal
-                builder.Services.AddScoped<GeolocationService>();
-                builder.Services.AddScoped<FallbackGeolocationService>();
-                
-                builder.Services.AddScoped<RouteService>();
-                builder.Services.AddScoped<GpsFilterService>();
+                // Servicios de app (Singleton): antes eran Scoped y al resolverlos a mano desde
+                // Handler.MauiContext.Services en las paginas fallaba/daba instancias distintas, y
+                // la geolocalizacion no llegaba a arrancar. Como servicios de aplicacion, Singleton.
+                builder.Services.AddSingleton<GeolocationService>();
+                builder.Services.AddSingleton<FallbackGeolocationService>();
+
+                builder.Services.AddSingleton<RouteService>();
+                builder.Services.AddSingleton<GpsFilterService>();
 
                 // Servicios de CommunityToolkit
                 try

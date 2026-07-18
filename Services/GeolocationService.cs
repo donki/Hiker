@@ -87,15 +87,26 @@ namespace Hiker.Services
             return Task.FromResult(false);
         }
 
+        // Log visible en logcat tambien en Release (Debug.WriteLine se elimina al compilar Release).
+        internal static void LogInfo(string msg)
+        {
+#if ANDROID
+            Android.Util.Log.Info("HikerGeo", msg);
+#endif
+            System.Diagnostics.Debug.WriteLine(msg);
+        }
+
         private async Task<bool> StartNativeListeningAsync()
         {
             try
             {
                 // Verificar permisos primero
                 var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+                LogInfo($"Permiso ubicacion (check) = {status}");
                 if (status != PermissionStatus.Granted)
                 {
                     status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+                    LogInfo($"Permiso ubicacion (request) = {status}");
                     if (status != PermissionStatus.Granted)
                     {
                         return false;
@@ -103,17 +114,22 @@ namespace Hiker.Services
                 }
 
                 Geolocation.LocationChanged += Geolocation_LocationChanged;
-                
+
+                // Escucha continua a precision Media: en tablets wifi / interiores el proveedor de
+                // red (fused) entrega posiciones aunque el GPS no fije; el detalle fino llega cuando
+                // hay senal GPS. Con Best (solo GPS) la traza se quedaba sin puntos en interiores.
                 var request = new GeolocationListeningRequest(
-                    GeolocationAccuracy.Best, 
-                    TimeSpan.FromMilliseconds(Math.Max(100, _settingsService.AppSettings.TimerInterval * 1000))
+                    GeolocationAccuracy.Medium,
+                    TimeSpan.FromMilliseconds(Math.Max(1000, _settingsService.AppSettings.TimerInterval * 1000))
                 );
-                
-                return await Geolocation.StartListeningForegroundAsync(request);
+
+                var started = await Geolocation.StartListeningForegroundAsync(request);
+                LogInfo($"StartListeningForeground = {started}");
+                return started;
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error starting native geolocation: {ex.Message}");
+                LogInfo($"Error starting native geolocation: {ex}");
                 return false;
             }
         }
@@ -171,11 +187,12 @@ namespace Hiker.Services
         private void Geolocation_LocationChanged(object? sender, GeolocationLocationChangedEventArgs e)
         {
             if (_disposed || e.Location == null) return;
-            
+
+            LogInfo($"LocationChanged: {e.Location.Latitude:F5},{e.Location.Longitude:F5} acc={e.Location.Accuracy}");
             // Usar TryWrite para evitar bloqueos
             if (!_locationWriter.TryWrite(e.Location))
             {
-                System.Diagnostics.Debug.WriteLine("Location buffer full, dropping location");
+                LogInfo("Location buffer full, dropping location");
             }
         }
 
@@ -196,14 +213,16 @@ namespace Hiker.Services
                     Timeout = TimeSpan.FromSeconds(25)
                 };
 
+                LogInfo("GetCurrentLocation: pidiendo fix (Medium, 25s)...");
                 var location = await Geolocation.GetLocationAsync(request, _cancellationTokenSource.Token);
+                LogInfo($"GetCurrentLocation: resultado = {(location != null ? $"{location.Latitude:F5},{location.Longitude:F5}" : "null")}");
                 return location ?? await Geolocation.GetLastKnownLocationAsync();
             }
             catch (Exception ex)
             {
                 // Sin fix disponible se devuelve null (antes se fingia Madrid). Como ultimo
                 // recurso se intenta la ultima ubicacion conocida por el sistema.
-                System.Diagnostics.Debug.WriteLine($"Error getting current location: {ex.Message}");
+                LogInfo($"Error getting current location: {ex}");
                 try
                 {
                     return await Geolocation.GetLastKnownLocationAsync();

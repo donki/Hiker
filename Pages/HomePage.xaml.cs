@@ -28,16 +28,23 @@ public partial class HomePage : ContentPage
         // Textos de UI externalizados (constitucion seccion 8): titulo, panel GPS y botones.
         TranslateUi();
 
-        // Obtener servicios cuando el Handler esté disponible
-        if (Handler?.MauiContext?.Services != null)
+        // Resolver servicios de forma fiable: el proveedor global (IPlatformApplication.Current)
+        // siempre esta disponible; antes se dependia solo de Handler.MauiContext.Services, que
+        // podia ser null al aparecer la pagina y dejaba la geolocalizacion sin arrancar.
+        var services = Handler?.MauiContext?.Services
+                       ?? IPlatformApplication.Current?.Services;
+        GeolocationService.LogInfo($"HomePage.OnAppearing services={(services != null)}");
+        if (services != null)
         {
-            _geolocationService = Handler.MauiContext.Services.GetService<GeolocationService>();
-            _gpsFilterService = Handler.MauiContext.Services.GetService<GpsFilterService>();
-            _settingsService = Handler.MauiContext.Services.GetService<SettingsService>();
-            _routeService = Handler.MauiContext.Services.GetService<RouteService>();
-            
+            _geolocationService ??= services.GetService<GeolocationService>();
+            _gpsFilterService ??= services.GetService<GpsFilterService>();
+            _settingsService ??= services.GetService<SettingsService>();
+            _routeService ??= services.GetService<RouteService>();
+
+            GeolocationService.LogInfo($"HomePage.OnAppearing geoService={(_geolocationService != null)}");
             if (_geolocationService != null)
             {
+                _geolocationService.OnLocationChangedDelegate -= OnLocationChanged;
                 _geolocationService.OnLocationChangedDelegate += OnLocationChanged;
                 await StartLocationUpdates();
                 // Centrado inicial rapido: evita que el mapa se quede en su centro por defecto
@@ -204,26 +211,23 @@ public partial class HomePage : ContentPage
         if (_geolocationService == null)
             return;
 
-        // Espera breve (max ~3s) a que el WebView del mapa termine de cargar.
-        for (int i = 0; i < 20 && !_mapReady; i++)
-            await Task.Delay(150);
-        if (!_mapReady)
-            return;
-
         try
         {
+            // La ETIQUETA de ubicacion se actualiza en cuanto hay un fix, SIN esperar al mapa
+            // (antes se bloqueaba aqui esperando al WebView y se quedaba en "Obteniendo ubicacion").
+            // El centrado del mapa se hace aparte, cuando el WebView este listo.
             var last = await _geolocationService.GetLastKnownLocationAsync();
             if (last != null)
             {
                 UpdateLocationDisplay(last);
-                await CenterMapAsync(last, 15);
+                await CenterMapWhenReadyAsync(last, 15);
             }
 
             var current = await _geolocationService.GetCurrentLocationAsync();
             if (current != null)
             {
                 UpdateLocationDisplay(current);
-                await CenterMapAsync(current, 16);
+                await CenterMapWhenReadyAsync(current, 16);
             }
         }
         catch (Exception ex)
@@ -237,6 +241,16 @@ public partial class HomePage : ContentPage
         var ci = System.Globalization.CultureInfo.InvariantCulture;
         await mapWebView.EvaluateJavaScriptAsync(
             $"centerOnLocation({location.Latitude.ToString(ci)}, {location.Longitude.ToString(ci)}, {zoom});");
+    }
+
+    /// <summary>Centra el mapa cuando el WebView este listo (espera hasta ~3s). No bloquea la
+    /// actualizacion de la etiqueta de ubicacion, que ocurre por separado.</summary>
+    private async Task CenterMapWhenReadyAsync(Location location, int zoom)
+    {
+        for (int i = 0; i < 20 && !_mapReady; i++)
+            await Task.Delay(150);
+        if (_mapReady)
+            await CenterMapAsync(location, zoom);
     }
 
     private async Task StartLocationUpdates()
