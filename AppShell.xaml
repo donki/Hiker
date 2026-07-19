@@ -4,40 +4,64 @@
        xmlns:local="clr-namespace:Hiker.Pages"
        x:Class="Hiker.AppShell"
        Title="Hiker"
+       FlyoutBehavior="Flyout"
+       FlyoutWidth="280"
+       FlyoutBackgroundColor="{AppThemeBinding Light={StaticResource PageBackgroundLight}, Dark={StaticResource PageBackgroundDark}}"
        BackgroundColor="{StaticResource Primary}">
 
     <Shell.Resources>
         <ResourceDictionary>
             <Style x:Key="BaseStyle" TargetType="Element">
                 <Setter Property="Shell.BackgroundColor" Value="{StaticResource Primary}" />
-                <Setter Property="Shell.ForegroundColor" Value="{StaticResource White}" />
-                <Setter Property="Shell.TitleColor" Value="{StaticResource White}" />
+                <Setter Property="Shell.ForegroundColor" Value="{StaticResource OnPrimary}" />
+                <Setter Property="Shell.TitleColor" Value="{StaticResource OnPrimary}" />
                 <Setter Property="Shell.DisabledColor" Value="#B4B4B4" />
                 <Setter Property="Shell.UnselectedColor" Value="#95FFFFFF" />
-                <Setter Property="Shell.TabBarBackgroundColor" Value="{StaticResource Primary}" />
-                <Setter Property="Shell.TabBarForegroundColor" Value="{StaticResource White}"/>
-                <Setter Property="Shell.TabBarUnselectedColor" Value="#95FFFFFF"/>
-                <Setter Property="Shell.TabBarTitleColor" Value="{StaticResource White}"/>
             </Style>
         </ResourceDictionary>
     </Shell.Resources>
 
-    <TabBar>
-        <ShellContent Title="GPS"
-                      Icon="location.png"
-                      ContentTemplate="{DataTemplate local:HomePage}" />
-        
-        <ShellContent Title="Rutas"
-                      Icon="map.png"
-                      ContentTemplate="{DataTemplate local:RoutesPage}" />
-        
-        <ShellContent Title="Configuración"
-                      Icon="settings.png"
-                      ContentTemplate="{DataTemplate local:SettingsPage}" />
-        
-        <ShellContent Title="Acerca de"
-                      Icon="info.png"
-                      ContentTemplate="{DataTemplate local:AboutPage}" />
-    </TabBar>
+    <!-- Cabecera del menu: marca Hiker sobre el verde corporativo -->
+    <Shell.FlyoutHeader>
+        <Grid BackgroundColor="{StaticResource Primary}" HeightRequest="150" Padding="20,44,20,16">
+            <VerticalStackLayout VerticalOptions="End" Spacing="4">
+                <Image Source="app_logo.png" WidthRequest="52" HeightRequest="52" HorizontalOptions="Start" />
+                <Label Text="Hiker" FontSize="22" FontAttributes="Bold"
+                       TextColor="{StaticResource OnPrimary}" />
+                <Label Text="Tu compañero de aventuras al aire libre"
+                       FontSize="12" TextColor="{StaticResource OnPrimary}" Opacity="0.9" />
+            </VerticalStackLayout>
+        </Grid>
+    </Shell.FlyoutHeader>
+
+    <!-- Plantilla de los items del menu: icono + texto con color segun tema
+         (evita que el texto quede invisible en modo oscuro). -->
+    <Shell.ItemTemplate>
+        <DataTemplate>
+            <Grid HeightRequest="52" Padding="20,0" ColumnDefinitions="26,*" ColumnSpacing="18">
+                <Image Grid.Column="0" Source="{Binding FlyoutIcon}"
+                       WidthRequest="24" HeightRequest="24" VerticalOptions="Center" />
+                <Label Grid.Column="1" Text="{Binding Title}"
+                       VerticalOptions="Center" FontSize="16"
+                       TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+            </Grid>
+        </DataTemplate>
+    </Shell.ItemTemplate>
+
+    <FlyoutItem Title="GPS" Icon="location.png">
+        <ShellContent ContentTemplate="{DataTemplate local:HomePage}" Route="HomePage" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Rutas" Icon="map.png">
+        <ShellContent ContentTemplate="{DataTemplate local:RoutesPage}" Route="RoutesPage" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Configuración" Icon="settings.png">
+        <ShellContent ContentTemplate="{DataTemplate local:SettingsPage}" Route="SettingsPage" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Acerca de" Icon="info.png">
+        <ShellContent ContentTemplate="{DataTemplate local:AboutPage}" Route="AboutPage" />
+    </FlyoutItem>
 
 </Shell>
