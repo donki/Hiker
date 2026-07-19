@@ -4,91 +4,50 @@
              x:Class="Hiker.Pages.HomePage"
              Title="GPS Tracker">
 
-    <Grid RowDefinitions="Auto,*,Auto">
+    <!-- Solo dos filas: barra de estado (una linea) y mapa. Las acciones (Iniciar/Parar/
+         Guardar/Borrar) viven en el submenu del menu hamburguesa para dar mas espacio al mapa. -->
+    <Grid RowDefinitions="Auto,*">
 
-        <!-- Panel de informacion GPS -->
+        <!-- Barra de estado en UNA sola linea, encima del mapa -->
         <Border Grid.Row="0"
                 BackgroundColor="{StaticResource PrimaryDark}"
                 StrokeThickness="0"
-                Margin="10,5">
+                Margin="6,4">
             <Border.StrokeShape>
-                <RoundRectangle CornerRadius="10" />
+                <RoundRectangle CornerRadius="8" />
             </Border.StrokeShape>
-            <Grid Padding="12" ColumnDefinitions="*,Auto">
-                <VerticalStackLayout Grid.Column="0">
-                    <Label x:Name="locationLabel"
-                           TextColor="{StaticResource White}"
-                           FontSize="14" />
-                    <Label x:Name="accuracyLabel"
-                           TextColor="{StaticResource TextOnPrimaryMuted}"
-                           FontSize="12" />
-                    <Label x:Name="speedLabel"
-                           TextColor="{StaticResource TextOnPrimaryMuted}"
-                           FontSize="12" />
-                </VerticalStackLayout>
+            <Grid Padding="10,6" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                <!-- Icono de estado: pausa (en espera), play (localizado), record (grabando) -->
+                <Image Grid.Column="0"
+                       x:Name="stateIcon"
+                       Source="ic_st_pause.png"
+                       WidthRequest="18"
+                       HeightRequest="18"
+                       VerticalOptions="Center" />
 
-                <Button Grid.Column="1"
+                <Label Grid.Column="1"
+                       x:Name="statusLabel"
+                       TextColor="{StaticResource White}"
+                       FontSize="12"
+                       VerticalOptions="Center"
+                       MaxLines="1"
+                       LineBreakMode="TailTruncation" />
+
+                <Button Grid.Column="2"
                         x:Name="gpsButton"
                         ImageSource="location.png"
                         BackgroundColor="{StaticResource Primary}"
-                        WidthRequest="50"
-                        HeightRequest="50"
-                        CornerRadius="25"
+                        WidthRequest="38"
+                        HeightRequest="38"
+                        CornerRadius="19"
                         Padding="0"
                         Clicked="OnGpsButtonClicked" />
             </Grid>
         </Border>
 
-        <!-- Mapa OpenStreetMap -->
+        <!-- Mapa: ocupa el resto de la pantalla -->
         <WebView x:Name="mapWebView"
                  Grid.Row="1"
                  BackgroundColor="{StaticResource MapCanvasBackground}" />
-
-        <!-- Panel de controles -->
-        <Border Grid.Row="2"
-                BackgroundColor="{StaticResource PrimaryDark}"
-                StrokeThickness="0"
-                Margin="10,5">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="10" />
-            </Border.StrokeShape>
-            <Grid Padding="8" ColumnDefinitions="*,*,*,*" ColumnSpacing="6">
-                <Button Grid.Column="0"
-                        x:Name="startTrackingButton"
-                        ImageSource="ic_play.png"
-                        ContentLayout="Top,4"
-                        Style="{StaticResource PrimaryButton}"
-                        FontSize="12"
-                        Clicked="OnStartTrackingClicked" />
-
-                <Button Grid.Column="1"
-                        x:Name="stopTrackingButton"
-                        ImageSource="ic_stop.png"
-                        ContentLayout="Top,4"
-                        Style="{StaticResource DangerButton}"
-                        FontSize="12"
-                        IsEnabled="False"
-                        Clicked="OnStopTrackingClicked" />
-
-                <Button Grid.Column="2"
-                        x:Name="saveRouteButton"
-                        ImageSource="ic_save.png"
-                        ContentLayout="Top,4"
-                        Style="{StaticResource AccentButton}"
-                        FontSize="12"
-                        IsEnabled="False"
-                        Clicked="OnSaveRouteClicked" />
-
-                <Button Grid.Column="3"
-                        x:Name="clearButton"
-                        ImageSource="ic_trash.png"
-                        ContentLayout="Top,4"
-                        Style="{StaticResource OutlineButton}"
-                        TextColor="{StaticResource White}"
-                        BorderColor="{StaticResource White}"
-                        FontSize="12"
-                        Clicked="OnClearClicked" />
-            </Grid>
-        </Border>
     </Grid>
 </ContentPage>

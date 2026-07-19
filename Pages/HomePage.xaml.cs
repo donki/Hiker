@@ -12,6 +12,7 @@ public partial class HomePage : ContentPage
     private readonly ObservableCollection<Location> _recordedLocations = new();
     private bool _isTracking = false;
     private bool _mapReady = false;
+    private bool _hasLocation = false;
 
     public HomePage()
     {
@@ -82,13 +83,8 @@ public partial class HomePage : ContentPage
         string L(string phrase) => translation?.Translate(phrase) ?? phrase;
 
         Title = L("GPS Tracker");
-        locationLabel.Text = L("Obteniendo ubicación...");
-        accuracyLabel.Text = L("Precisión: --");
-        speedLabel.Text = L("Velocidad: -- km/h");
-        startTrackingButton.Text = L("Iniciar");
-        stopTrackingButton.Text = L("Parar");
-        saveRouteButton.Text = L("Guardar");
-        clearButton.Text = L("Limpiar");
+        if (!_hasLocation)
+            statusLabel.Text = L("Obteniendo ubicación...");
     }
 
     private async void InitializeMap()
@@ -298,14 +294,22 @@ public partial class HomePage : ContentPage
 
     private void UpdateLocationDisplay(Location location)
     {
-        locationLabel.Text = $"Lat: {location.Latitude:F6}, Lon: {location.Longitude:F6}";
-        accuracyLabel.Text = $"Precisión: {location.Accuracy:F1}m";
-        
-        if (location.Speed.HasValue)
-        {
-            var speedKmh = location.Speed.Value * 3.6; // m/s to km/h
-            speedLabel.Text = $"Velocidad: {speedKmh:F1} km/h";
-        }
+        // Todo en UNA linea: Lat · Lon · precision · velocidad.
+        var speedKmh = (location.Speed ?? 0) * 3.6; // m/s -> km/h
+        statusLabel.Text =
+            $"Lat {location.Latitude:F5} · Lon {location.Longitude:F5} · ±{location.Accuracy:F0} m · {speedKmh:F1} km/h";
+
+        _hasLocation = true;
+        UpdateStateIcon();
+    }
+
+    /// <summary>Icono de estado en la barra: grabando (record rojo), localizado (play) o en
+    /// espera (pausa), segun si se esta grabando ruta y si ya hay ubicacion.</summary>
+    private void UpdateStateIcon()
+    {
+        stateIcon.Source = _isTracking
+            ? "ic_st_rec.png"
+            : (_hasLocation ? "ic_st_play.png" : "ic_st_pause.png");
     }
 
     private async Task UpdateMapLocation(Location location)
@@ -406,8 +410,24 @@ public partial class HomePage : ContentPage
         }
     }
 
+    /// <summary>Invoca una accion del mapa desde el submenu del menu hamburguesa
+    /// (play=iniciar, stop=parar, save=guardar, clear=borrar).</summary>
+    public void RunMapAction(string action)
+    {
+        switch (action)
+        {
+            case "play": OnStartTrackingClicked(this, EventArgs.Empty); break;
+            case "stop": OnStopTrackingClicked(this, EventArgs.Empty); break;
+            case "save": OnSaveRouteClicked(this, EventArgs.Empty); break;
+            case "clear": OnClearClicked(this, EventArgs.Empty); break;
+        }
+    }
+
     private async void OnStartTrackingClicked(object sender, EventArgs e)
     {
+        if (_isTracking)
+            return;
+
         _isTracking = true;
         _recordedLocations.Clear();
 
@@ -415,9 +435,7 @@ public partial class HomePage : ContentPage
         // que sesgaba los primeros puntos de la nueva ruta.
         _gpsFilterService?.Reset();
 
-        startTrackingButton.IsEnabled = false;
-        stopTrackingButton.IsEnabled = true;
-        saveRouteButton.IsEnabled = false;
+        UpdateStateIcon();
 
         // Limpiar mapa
         await ClearMapRoute();
@@ -426,10 +444,7 @@ public partial class HomePage : ContentPage
     private void OnStopTrackingClicked(object sender, EventArgs e)
     {
         _isTracking = false;
-        
-        startTrackingButton.IsEnabled = true;
-        stopTrackingButton.IsEnabled = false;
-        saveRouteButton.IsEnabled = _recordedLocations.Count > 0;
+        UpdateStateIcon();
     }
 
     private async void OnSaveRouteClicked(object sender, EventArgs e)
@@ -454,7 +469,6 @@ public partial class HomePage : ContentPage
                 // Guardado real: escribe la ruta como GPX en el almacenamiento de la app.
                 await _routeService.SaveRouteAsync(_recordedLocations.ToList(), routeName);
                 await DisplayAlert("Éxito", $"Ruta '{routeName}' guardada correctamente", "OK");
-                saveRouteButton.IsEnabled = false;
             }
         }
         catch (Exception ex)
@@ -467,6 +481,5 @@ public partial class HomePage : ContentPage
     {
         _recordedLocations.Clear();
         await ClearMapRoute();
-        saveRouteButton.IsEnabled = false;
     }
 }

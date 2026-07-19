@@ -48,6 +48,20 @@
         </DataTemplate>
     </Shell.ItemTemplate>
 
+    <!-- Plantilla de las ACCIONES del submenu (MenuItem): indentadas bajo GPS, con icono y
+         texto segun tema, para que se lean como un submenu de la opcion GPS. -->
+    <Shell.MenuItemTemplate>
+        <DataTemplate>
+            <Grid HeightRequest="46" Padding="44,0,20,0" ColumnDefinitions="22,*" ColumnSpacing="16">
+                <Image Grid.Column="0" Source="{Binding IconImageSource}"
+                       WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
+                <Label Grid.Column="1" Text="{Binding Text}"
+                       VerticalOptions="Center" FontSize="15"
+                       TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+            </Grid>
+        </DataTemplate>
+    </Shell.MenuItemTemplate>
+
     <FlyoutItem Title="GPS" Icon="location.png">
         <ShellContent ContentTemplate="{DataTemplate local:HomePage}" Route="HomePage" />
     </FlyoutItem>
