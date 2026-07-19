@@ -7,29 +7,43 @@
     <!-- La barra de estado vive en la CABECERA (Shell.TitleView): icono de estado + datos en
          una linea + boton de centrar. Asi el mapa ocupa toda la pantalla. -->
     <Shell.TitleView>
-        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" Padding="0,0,4,0" VerticalOptions="Fill">
-            <Image Grid.Column="0"
-                   x:Name="stateIcon"
-                   Source="ic_st_pause.png"
-                   WidthRequest="18"
-                   HeightRequest="18"
+        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" Padding="0,4,4,4">
+            <!-- Nombre de la app -->
+            <Label Grid.Row="0" Grid.Column="0"
+                   Text="Hiker"
+                   FontSize="16"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource OnPrimary}"
                    VerticalOptions="Center" />
 
-            <Label Grid.Column="1"
-                   x:Name="statusLabel"
-                   TextColor="{StaticResource OnPrimary}"
-                   FontSize="13"
-                   VerticalOptions="Center"
-                   MaxLines="1"
-                   LineBreakMode="TailTruncation" />
+            <!-- Barra de estado: icono + Lat/Lon/precision/velocidad en una linea -->
+            <Grid Grid.Row="1" Grid.Column="0"
+                  ColumnDefinitions="Auto,*" ColumnSpacing="6">
+                <Image Grid.Column="0"
+                       x:Name="stateIcon"
+                       Source="ic_st_pause.png"
+                       WidthRequest="15"
+                       HeightRequest="15"
+                       VerticalOptions="Center" />
+                <Label Grid.Column="1"
+                       x:Name="statusLabel"
+                       TextColor="{StaticResource OnPrimary}"
+                       FontSize="11"
+                       Opacity="0.95"
+                       VerticalOptions="Center"
+                       MaxLines="1"
+                       LineBreakMode="TailTruncation" />
+            </Grid>
 
-            <Button Grid.Column="2"
+            <!-- Boton de centrar en la ubicacion -->
+            <Button Grid.Row="0" Grid.RowSpan="2" Grid.Column="1"
                     x:Name="gpsButton"
                     ImageSource="location.png"
                     BackgroundColor="Transparent"
-                    WidthRequest="40"
-                    HeightRequest="40"
+                    WidthRequest="42"
+                    HeightRequest="42"
                     Padding="0"
+                    VerticalOptions="Center"
                     Clicked="OnGpsButtonClicked" />
         </Grid>
     </Shell.TitleView>

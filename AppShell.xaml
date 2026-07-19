@@ -15,65 +15,106 @@
                 <Setter Property="Shell.BackgroundColor" Value="{StaticResource Primary}" />
                 <Setter Property="Shell.ForegroundColor" Value="{StaticResource OnPrimary}" />
                 <Setter Property="Shell.TitleColor" Value="{StaticResource OnPrimary}" />
-                <Setter Property="Shell.DisabledColor" Value="#B4B4B4" />
-                <Setter Property="Shell.UnselectedColor" Value="#95FFFFFF" />
             </Style>
         </ResourceDictionary>
     </Shell.Resources>
 
-    <!-- Cabecera del menu: marca Hiker sobre el verde corporativo -->
+    <!-- Cabecera del menu -->
     <Shell.FlyoutHeader>
         <Grid BackgroundColor="{StaticResource Primary}" HeightRequest="150" Padding="20,44,20,16">
             <VerticalStackLayout VerticalOptions="End" Spacing="4">
                 <Image Source="app_logo.png" WidthRequest="52" HeightRequest="52" HorizontalOptions="Start" />
-                <Label Text="Hiker" FontSize="22" FontAttributes="Bold"
-                       TextColor="{StaticResource OnPrimary}" />
+                <Label Text="Hiker" FontSize="22" FontAttributes="Bold" TextColor="{StaticResource OnPrimary}" />
                 <Label Text="Tu compañero de aventuras al aire libre"
                        FontSize="12" TextColor="{StaticResource OnPrimary}" Opacity="0.9" />
             </VerticalStackLayout>
         </Grid>
     </Shell.FlyoutHeader>
 
-    <!-- Plantilla de los items del menu: icono + texto con color segun tema
-         (evita que el texto quede invisible en modo oscuro). -->
-    <Shell.ItemTemplate>
-        <DataTemplate>
-            <Grid HeightRequest="52" Padding="20,0" ColumnDefinitions="26,*" ColumnSpacing="18">
-                <Image Grid.Column="0" Source="{Binding FlyoutIcon}"
-                       WidthRequest="24" HeightRequest="24" VerticalOptions="Center" />
-                <Label Grid.Column="1" Text="{Binding Title}"
-                       VerticalOptions="Center" FontSize="16"
-                       TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
-            </Grid>
-        </DataTemplate>
-    </Shell.ItemTemplate>
+    <!-- Contenido del menu a medida: GPS con submenu desplegable, y el resto de opciones -->
+    <Shell.FlyoutContent>
+        <ScrollView>
+            <VerticalStackLayout Padding="0,8" Spacing="0">
 
-    <!-- Plantilla de las ACCIONES del submenu (MenuItem): indentadas bajo GPS, con icono y
-         texto segun tema, para que se lean como un submenu de la opcion GPS. -->
-    <Shell.MenuItemTemplate>
-        <DataTemplate>
-            <Grid HeightRequest="46" Padding="44,0,20,0" ColumnDefinitions="22,*" ColumnSpacing="16">
-                <Image Grid.Column="0" Source="{Binding IconImageSource}"
-                       WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
-                <Label Grid.Column="1" Text="{Binding Text}"
-                       VerticalOptions="Center" FontSize="15"
-                       TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
-            </Grid>
-        </DataTemplate>
-    </Shell.MenuItemTemplate>
+                <!-- GPS (desplegable) -->
+                <Grid ColumnDefinitions="26,*,Auto" Padding="20,0" HeightRequest="52" ColumnSpacing="16">
+                    <Image Grid.Column="0" Source="location.png" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="GPS" VerticalOptions="Center" FontSize="16"
+                           TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                    <Label Grid.Column="2" x:Name="GpsChevron" Text="▸" FontSize="16" VerticalOptions="Center"
+                           TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnGpsTapped" />
+                    </Grid.GestureRecognizers>
+                </Grid>
 
+                <!-- Submenu de acciones del mapa (oculto hasta que se despliega) -->
+                <VerticalStackLayout x:Name="GpsSubmenu" IsVisible="False"
+                                     BackgroundColor="{AppThemeBinding Light=#EEF3EE, Dark=#12211410}">
+                    <Grid ColumnDefinitions="22,*" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
+                        <Image Grid.Column="0" Source="ic_play.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="Iniciar" VerticalOptions="Center" FontSize="15"
+                               TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                        <Grid.GestureRecognizers><TapGestureRecognizer Tapped="OnActionPlay" /></Grid.GestureRecognizers>
+                    </Grid>
+                    <Grid ColumnDefinitions="22,*" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
+                        <Image Grid.Column="0" Source="ic_stop.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="Parar" VerticalOptions="Center" FontSize="15"
+                               TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                        <Grid.GestureRecognizers><TapGestureRecognizer Tapped="OnActionStop" /></Grid.GestureRecognizers>
+                    </Grid>
+                    <Grid ColumnDefinitions="22,*" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
+                        <Image Grid.Column="0" Source="ic_save.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="Guardar" VerticalOptions="Center" FontSize="15"
+                               TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                        <Grid.GestureRecognizers><TapGestureRecognizer Tapped="OnActionSave" /></Grid.GestureRecognizers>
+                    </Grid>
+                    <Grid ColumnDefinitions="22,*" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
+                        <Image Grid.Column="0" Source="ic_trash.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="Borrar" VerticalOptions="Center" FontSize="15"
+                               TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                        <Grid.GestureRecognizers><TapGestureRecognizer Tapped="OnActionClear" /></Grid.GestureRecognizers>
+                    </Grid>
+                </VerticalStackLayout>
+
+                <!-- Rutas -->
+                <Grid ColumnDefinitions="26,*" Padding="20,0" HeightRequest="52" ColumnSpacing="16">
+                    <Image Grid.Column="0" Source="map.png" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="Rutas" VerticalOptions="Center" FontSize="16"
+                           TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                    <Grid.GestureRecognizers><TapGestureRecognizer Tapped="OnRoutesTapped" /></Grid.GestureRecognizers>
+                </Grid>
+
+                <!-- Configuración -->
+                <Grid ColumnDefinitions="26,*" Padding="20,0" HeightRequest="52" ColumnSpacing="16">
+                    <Image Grid.Column="0" Source="settings.png" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="Configuración" VerticalOptions="Center" FontSize="16"
+                           TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                    <Grid.GestureRecognizers><TapGestureRecognizer Tapped="OnSettingsTapped" /></Grid.GestureRecognizers>
+                </Grid>
+
+                <!-- Acerca de -->
+                <Grid ColumnDefinitions="26,*" Padding="20,0" HeightRequest="52" ColumnSpacing="16">
+                    <Image Grid.Column="0" Source="info.png" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="Acerca de" VerticalOptions="Center" FontSize="16"
+                           TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                    <Grid.GestureRecognizers><TapGestureRecognizer Tapped="OnAboutTapped" /></Grid.GestureRecognizers>
+                </Grid>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Shell.FlyoutContent>
+
+    <!-- Estructura de navegacion (rutas). El menu visual lo pinta FlyoutContent. -->
     <FlyoutItem Title="GPS" Icon="location.png">
         <ShellContent ContentTemplate="{DataTemplate local:HomePage}" Route="HomePage" />
     </FlyoutItem>
-
     <FlyoutItem Title="Rutas" Icon="map.png">
         <ShellContent ContentTemplate="{DataTemplate local:RoutesPage}" Route="RoutesPage" />
     </FlyoutItem>
-
     <FlyoutItem Title="Configuración" Icon="settings.png">
         <ShellContent ContentTemplate="{DataTemplate local:SettingsPage}" Route="SettingsPage" />
     </FlyoutItem>
-
     <FlyoutItem Title="Acerca de" Icon="info.png">
         <ShellContent ContentTemplate="{DataTemplate local:AboutPage}" Route="AboutPage" />
     </FlyoutItem>

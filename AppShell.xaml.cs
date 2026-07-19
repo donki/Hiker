@@ -4,53 +4,38 @@ namespace Hiker;
 
 public partial class AppShell : Shell
 {
-    // Acciones del mapa (Iniciar/Parar/Guardar/Borrar) que aparecen como submenu indentado bajo
-    // la opcion "GPS" del menu, SOLO cuando la pagina actual es el GPS Tracker.
-    private readonly List<ShellItem> _gpsActions = new();
-    private bool _actionsShown;
-
     public AppShell()
     {
         InitializeComponent();
-        BuildGpsActions();
-        Navigated += (_, _) => UpdateGpsActions();
     }
 
-    private void BuildGpsActions()
+    // GPS: despliega/colapsa el submenu de acciones del mapa (no cierra el menu).
+    private void OnGpsTapped(object sender, TappedEventArgs e)
     {
-        _gpsActions.Add(MakeAction("Iniciar", "ic_play.png", "play"));
-        _gpsActions.Add(MakeAction("Parar", "ic_stop.png", "stop"));
-        _gpsActions.Add(MakeAction("Guardar", "ic_save.png", "save"));
-        _gpsActions.Add(MakeAction("Borrar", "ic_trash.png", "clear"));
+        GpsSubmenu.IsVisible = !GpsSubmenu.IsVisible;
+        GpsChevron.Text = GpsSubmenu.IsVisible ? "▾" : "▸";
     }
 
-    private ShellItem MakeAction(string text, string icon, string action)
+    private async void OnActionPlay(object sender, TappedEventArgs e) => await RunMapActionAsync("play");
+    private async void OnActionStop(object sender, TappedEventArgs e) => await RunMapActionAsync("stop");
+    private async void OnActionSave(object sender, TappedEventArgs e) => await RunMapActionAsync("save");
+    private async void OnActionClear(object sender, TappedEventArgs e) => await RunMapActionAsync("clear");
+
+    private async Task RunMapActionAsync(string action)
     {
-        var item = new MenuItem { Text = text, IconImageSource = icon };
-        item.Clicked += (_, _) =>
-        {
-            FlyoutIsPresented = false;
-            if (CurrentPage is HomePage home)
-                home.RunMapAction(action);
-        };
-        return item;   // conversion implicita MenuItem -> MenuShellItem
+        FlyoutIsPresented = false;
+        if (CurrentPage is not HomePage)
+            await GoToAsync("//HomePage");
+        (CurrentPage as HomePage)?.RunMapAction(action);
     }
 
-    private void UpdateGpsActions()
+    private async void OnRoutesTapped(object sender, TappedEventArgs e) => await NavigateAsync("//RoutesPage");
+    private async void OnSettingsTapped(object sender, TappedEventArgs e) => await NavigateAsync("//SettingsPage");
+    private async void OnAboutTapped(object sender, TappedEventArgs e) => await NavigateAsync("//AboutPage");
+
+    private async Task NavigateAsync(string route)
     {
-        var onGps = CurrentPage is HomePage;
-        if (onGps && !_actionsShown)
-        {
-            // Se insertan justo despues de la opcion "GPS" (indice 0) para que se lean como submenu.
-            for (int i = 0; i < _gpsActions.Count; i++)
-                Items.Insert(1 + i, _gpsActions[i]);
-            _actionsShown = true;
-        }
-        else if (!onGps && _actionsShown)
-        {
-            foreach (var it in _gpsActions)
-                Items.Remove(it);
-            _actionsShown = false;
-        }
+        FlyoutIsPresented = false;
+        await GoToAsync(route);
     }
 }
