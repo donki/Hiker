@@ -4,50 +4,37 @@
              x:Class="Hiker.Pages.HomePage"
              Title="GPS Tracker">
 
-    <!-- Solo dos filas: barra de estado (una linea) y mapa. Las acciones (Iniciar/Parar/
-         Guardar/Borrar) viven en el submenu del menu hamburguesa para dar mas espacio al mapa. -->
-    <Grid RowDefinitions="Auto,*">
+    <!-- La barra de estado vive en la CABECERA (Shell.TitleView): icono de estado + datos en
+         una linea + boton de centrar. Asi el mapa ocupa toda la pantalla. -->
+    <Shell.TitleView>
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" Padding="0,0,4,0" VerticalOptions="Fill">
+            <Image Grid.Column="0"
+                   x:Name="stateIcon"
+                   Source="ic_st_pause.png"
+                   WidthRequest="18"
+                   HeightRequest="18"
+                   VerticalOptions="Center" />
 
-        <!-- Barra de estado en UNA sola linea, encima del mapa -->
-        <Border Grid.Row="0"
-                BackgroundColor="{StaticResource PrimaryDark}"
-                StrokeThickness="0"
-                Margin="6,4">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="8" />
-            </Border.StrokeShape>
-            <Grid Padding="10,6" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
-                <!-- Icono de estado: pausa (en espera), play (localizado), record (grabando) -->
-                <Image Grid.Column="0"
-                       x:Name="stateIcon"
-                       Source="ic_st_pause.png"
-                       WidthRequest="18"
-                       HeightRequest="18"
-                       VerticalOptions="Center" />
+            <Label Grid.Column="1"
+                   x:Name="statusLabel"
+                   TextColor="{StaticResource OnPrimary}"
+                   FontSize="13"
+                   VerticalOptions="Center"
+                   MaxLines="1"
+                   LineBreakMode="TailTruncation" />
 
-                <Label Grid.Column="1"
-                       x:Name="statusLabel"
-                       TextColor="{StaticResource White}"
-                       FontSize="12"
-                       VerticalOptions="Center"
-                       MaxLines="1"
-                       LineBreakMode="TailTruncation" />
+            <Button Grid.Column="2"
+                    x:Name="gpsButton"
+                    ImageSource="location.png"
+                    BackgroundColor="Transparent"
+                    WidthRequest="40"
+                    HeightRequest="40"
+                    Padding="0"
+                    Clicked="OnGpsButtonClicked" />
+        </Grid>
+    </Shell.TitleView>
 
-                <Button Grid.Column="2"
-                        x:Name="gpsButton"
-                        ImageSource="location.png"
-                        BackgroundColor="{StaticResource Primary}"
-                        WidthRequest="38"
-                        HeightRequest="38"
-                        CornerRadius="19"
-                        Padding="0"
-                        Clicked="OnGpsButtonClicked" />
-            </Grid>
-        </Border>
-
-        <!-- Mapa: ocupa el resto de la pantalla -->
-        <WebView x:Name="mapWebView"
-                 Grid.Row="1"
-                 BackgroundColor="{StaticResource MapCanvasBackground}" />
-    </Grid>
+    <!-- Mapa a pantalla completa -->
+    <WebView x:Name="mapWebView"
+             BackgroundColor="{StaticResource MapCanvasBackground}" />
 </ContentPage>
