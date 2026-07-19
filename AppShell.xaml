@@ -52,6 +52,12 @@
                 <VerticalStackLayout x:Name="GpsSubmenu" IsVisible="False"
                                      BackgroundColor="{AppThemeBinding Light=#EEF3EE, Dark=#12211410}">
                     <Grid ColumnDefinitions="22,*" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
+                        <Image Grid.Column="0" Source="location.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="Mapa" VerticalOptions="Center" FontSize="15"
+                               TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                        <Grid.GestureRecognizers><TapGestureRecognizer Tapped="OnActionMap" /></Grid.GestureRecognizers>
+                    </Grid>
+                    <Grid ColumnDefinitions="22,*" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
                         <Image Grid.Column="0" Source="ic_play.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
                         <Label Grid.Column="1" Text="Iniciar" VerticalOptions="Center" FontSize="15"
                                TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />

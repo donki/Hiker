@@ -16,6 +16,9 @@ public partial class AppShell : Shell
         GpsChevron.Text = GpsSubmenu.IsVisible ? "▾" : "▸";
     }
 
+    // Muestra solo el mapa (pantalla del GPS Tracker) sin ejecutar ninguna accion.
+    private async void OnActionMap(object sender, TappedEventArgs e) => await NavigateAsync("//HomePage");
+
     private async void OnActionPlay(object sender, TappedEventArgs e) => await RunMapActionAsync("play");
     private async void OnActionStop(object sender, TappedEventArgs e) => await RunMapActionAsync("stop");
     private async void OnActionSave(object sender, TappedEventArgs e) => await RunMapActionAsync("save");
