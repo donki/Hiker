@@ -56,6 +56,13 @@ public partial class HomePage : ContentPage
 
         // Si venimos de la pantalla de Rutas con una ruta seleccionada, la pintamos en el mapa.
         await LoadPendingRouteAsync();
+
+        // Comprobacion de version al arrancar (constitucion seccion 15): avisa si hay una version
+        // mas reciente y propone actualizar. No bloqueante.
+        var updateService = (Handler?.MauiContext?.Services ?? IPlatformApplication.Current?.Services)
+            ?.GetService<UpdateService>();
+        if (updateService != null)
+            _ = updateService.CheckAndPromptAsync(this);
     }
 
     protected override async void OnDisappearing()

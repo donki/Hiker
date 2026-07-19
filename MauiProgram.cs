@@ -35,6 +35,9 @@ namespace Hiker
                 builder.Services.AddSingleton<RouteService>();
                 builder.Services.AddSingleton<GpsFilterService>();
 
+                // Comprobacion de version al arrancar (constitucion seccion 15).
+                builder.Services.AddSingleton<UpdateService>();
+
                 // Servicios de CommunityToolkit
                 try
                 {
