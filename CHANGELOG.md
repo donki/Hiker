@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026.07.20.0 (202607200)
+- Conformidad con la constitucion: tipografia del sistema (sin fuentes propias embebidas),
+  colores/tamaños a tokens semanticos, botones de idioma con estilo, retirada la dependencia
+  Microsoft.Maui.Controls.Compatibility.
+- GPS: corregido que la geolocalizacion no arrancaba (servicios a Singleton); primer fix por
+  red/fused para tablets wifi; sitúa correctamente.
+- Mapa MapLibre GL + OpenFreeMap; menu hamburguesa con submenu de acciones desplegable; barra de
+  estado en la cabecera y mapa a pantalla completa.
+- Comprobacion de version al arrancar (constitucion seccion 15).
+
 ## 2026-06-26 - Cumplimiento de la constitucion (mejora tecnica, sin publicacion)
 - Incorporada la constitucion canonica como submodulo Git en `constitution/` (repo donki/constitution).
 - Completada `constitucion.md`: `Helpers/` y plataformas secundarias en la estructura; minimo privilegio con `maxSdkVersion`; gobernanza de logs; nueva seccion 14 (internacionalizacion) y 15 (documentos de gobernanza y submodulos).
