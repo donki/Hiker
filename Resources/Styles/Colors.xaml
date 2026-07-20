@@ -32,6 +32,10 @@
     <!-- Fondo del lienzo del mapa mientras carga el WebView. -->
     <Color x:Key="MapCanvasBackground">#1A1A1A</Color>
 
+    <!-- Fondo del submenu GPS desplegable en el menu lateral. -->
+    <Color x:Key="SubmenuBackgroundLight">#EEF3EE</Color>
+    <Color x:Key="SubmenuBackgroundDark">#12211410</Color>
+
     <!-- Compatibilidad con estilos heredados que aun referencian estos nombres. -->
     <Color x:Key="Secondary">#FF9800</Color>
     <Color x:Key="OnPrimary">#FFFFFF</Color>

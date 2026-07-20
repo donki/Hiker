@@ -84,17 +84,13 @@
                         <Button Grid.Column="0"
                                 x:Name="SpanishButton"
                                 Text="🇪🇸 Español"
-                                FontSize="14"
-                                CornerRadius="10"
-                                HeightRequest="46"
+                                Style="{StaticResource OutlineButton}"
                                 Clicked="OnSpanishClicked" />
 
                         <Button Grid.Column="1"
                                 x:Name="EnglishButton"
                                 Text="🇺🇸 English"
-                                FontSize="14"
-                                CornerRadius="10"
-                                HeightRequest="46"
+                                Style="{StaticResource OutlineButton}"
                                 Clicked="OnEnglishClicked" />
                     </Grid>
 

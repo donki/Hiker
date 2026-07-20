@@ -10,7 +10,6 @@ own license terms, reproduced or referenced below.
 | CommunityToolkit.Mvvm | 8.3.2 | MIT |
 | CsvHelper | 33.0.1 | MS-PL OR Apache-2.0 (dual-licensed) |
 | Microsoft.Maui.Controls | 9.0.21 | MIT |
-| Microsoft.Maui.Controls.Compatibility | 9.0.21 | MIT |
 | Microsoft.Maui.Essentials | 9.0.21 | MIT |
 | Microsoft.Extensions.Logging.Debug | 9.0.0 | MIT |
 | System.Text.Json | 9.0.0 | MIT |

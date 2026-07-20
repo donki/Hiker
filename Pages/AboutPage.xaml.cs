@@ -12,9 +12,6 @@ public partial class AboutPage : ContentPage
     private const string ContactEmail = "jsoladelarosa@gmail.com";
     private const string KofiUrl = "https://ko-fi.com/josepsola";
 
-    // Verde de marca de Hiker para resaltar el idioma activo.
-    private static readonly Color ActiveLanguage = Color.FromArgb("#2E7D32");
-
     private TranslationService? _translation;
 
     public AboutPage()
@@ -71,12 +68,15 @@ public partial class AboutPage : ContentPage
         StyleLanguageButton(EnglishButton, !spanishActive);
     }
 
-    private static void StyleLanguageButton(Button button, bool active)
+    // El idioma activo se resalta por estilo (relleno de marca) y el inactivo con contorno.
+    private void StyleLanguageButton(Button button, bool active)
     {
-        button.BackgroundColor = active ? ActiveLanguage : Colors.Transparent;
-        button.TextColor = active ? Colors.White : ActiveLanguage;
-        button.BorderColor = ActiveLanguage;
-        button.BorderWidth = active ? 0 : 1;
+        var key = active ? "PrimaryButton" : "OutlineButton";
+        if (Resources.TryGetValue(key, out var style) ||
+            Application.Current!.Resources.TryGetValue(key, out style))
+        {
+            button.Style = (Style)style;
+        }
     }
 
     private void OnSpanishClicked(object? sender, EventArgs e) => SetLanguage("es");

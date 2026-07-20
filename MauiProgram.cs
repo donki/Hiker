@@ -15,12 +15,8 @@ namespace Hiker
             {
                 builder
                     .UseMauiApp<App>()
-                    .UseMauiCommunityToolkit()
-                    .ConfigureFonts(fonts =>
-                    {
-                        fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                        fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                    });
+                    .UseMauiCommunityToolkit();
+                // Tipografia del sistema (constitucion A.9): sin fuentes propias.
 
                 // Servicios optimizados para .NET 9 - MAUI Nativo
                 builder.Services.AddSingleton<SettingsService>();
