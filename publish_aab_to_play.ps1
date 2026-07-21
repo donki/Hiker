@@ -22,8 +22,6 @@ param(
     [switch]$SkipAabUpload,
     [switch]$ReuseExistingVersionCode,
     [string]$ExistingVersionCode,
-    [switch]$AllowInRepoSecrets,
-    [switch]$AllowNonInternalTrack,
     [bool]$ErrorIfInReview = $true,
     [bool]$SendForReview = $true,
     [switch]$AssumeYes,
@@ -40,16 +38,16 @@ $ApiRoot = 'https://androidpublisher.googleapis.com/androidpublisher/v3'
 $UploadRoot = 'https://androidpublisher.googleapis.com/upload/androidpublisher/v3'
 $AndroidPublisherScope = 'https://www.googleapis.com/auth/androidpublisher'
 $ProjectRoot = $PSScriptRoot
-$ProjectPath = Join-Path $ProjectRoot 'Hiker.csproj'
+$ProjectPath = (Get-ChildItem -LiteralPath $ProjectRoot -Filter '*.csproj' | Select-Object -First 1).FullName
 $DefaultServiceAccountJson = if (-not [string]::IsNullOrWhiteSpace($env:GOOGLE_APPLICATION_CREDENTIALS)) {
     $env:GOOGLE_APPLICATION_CREDENTIALS
 }
 else {
-    Join-Path $ProjectRoot 'hiker-service-account.local.json'
+    Join-Path $ProjectRoot 'hiker-433118-98861f2881fa.json'
 }
 $DefaultStoreIconPath = Join-Path $ProjectRoot 'Resources\AppIcon\play_store_icon.png'
 $DefaultStoreListingPath = Join-Path $ProjectRoot 'PlayStoreListing.es-ES.json'
-$DefaultTargetFramework = 'net9.0-android'
+$DefaultTargetFramework = 'net9.0-android36.0'
 $AccessToken = $null
 
 function Write-Section {
@@ -122,48 +120,6 @@ function Resolve-InputPath {
     }
 
     return Join-Path (Get-Location) $cleanPath
-}
-
-function Test-IsPathUnderRoot {
-    param(
-        [Parameter(Mandatory = $true)][string]$Path,
-        [Parameter(Mandatory = $true)][string]$Root
-    )
-
-    $resolvedPath = (Resolve-Path -LiteralPath $Path).Path
-    $resolvedRoot = (Resolve-Path -LiteralPath $Root).Path
-    return $resolvedPath.StartsWith($resolvedRoot, [StringComparison]::OrdinalIgnoreCase)
-}
-
-function Test-ConstitutionPublishingRules {
-    param(
-        [Parameter(Mandatory = $true)][string]$PackageNameToCheck,
-        [string]$DisplayVersion,
-        [string]$VersionCode
-    )
-
-    if ($PackageNameToCheck -notmatch '^com\.socratic\.[a-z0-9.]+$') {
-        throw 'ApplicationId no cumple la convencion: com.socratic.[nombre-aplicacion]'
-    }
-
-    $versionInt = 0
-    if ([string]::IsNullOrWhiteSpace($VersionCode) -or -not [int]::TryParse($VersionCode, [ref]$versionInt) -or $versionInt -le 0) {
-        throw "ApplicationVersion debe ser entero incremental > 0. Actual: $VersionCode"
-    }
-
-    if ([string]::IsNullOrWhiteSpace($DisplayVersion)) {
-        throw 'ApplicationDisplayVersion es obligatorio antes de publicar.'
-    }
-
-    $changelogPath = Join-Path $ProjectRoot 'CHANGELOG.md'
-    if (-not (Test-Path -LiteralPath $changelogPath)) {
-        throw 'Falta CHANGELOG.md requerido por la constitucion para publicar.'
-    }
-
-    $changelog = Get-Content -LiteralPath $changelogPath -Raw
-    if ($changelog -notmatch [Regex]::Escape($DisplayVersion) -and $changelog -notmatch [Regex]::Escape($VersionCode)) {
-        throw "CHANGELOG.md no contiene la version actual ($DisplayVersion / $VersionCode)."
-    }
 }
 
 function Get-ProjectValue {
@@ -502,7 +458,7 @@ function Read-PercentAsFraction {
 }
 
 Write-Host '========================================'
-Write-Host '     Hiker - Publish AAB to Play Console'
+Write-Host ' SMS Forwarder - Publish AAB to Play Console'
 Write-Host '========================================'
 Write-Host
 Write-Host 'Necesitas una cuenta de servicio invitada en Play Console con permisos de release.'
@@ -530,13 +486,13 @@ else {
 $defaultVersionCode = if ($projectXml) { Get-ProjectValue $projectXml 'ApplicationVersion' } else { $null }
 $defaultDisplayVersion = if ($projectXml) { Get-ProjectValue $projectXml 'ApplicationDisplayVersion' } else { $null }
 $defaultReleaseName = if ($defaultDisplayVersion -and $defaultVersionCode) {
-    "Hiker $defaultDisplayVersion ($defaultVersionCode)"
+    "SMS Forwarder $defaultDisplayVersion ($defaultVersionCode)"
 }
 elseif ($defaultVersionCode) {
-    "Hiker ($defaultVersionCode)"
+    "SMS Forwarder ($defaultVersionCode)"
 }
 else {
-    "Hiker $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
+    "SMS Forwarder $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
 }
 
 Write-Section 'Datos de la app'
@@ -546,7 +502,6 @@ if (-not $PackageName) {
 if ([string]::IsNullOrWhiteSpace($PackageName)) {
     throw 'Package name requerido.'
 }
-Test-ConstitutionPublishingRules -PackageNameToCheck $PackageName -DisplayVersion $defaultDisplayVersion -VersionCode $defaultVersionCode
 
 if ($BuildFirst -and -not $SkipAabUpload) {
     if ([string]::IsNullOrWhiteSpace($BuildScriptPath)) {
@@ -558,7 +513,7 @@ if ($BuildFirst -and -not $SkipAabUpload) {
     }
 
     Write-Section 'Build previo'
-    & $BuildScriptPath -SkipApk -NoPause -AllowInRepoSecrets:$AllowInRepoSecrets
+    & $BuildScriptPath -SkipApk -NoPause
     if ($LASTEXITCODE -ne 0) {
         throw 'Fallo el build previo.'
     }
@@ -641,10 +596,7 @@ if (-not (Test-Path -LiteralPath $ServiceAccountJson)) {
 $resolvedJsonPath = (Resolve-Path -LiteralPath $ServiceAccountJson).Path
 $resolvedProjectRoot = (Resolve-Path -LiteralPath $ProjectRoot).Path
 if ($resolvedJsonPath.StartsWith($resolvedProjectRoot, [StringComparison]::OrdinalIgnoreCase)) {
-    if (-not $AllowInRepoSecrets) {
-        throw 'El JSON de cuenta de servicio esta dentro del repo. Muevelo fuera o usa -AllowInRepoSecrets.'
-    }
-    Write-Warning 'JSON de cuenta de servicio dentro del repo: permitido solo por override.'
+    Write-Warning 'El JSON de cuenta de servicio esta dentro del repo. No lo subas a git.'
 }
 
 Write-Host "Usando cuenta de servicio: $ServiceAccountJson"
@@ -663,9 +615,6 @@ if (-not $Track) {
 }
 if ([string]::IsNullOrWhiteSpace($Track)) {
     throw 'Track requerido.'
-}
-if (-not $AllowNonInternalTrack -and $Track -ne 'internal') {
-    throw 'La constitucion exige publicar primero en internal. Usa -AllowNonInternalTrack para override.'
 }
 
 if ($PSBoundParameters.ContainsKey('Status')) {

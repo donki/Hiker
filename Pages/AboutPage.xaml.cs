@@ -37,10 +37,10 @@ public partial class AboutPage : ContentPage
     {
         Title = T("Acerca de");
         VersionLabel.Text = $"{T("Versión")} {AppInfo.Current.VersionString}";
-        DescriptionLabel.Text = T("Tu compañero de aventuras al aire libre");
+        DescriptionLabel.IsVisible = false;
 
         ContactTitleLabel.Text = T("Contacto");
-        ContactHintLabel.Text = T("Toca para enviar un correo electrónico");
+        ContactHintLabel.IsVisible = false;
 
         SupportTitleLabel.Text = T("Apoya el Desarrollo");
         DonationButton.Text = T("Ko-fi.com - Invítame un café");
@@ -50,7 +50,7 @@ public partial class AboutPage : ContentPage
         LanguageHintLabel.Text = T("Selecciona tu idioma preferido");
 
         PrivacyTitleLabel.Text = T("Privacidad");
-        PrivacyTextLabel.Text = T("Esta aplicación no recopila tus datos personales ni los envía a los desarrolladores. La información se procesa en tu dispositivo para la función propia de la app.");
+        PrivacyTextLabel.Text = T("Esta aplicación no recopila tus datos personales. La información se procesa en tu dispositivo para la función propia de la app.");
 
         LicenseTitleLabel.Text = T("Licencia");
         LicenseTextLabel.Text = T("Esta aplicación es software libre distribuido bajo licencia MIT.");

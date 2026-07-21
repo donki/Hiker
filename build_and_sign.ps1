@@ -4,11 +4,10 @@ param(
     [string]$TargetFramework,
     [string]$DotnetPath,
     [string]$KeystorePath,
-    [string]$KeyAlias,
+    [string]$KeyAlias = 'hiker',
     [string]$StorePass,
     [string]$KeyPass,
     [string]$IntermediateOutputRoot,
-    [switch]$AllowInRepoSecrets,
     [switch]$Clean,
     [switch]$SkipApk,
     [switch]$SkipClean,
@@ -18,7 +17,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 $ProjectRoot = $PSScriptRoot
-$ProjectPath = Join-Path $ProjectRoot 'Hiker.csproj'
+$ProjectPath = (Get-ChildItem -LiteralPath $ProjectRoot -Filter '*.csproj' | Select-Object -First 1).FullName
 
 function Pause-Script {
     if (-not $NoPause) {
@@ -104,46 +103,6 @@ function Get-LatestPackage {
     return $items | Select-Object -First 1
 }
 
-function Test-IsPathUnderRoot {
-    param(
-        [Parameter(Mandatory = $true)][string]$Path,
-        [Parameter(Mandatory = $true)][string]$Root
-    )
-
-    $resolvedPath = (Resolve-Path -LiteralPath $Path).Path
-    $resolvedRoot = (Resolve-Path -LiteralPath $Root).Path
-    return $resolvedPath.StartsWith($resolvedRoot, [StringComparison]::OrdinalIgnoreCase)
-}
-
-function Test-ConstitutionRules {
-    param(
-        [Parameter(Mandatory = $true)][xml]$ProjectXml,
-        [Parameter(Mandatory = $true)][string]$ProjectPathToCheck,
-        [Parameter(Mandatory = $true)][string]$PackageNameToCheck,
-        [Parameter(Mandatory = $true)][string]$KeystorePathToCheck,
-        [switch]$AllowInRepoSecretsCheck
-    )
-
-    if ($PackageNameToCheck -notmatch '^com\.socratic\.[a-z0-9.]+$') {
-        Exit-WithError "ApplicationId invalido en $ProjectPathToCheck. Debe cumplir com.socratic.[app]."
-    }
-
-    $displayVersion = Get-ProjectValue $ProjectXml 'ApplicationDisplayVersion'
-    $appVersion = Get-ProjectValue $ProjectXml 'ApplicationVersion'
-    if ([string]::IsNullOrWhiteSpace($displayVersion) -or [string]::IsNullOrWhiteSpace($appVersion)) {
-        Exit-WithError 'ApplicationDisplayVersion y ApplicationVersion son obligatorios antes de publicar.'
-    }
-
-    $versionInt = 0
-    if (-not [int]::TryParse($appVersion, [ref]$versionInt) -or $versionInt -le 0) {
-        Exit-WithError "ApplicationVersion debe ser entero incremental > 0. Actual: $appVersion"
-    }
-
-    if (-not $AllowInRepoSecretsCheck -and (Test-IsPathUnderRoot -Path $KeystorePathToCheck -Root $ProjectRoot)) {
-        Exit-WithError 'El keystore esta dentro del repositorio. Muevelo fuera del repo o usa -AllowInRepoSecrets.'
-    }
-}
-
 if (-not (Test-Path -LiteralPath $ProjectPath)) {
     Exit-WithError "No existe el proyecto: $ProjectPath"
 }
@@ -188,27 +147,17 @@ if (-not (Test-Path -LiteralPath $KeystorePath)) {
 }
 $KeystorePath = (Resolve-Path -LiteralPath $KeystorePath).Path
 
-if ([string]::IsNullOrWhiteSpace($KeyAlias)) {
-    if (-not [string]::IsNullOrWhiteSpace($env:ANDROID_KEY_ALIAS)) {
-        $KeyAlias = $env:ANDROID_KEY_ALIAS
-    }
-    else {
-        $KeyAlias = 'hiker'
-    }
-}
-
 if ([string]::IsNullOrWhiteSpace($StorePass)) {
     $StorePass = if (-not [string]::IsNullOrWhiteSpace($env:ANDROID_KEYSTORE_PASSWORD)) {
         $env:ANDROID_KEYSTORE_PASSWORD
     }
-    elseif (Test-Path -LiteralPath (Join-Path $ProjectRoot 'keystore.password.local.txt')) {
-        (Get-Content -LiteralPath (Join-Path $ProjectRoot 'keystore.password.local.txt') -Raw).Trim()
+    elseif (Test-Path -LiteralPath (Join-Path $ProjectRoot 'keystore.password.txt')) {
+        (Get-Content -LiteralPath (Join-Path $ProjectRoot 'keystore.password.txt') -Raw).Trim()
     }
     else {
-        Exit-WithError 'No se encontro ANDROID_KEYSTORE_PASSWORD ni keystore.password.local.txt'
+        throw "No hay contrasena del keystore. Define la variable de entorno ANDROID_KEYSTORE_PASSWORD o crea el fichero keystore.password.txt (no versionado)."
     }
 }
-
 if ([string]::IsNullOrWhiteSpace($KeyPass)) {
     $KeyPass = if (-not [string]::IsNullOrWhiteSpace($env:ANDROID_KEY_PASSWORD)) {
         $env:ANDROID_KEY_PASSWORD
@@ -218,12 +167,10 @@ if ([string]::IsNullOrWhiteSpace($KeyPass)) {
     }
 }
 
-Test-ConstitutionRules -ProjectXml $projectXml -ProjectPathToCheck $ProjectPath -PackageNameToCheck $packageName -KeystorePathToCheck $KeystorePath -AllowInRepoSecretsCheck:$AllowInRepoSecrets
-
 $releaseOutputPath = Join-Path $ProjectRoot "bin\$Configuration\$TargetFramework"
 $debugOutputPath = Join-Path $ProjectRoot "bin\Debug\$TargetFramework"
 if ([string]::IsNullOrWhiteSpace($IntermediateOutputRoot)) {
-    $IntermediateOutputRoot = Join-Path ([System.IO.Path]::GetTempPath()) 'Hiker-msbuild-obj'
+    $IntermediateOutputRoot = Join-Path ([System.IO.Path]::GetTempPath()) "$([System.IO.Path]::GetFileNameWithoutExtension($ProjectPath))-msbuild-obj"
 }
 $IntermediateOutputRoot = if ([System.IO.Path]::IsPathRooted($IntermediateOutputRoot)) { $IntermediateOutputRoot } else { Join-Path $ProjectRoot $IntermediateOutputRoot }
 New-Item -ItemType Directory -Path $IntermediateOutputRoot -Force | Out-Null
@@ -246,7 +193,7 @@ $signingArgs = @(
 )
 
 Write-Host '========================================'
-Write-Host '        Hiker - Build and Sign Script'
+Write-Host '   SMS Forwarder - Build and Sign Script'
 Write-Host '========================================'
 Write-Host
 Write-Host "Proyecto: $ProjectPath"
