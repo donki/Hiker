@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Splash: montaña blanca centrada sobre fondo indigo (MauiSplashScreen Color=#3525CD). -->
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <circle cx="356" cy="168" r="30" fill="#C3C0FF"/>
+  <path fill="#FFFFFF" d="M80 388 L206 176 L296 312 L340 250 L432 388 Z"/>
+  <path fill="#C3C0FF" d="M206 176 L246 244 L206 268 L172 232 Z"/>
+</svg>

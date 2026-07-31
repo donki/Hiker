@@ -73,7 +73,7 @@ public partial class RoutesPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Error", $"Error cargando rutas: {ex.Message}", "OK");
+            await SocShared.ModernDialog.AlertAsync(this, "Error", $"Error cargando rutas: {ex.Message}", "OK");
         }
     }
 
@@ -103,7 +103,7 @@ public partial class RoutesPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Error", $"Error cargando ruta: {ex.Message}", "OK");
+            await SocShared.ModernDialog.AlertAsync(this, "Error", $"Error cargando ruta: {ex.Message}", "OK");
         }
     }
 
@@ -111,7 +111,7 @@ public partial class RoutesPage : ContentPage
     {
         try
         {
-            var confirm = await DisplayAlert("Confirmar",
+            var confirm = await SocShared.ModernDialog.AlertAsync(this, "Confirmar",
                 $"¿Eliminar la ruta '{routeInfo.Name}'?", "Sí", "No");
 
             if (confirm && _routeService != null)
@@ -122,7 +122,7 @@ public partial class RoutesPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Error", $"Error eliminando ruta: {ex.Message}", "OK");
+            await SocShared.ModernDialog.AlertAsync(this, "Error", $"Error eliminando ruta: {ex.Message}", "OK");
         }
     }
 
@@ -138,7 +138,9 @@ public partial class RoutesPage : ContentPage
                 PickerTitle = "Seleccionar archivo GPX",
                 FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
                 {
-                    { DevicePlatform.Android, new[] { "application/gpx+xml", "text/xml" } },
+                    // Android resuelve .gpx como octet-stream/xml (no hay MIME oficial); con "*/*"
+                    // el selector muestra los .gpx en vez de dejarlos grises. Se valida al parsear.
+                    { DevicePlatform.Android, new[] { "*/*" } },
                     { DevicePlatform.WinUI, new[] { ".gpx", ".xml" } }
                 })
             });
@@ -156,18 +158,18 @@ public partial class RoutesPage : ContentPage
                 var points = await ExtractLocations(gpxContent);
                 if (points.Count == 0)
                 {
-                    await DisplayAlert("Aviso", "El archivo GPX no contiene puntos.", "OK");
+                    await SocShared.ModernDialog.AlertAsync(this, "Aviso", "El archivo GPX no contiene puntos.", "OK");
                     return;
                 }
 
                 await _routeService.SaveRouteAsync(points, name);
                 await LoadRoutes();
-                await DisplayAlert("Éxito", $"Ruta '{name}' importada.", "OK");
+                await SocShared.ModernDialog.AlertAsync(this, "Éxito", $"Ruta '{name}' importada.", "OK");
             }
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Error", $"Error cargando GPX: {ex.Message}", "OK");
+            await SocShared.ModernDialog.AlertAsync(this, "Error", $"Error cargando GPX: {ex.Message}", "OK");
         }
     }
 

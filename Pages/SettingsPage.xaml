@@ -35,8 +35,8 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Filtros -->
-            <Border Style="{StaticResource Card}">
+            <!-- Filtros GPS: ocultos a petición (los controles siguen en el árbol para el code-behind). -->
+            <Border Style="{StaticResource Card}" IsVisible="False">
                 <VerticalStackLayout Padding="16" Spacing="10">
                     <Label Text="Filtros GPS" Style="{StaticResource CardTitle}" />
 

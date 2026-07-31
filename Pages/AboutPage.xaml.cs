@@ -98,7 +98,7 @@ public partial class AboutPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert(T("Error"), $"{T("No se pudo abrir el cliente de correo")}: {ex.Message}", "OK");
+            await SocShared.ModernDialog.AlertAsync(this, T("Error"), $"{T("No se pudo abrir el cliente de correo")}: {ex.Message}", "OK");
         }
     }
 
@@ -113,7 +113,7 @@ public partial class AboutPage : ContentPage
             try
             {
                 await Clipboard.SetTextAsync(KofiUrl);
-                await DisplayAlert(T("Apoya el Desarrollo"), $"{KofiUrl}", "OK");
+                await SocShared.ModernDialog.AlertAsync(this, T("Apoya el Desarrollo"), $"{KofiUrl}", "OK");
             }
             catch { /* nada mas que hacer */ }
         }

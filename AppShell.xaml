@@ -46,37 +46,74 @@
                     </Grid.GestureRecognizers>
                 </Grid>
 
-                <!-- Submenu de acciones del mapa (oculto hasta que se despliega) -->
+                <!-- Submenu de acciones del mapa (oculto hasta que se despliega).
+                     Cada fila lleva un icono de accion, su etiqueta y, a la derecha, un icono
+                     de info (ℹ) que explica que hace la accion (ModernDialog). -->
                 <VerticalStackLayout x:Name="GpsSubmenu" IsVisible="False"
                                      BackgroundColor="{AppThemeBinding Light={StaticResource SubmenuBackgroundLight}, Dark={StaticResource SubmenuBackgroundDark}}">
-                    <Grid ColumnDefinitions="22,*" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
+                    <Grid ColumnDefinitions="22,*,Auto" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
                         <Image Grid.Column="0" Source="location.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
                         <Label Grid.Column="1" Text="Mapa" VerticalOptions="Center" FontSize="15"
                                TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                        <Image Grid.Column="2" Source="info.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center">
+                            <Image.GestureRecognizers><TapGestureRecognizer Tapped="OnInfoMap" /></Image.GestureRecognizers>
+                        </Image>
                         <Grid.GestureRecognizers><TapGestureRecognizer Tapped="OnActionMap" /></Grid.GestureRecognizers>
                     </Grid>
-                    <Grid ColumnDefinitions="22,*" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
+                    <Grid ColumnDefinitions="22,*,Auto" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
                         <Image Grid.Column="0" Source="ic_play.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
                         <Label Grid.Column="1" Text="Iniciar" VerticalOptions="Center" FontSize="15"
                                TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                        <Image Grid.Column="2" Source="info.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center">
+                            <Image.GestureRecognizers><TapGestureRecognizer Tapped="OnInfoPlay" /></Image.GestureRecognizers>
+                        </Image>
                         <Grid.GestureRecognizers><TapGestureRecognizer Tapped="OnActionPlay" /></Grid.GestureRecognizers>
                     </Grid>
-                    <Grid ColumnDefinitions="22,*" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
+                    <Grid ColumnDefinitions="22,*,Auto" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
                         <Image Grid.Column="0" Source="ic_stop.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
                         <Label Grid.Column="1" Text="Parar" VerticalOptions="Center" FontSize="15"
                                TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                        <Image Grid.Column="2" Source="info.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center">
+                            <Image.GestureRecognizers><TapGestureRecognizer Tapped="OnInfoStop" /></Image.GestureRecognizers>
+                        </Image>
                         <Grid.GestureRecognizers><TapGestureRecognizer Tapped="OnActionStop" /></Grid.GestureRecognizers>
                     </Grid>
-                    <Grid ColumnDefinitions="22,*" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
+                    <!-- Seguir: mantiene el mapa centrado en la ubicacion en vivo -->
+                    <Grid ColumnDefinitions="22,*,Auto" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
+                        <Image Grid.Column="0" Source="location.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
+                        <Label Grid.Column="1" x:Name="FollowLabel" Text="Seguir: Sí" VerticalOptions="Center" FontSize="15"
+                               TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                        <Image Grid.Column="2" Source="info.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center">
+                            <Image.GestureRecognizers><TapGestureRecognizer Tapped="OnInfoFollow" /></Image.GestureRecognizers>
+                        </Image>
+                        <Grid.GestureRecognizers><TapGestureRecognizer Tapped="OnActionFollow" /></Grid.GestureRecognizers>
+                    </Grid>
+                    <!-- Rumbo: rota el mapa segun la brujula (heading-up). Por defecto desactivado. -->
+                    <Grid ColumnDefinitions="22,*,Auto" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
+                        <Image Grid.Column="0" Source="map.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
+                        <Label Grid.Column="1" x:Name="HeadingLabel" Text="Rumbo: No" VerticalOptions="Center" FontSize="15"
+                               TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                        <Image Grid.Column="2" Source="info.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center">
+                            <Image.GestureRecognizers><TapGestureRecognizer Tapped="OnInfoHeading" /></Image.GestureRecognizers>
+                        </Image>
+                        <Grid.GestureRecognizers><TapGestureRecognizer Tapped="OnActionHeading" /></Grid.GestureRecognizers>
+                    </Grid>
+                    <Grid ColumnDefinitions="22,*,Auto" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
                         <Image Grid.Column="0" Source="ic_save.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
                         <Label Grid.Column="1" Text="Guardar" VerticalOptions="Center" FontSize="15"
                                TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                        <Image Grid.Column="2" Source="info.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center">
+                            <Image.GestureRecognizers><TapGestureRecognizer Tapped="OnInfoSave" /></Image.GestureRecognizers>
+                        </Image>
                         <Grid.GestureRecognizers><TapGestureRecognizer Tapped="OnActionSave" /></Grid.GestureRecognizers>
                     </Grid>
-                    <Grid ColumnDefinitions="22,*" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
+                    <Grid ColumnDefinitions="22,*,Auto" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
                         <Image Grid.Column="0" Source="ic_trash.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
                         <Label Grid.Column="1" Text="Borrar" VerticalOptions="Center" FontSize="15"
                                TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                        <Image Grid.Column="2" Source="info.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center">
+                            <Image.GestureRecognizers><TapGestureRecognizer Tapped="OnInfoClear" /></Image.GestureRecognizers>
+                        </Image>
                         <Grid.GestureRecognizers><TapGestureRecognizer Tapped="OnActionClear" /></Grid.GestureRecognizers>
                     </Grid>
                 </VerticalStackLayout>
@@ -108,6 +145,17 @@
             </VerticalStackLayout>
         </ScrollView>
     </Shell.FlyoutContent>
+
+    <!-- Pie del menu: version de la app (patron comun a las apps sOCratic). -->
+    <Shell.FlyoutFooter>
+        <Grid Padding="20,12">
+            <Label x:Name="VersionLabel"
+                   FontSize="12"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+        </Grid>
+    </Shell.FlyoutFooter>
 
     <!-- Estructura de navegacion (rutas). El menu visual lo pinta FlyoutContent. -->
     <FlyoutItem Title="GPS" Icon="location.png">

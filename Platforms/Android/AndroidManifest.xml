@@ -1,8 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
   <application android:allowBackup="true" android:icon="@mipmap/appicon" android:roundIcon="@mipmap/appicon_round" android:supportsRtl="true" android:label="Hiker" android:screenOrientation="portrait"></application>
-  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  <!-- Permisos justificados (constitución §A.3: cada permiso justificado, mínimo privilegio). -->
+
+  <!-- INTERNET: descarga de teselas del mapa (MapLibre GL + OpenFreeMap) en el WebView. -->
   <uses-permission android:name="android.permission.INTERNET" />
+  <!-- Ubicación: es una app de senderismo/GPS; registra la ruta del usuario en primer plano. -->
   <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
   <!-- Almacenamiento externo: solo necesario en Android antiguo. Desde Android 11+ (API 30)
@@ -10,9 +13,14 @@
        minimo privilegio (constitucion seccion 5) para no solicitarlos en Android moderno. -->
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
+  <!-- REQUEST_IGNORE_BATTERY_OPTIMIZATIONS: el usuario puede pedir excluir la app de la
+       optimización de batería para que el GPS no se corte durante una ruta larga (MainActivity). -->
   <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
-  <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-  <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+  <!-- Retirados por no usarse (mínimo privilegio):
+       - ACCESS_NETWORK_STATE: default de la plantilla MAUI, ninguna API de conectividad se usa.
+       - ACCESS_WIFI_STATE: sin uso de WifiManager en el código.
+       - ACCESS_BACKGROUND_LOCATION: no hay servicio en segundo plano; el GPS se detiene al salir
+         de la pantalla. Es un permiso de alta revisión en Google Play y provocaría rechazo. -->
   <uses-feature android:name="android.hardware.location" android:required="false" />
   <uses-feature android:name="android.hardware.location.gps" android:required="false" />
   <uses-feature android:name="android.hardware.location.network" android:required="false" />

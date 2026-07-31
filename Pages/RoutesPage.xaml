@@ -6,8 +6,9 @@
 
     <Grid RowDefinitions="Auto,*,Auto">
 
-        <!-- Cabecera -->
+        <!-- Cabecera oculta (a petición: sin el título "Rutas guardadas"). La fila Auto colapsa. -->
         <Border Grid.Row="0"
+                IsVisible="False"
                 BackgroundColor="{StaticResource PrimaryDark}"
                 StrokeThickness="0"
                 Margin="10,5">
@@ -74,6 +75,8 @@
                     x:Name="loadGpxButton"
                     ImageSource="ic_folder.png"
                     ContentLayout="Left,6"
+                    FontSize="13"
+                    Padding="6,0"
                     Style="{StaticResource PrimaryButton}"
                     Clicked="OnLoadGpxClicked" />
 
@@ -81,6 +84,8 @@
                     x:Name="refreshButton"
                     ImageSource="ic_refresh.png"
                     ContentLayout="Left,6"
+                    FontSize="13"
+                    Padding="6,0"
                     Style="{StaticResource AccentButton}"
                     Clicked="OnRefreshClicked" />
         </Grid>

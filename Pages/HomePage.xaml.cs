@@ -13,6 +13,9 @@ public partial class HomePage : ContentPage
     private bool _isTracking = false;
     private bool _mapReady = false;
     private bool _hasLocation = false;
+    private bool _followMode = true;   // el mapa arranca siguiendo al usuario (followUser=true en JS)
+    private bool _headingUp = false;   // modo "Rumbo" (heading-up): desactivado por defecto
+    private static bool _backgroundPromptsChecked = false; // avisos de bateria: una vez por sesion
 
     public HomePage()
     {
@@ -57,6 +60,14 @@ public partial class HomePage : ContentPage
         // Si venimos de la pantalla de Rutas con una ruta seleccionada, la pintamos en el mapa.
         await LoadPendingRouteAsync();
 
+        // Si el modo Rumbo estaba activo, reanuda la brujula al volver a la pagina.
+        if (_headingUp)
+            SetHeadingUp(true);
+
+        // Avisos de bateria/segundo plano: antes se mostraban con AlertDialog nativo desde
+        // MainActivity (prohibido). Ahora se piden aqui, una sola vez, con ModernDialog.
+        await CheckBackgroundPermissionsAsync();
+
         // Comprobacion de version al arrancar (constitucion seccion 15): avisa si hay una version
         // mas reciente y propone actualizar. No bloqueante.
         var updateService = (Handler?.MauiContext?.Services ?? IPlatformApplication.Current?.Services)
@@ -68,6 +79,10 @@ public partial class HomePage : ContentPage
     protected override async void OnDisappearing()
     {
         base.OnDisappearing();
+
+        // La brujula solo hace falta mientras se ve el mapa: se detiene al salir para no gastar
+        // bateria (se reanuda en OnAppearing si el modo Rumbo sigue activo).
+        StopCompass();
 
         // Si se esta grabando una ruta, NO se detiene el GPS al cambiar de pestaña: antes, salir
         // de esta pagina cortaba la captura y podia perderse la traza en curso.
@@ -265,13 +280,13 @@ public partial class HomePage : ContentPage
                 var success = await _geolocationService.ListeningStartAsync();
                 if (!success)
                 {
-                    await DisplayAlert("Error", "No se pudo iniciar el GPS", "OK");
+                    await SocShared.ModernDialog.AlertAsync(this, "Error", "No se pudo iniciar el GPS", "OK");
                 }
             }
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Error", $"Error al iniciar GPS: {ex.Message}", "OK");
+            await SocShared.ModernDialog.AlertAsync(this, "Error", $"Error al iniciar GPS: {ex.Message}", "OK");
         }
     }
 
@@ -413,7 +428,7 @@ public partial class HomePage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Error", $"No se pudo obtener la ubicación: {ex.Message}", "OK");
+            await SocShared.ModernDialog.AlertAsync(this, "Error", $"No se pudo obtener la ubicación: {ex.Message}", "OK");
         }
     }
 
@@ -458,29 +473,29 @@ public partial class HomePage : ContentPage
     {
         if (_recordedLocations.Count == 0)
         {
-            await DisplayAlert("Aviso", "No hay datos de ruta para guardar", "OK");
+            await SocShared.ModernDialog.AlertAsync(this, "Aviso", "No hay datos de ruta para guardar", "OK");
             return;
         }
 
         try
         {
-            var routeName = await DisplayPromptAsync("Guardar Ruta", "Nombre de la ruta:", "Guardar", "Cancelar");
+            var routeName = await SocShared.ModernDialog.PromptAsync(this, "Guardar Ruta", "Nombre de la ruta:", "Guardar", "Cancelar");
             if (!string.IsNullOrWhiteSpace(routeName))
             {
                 if (_routeService is null)
                 {
-                    await DisplayAlert("Error", "El servicio de rutas no está disponible.", "OK");
+                    await SocShared.ModernDialog.AlertAsync(this, "Error", "El servicio de rutas no está disponible.", "OK");
                     return;
                 }
 
                 // Guardado real: escribe la ruta como GPX en el almacenamiento de la app.
                 await _routeService.SaveRouteAsync(_recordedLocations.ToList(), routeName);
-                await DisplayAlert("Éxito", $"Ruta '{routeName}' guardada correctamente", "OK");
+                await SocShared.ModernDialog.AlertAsync(this, "Éxito", $"Ruta '{routeName}' guardada correctamente", "OK");
             }
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Error", $"Error al guardar la ruta: {ex.Message}", "OK");
+            await SocShared.ModernDialog.AlertAsync(this, "Error", $"Error al guardar la ruta: {ex.Message}", "OK");
         }
     }
 
@@ -488,5 +503,137 @@ public partial class HomePage : ContentPage
     {
         _recordedLocations.Clear();
         await ClearMapRoute();
+    }
+
+    /// <summary>Activa/desactiva el modo "Seguir": recentrar el mapa en cada punto GPS.</summary>
+    public async void SetFollow(bool enabled)
+    {
+        _followMode = enabled;
+        try
+        {
+            if (_mapReady)
+                await mapWebView.EvaluateJavaScriptAsync($"setFollow({(enabled ? "true" : "false")});");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error en setFollow: {ex.Message}");
+        }
+    }
+
+    /// <summary>Modo "Rumbo" (heading-up): rota el mapa segun la brujula del dispositivo.</summary>
+    public async void SetHeadingUp(bool enabled)
+    {
+        _headingUp = enabled;
+        try
+        {
+            if (_mapReady)
+                await mapWebView.EvaluateJavaScriptAsync($"setHeadingUp({(enabled ? "true" : "false")});");
+
+            if (enabled)
+            {
+                if (Compass.Default.IsSupported && !Compass.Default.IsMonitoring)
+                {
+                    Compass.Default.ReadingChanged += OnCompassReadingChanged;
+                    Compass.Default.Start(SensorSpeed.UI);
+                }
+            }
+            else
+            {
+                StopCompass();
+            }
+        }
+        catch (FeatureNotSupportedException)
+        {
+            // El dispositivo no tiene brujula: se ignora, el mapa sigue en norte-arriba.
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error en modo Rumbo: {ex.Message}");
+        }
+    }
+
+    private void StopCompass()
+    {
+        try
+        {
+            if (Compass.Default.IsSupported && Compass.Default.IsMonitoring)
+            {
+                Compass.Default.Stop();
+                Compass.Default.ReadingChanged -= OnCompassReadingChanged;
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error deteniendo brújula: {ex.Message}");
+        }
+    }
+
+    private void OnCompassReadingChanged(object? sender, CompassChangedEventArgs e)
+    {
+        if (!_headingUp || !_mapReady)
+            return;
+
+        var heading = e.Reading.HeadingMagneticNorth;
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            try
+            {
+                await mapWebView.EvaluateJavaScriptAsync(
+                    $"setHeading({heading.ToString(System.Globalization.CultureInfo.InvariantCulture)});");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error aplicando rumbo: {ex.Message}");
+            }
+        });
+    }
+
+    /// <summary>
+    /// Avisos de optimización de batería y ejecución en segundo plano. Se muestran con el
+    /// diálogo NO nativo (ModernDialog) desde la capa MAUI (la constitución prohíbe los
+    /// AlertDialog nativos). Solo se pregunta una vez (Preferences) y solo en Android.
+    /// </summary>
+    private async Task CheckBackgroundPermissionsAsync()
+    {
+        if (_backgroundPromptsChecked)
+            return;
+        _backgroundPromptsChecked = true;
+
+#if ANDROID
+        try
+        {
+            if (MainActivity.IsBatteryOptimizationIgnored())
+                return; // ya esta exenta: no hace falta preguntar nada
+
+            var translation = Handler?.MauiContext?.Services.GetService<TranslationService>();
+            string L(string phrase) => translation?.Translate(phrase) ?? phrase;
+
+            if (!Preferences.Get("prompt_battery_opt", false))
+            {
+                Preferences.Set("prompt_battery_opt", true);
+                bool ok = await SocShared.ModernDialog.AlertAsync(this,
+                    L("Optimización de batería"),
+                    L("Para mejorar el posicionamiento y el rendimiento de Hiker, permite que la aplicación funcione sin restricciones de batería. ¿Deseas modificar esta configuración ahora?"),
+                    L("Sí"), L("No"));
+                if (ok) MainActivity.OpenBatteryOptimizationSettings();
+            }
+
+            if (!Preferences.Get("prompt_background_exec", false))
+            {
+                Preferences.Set("prompt_background_exec", true);
+                bool ok = await SocShared.ModernDialog.AlertAsync(this,
+                    L("Ejecución en segundo plano"),
+                    L("Para que Hiker funcione correctamente en segundo plano, permite la ejecución sin restricciones. ¿Deseas modificar esta configuración ahora?"),
+                    L("Sí"), L("No"));
+                if (ok) MainActivity.OpenBatterySaverSettings();
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error comprobando permisos de segundo plano: {ex.Message}");
+        }
+#else
+        await Task.CompletedTask;
+#endif
     }
 }

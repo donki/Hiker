@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Primer plano del icono: montaña con cima nevada, tematica de senderismo. Blanco sobre el
-     verde de marca, mismo estilo flat que el resto de aplicaciones. Dibujo dentro de la zona
-     central segura del icono adaptativo. -->
+     fondo indigo de marca, mismo estilo flat que el resto de aplicaciones. Dibujo dentro de la
+     zona central segura del icono adaptativo. -->
 <svg xmlns="http://www.w3.org/2000/svg" width="456" height="456" viewBox="0 0 456 456">
 
   <!-- Sol -->
   <circle cx="312" cy="150" r="26" fill="#FFFFFF" opacity="0.9" />
 
-  <!-- Montaña trasera -->
-  <path d="M150 316 L214 206 L278 316 Z" fill="#FFFFFF" opacity="0.55" />
+  <!-- Montaña trasera (detalle secundario en indigo claro) -->
+  <path d="M150 316 L214 206 L278 316 Z" fill="#C3C0FF" opacity="0.7" />
 
-  <!-- Montaña principal, blanca solida para que destaque sobre el fondo verde -->
+  <!-- Montaña principal, blanca solida para que destaque sobre el fondo indigo -->
   <path d="M196 316 L268 172 L340 316 Z" fill="#FFFFFF" />
+
+  <!-- Cima nevada en indigo claro -->
+  <path d="M244 220 L268 172 L292 220 L278 214 L268 224 L258 214 Z" fill="#C3C0FF" />
 
   <!-- Suelo -->
   <rect x="140" y="316" width="176" height="14" rx="7" fill="#FFFFFF" />

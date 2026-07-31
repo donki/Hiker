@@ -96,11 +96,11 @@ public partial class SettingsPage : ContentPage
 
             // El idioma se aplica de inmediato al pulsar los botones Español/English.
 
-            await DisplayAlert("Éxito", "Configuración guardada correctamente", "OK");
+            await SocShared.ModernDialog.AlertAsync(this, "Éxito", "Configuración guardada correctamente", "OK");
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Error", $"Error guardando configuración: {ex.Message}", "OK");
+            await SocShared.ModernDialog.AlertAsync(this, "Error", $"Error guardando configuración: {ex.Message}", "OK");
         }
     }
 
@@ -108,19 +108,19 @@ public partial class SettingsPage : ContentPage
     {
         try
         {
-            var confirm = await DisplayAlert("Confirmar", 
+            var confirm = await SocShared.ModernDialog.AlertAsync(this, "Confirmar",
                 "¿Restablecer configuración a valores por defecto?", "Sí", "No");
             
             if (confirm && _settingsService != null)
             {
                 await _settingsService.ResetSettingsAsync();
                 LoadSettings();
-                await DisplayAlert("Éxito", "Configuración restablecida", "OK");
+                await SocShared.ModernDialog.AlertAsync(this, "Éxito", "Configuración restablecida", "OK");
             }
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Error", $"Error restableciendo configuración: {ex.Message}", "OK");
+            await SocShared.ModernDialog.AlertAsync(this, "Error", $"Error restableciendo configuración: {ex.Message}", "OK");
         }
     }
 }

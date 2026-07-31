@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net9.0-android</TargetFrameworks>
@@ -30,8 +30,8 @@
     <!-- Versions: ApplicationVersion debe ser entero incremental (constitucion seccion 6).
          Convencion: yyyyMMddR (R=rev del dia, empieza en 0). Mantener en sincronia con
          ApplicationDisplayVersion antes de cada publicacion. -->
-    <ApplicationDisplayVersion>2026.07.21.0</ApplicationDisplayVersion>
-    <ApplicationVersion>202607210</ApplicationVersion>
+    <ApplicationDisplayVersion>2026.07.28.0</ApplicationDisplayVersion>
+    <ApplicationVersion>202607280</ApplicationVersion>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
@@ -39,11 +39,20 @@
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
   </PropertyGroup>
 
+  <!--
+    Embeber los ensamblados en el APK tambien en Debug. Sin esto, un APK Debug usa Fast Deployment:
+    los ensamblados no viajan dentro del APK y la app aborta al arrancar ("No assemblies found")
+    cuando se instala suelta con adb (sin desplegar desde el IDE).
+  -->
+  <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+  </PropertyGroup>
+
   <ItemGroup>
     <!-- App Icon: fondo verde de marca + montaña, mismo patron que el resto de apps. -->
-    <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#2E7D32" />
+    <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#3525CD" />
     <!-- Splash Screen -->
-    <MauiSplashScreen Include="Resources\AppIcon\hikersplash.png" Color="white" />
+    <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#3525CD" BaseSize="200,200" />
 
     <!-- Images -->
     <MauiImage Include="Resources\Images\*" />
@@ -116,4 +125,11 @@
     <RunAOTCompilation>false</RunAOTCompilation>
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
   </PropertyGroup>
+  <!-- Notas de autor compartidas -->
+  <ItemGroup>
+    <Compile Include="..\..\Shared\AuthorNotes.cs" Link="AuthorNotes.cs" />
+    <Compile Include="..\..\Shared\ModernDialog.cs" Link="ModernDialog.cs" />
+  </ItemGroup>
+
+  <Import Project="..\..\Shared\signing.props" />
 </Project>

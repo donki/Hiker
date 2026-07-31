@@ -23,7 +23,7 @@
             style: 'https://tiles.openfreemap.org/styles/liberty',
             center: [-3.7038, 40.4168], // [lng, lat] — OJO: MapLibre usa lng,lat
             zoom: 13,
-            attributionControl: true
+            attributionControl: false
         });
         map.addControl(new maplibregl.NavigationControl(), 'top-right');
 
@@ -65,7 +65,7 @@
                 var pos = [lng, lat];
                 if (!meMarker) {
                     var el = document.createElement('div');
-                    el.style.cssText = 'width:16px;height:16px;border-radius:50%;background:#4CAF50;' +
+                    el.style.cssText = 'width:16px;height:16px;border-radius:50%;background:#3525CD;' +
                         'border:2px solid #ffffff;box-shadow:0 0 5px rgba(0,0,0,.6)';
                     meMarker = new maplibregl.Marker({ element: el }).setLngLat(pos).addTo(map);
                 } else {
@@ -117,12 +117,38 @@
             });
         }
 
+        // Modo "Seguir": activa/desactiva el recentrado automatico en cada punto GPS.
+        function setFollow(enabled) {
+            followUser = !!enabled;
+            whenReady(function () {
+                if (followUser && meMarker)
+                    map.easeTo({ center: meMarker.getLngLat(), duration: 500 });
+            });
+        }
+
+        // Modo "Rumbo" (heading-up): rota el mapa para que la direccion del dispositivo
+        // apunte hacia arriba. MapLibre soporta rotacion nativa (setBearing), sin CSS.
+        var headingUp = false;
+        function setHeadingUp(enabled) {
+            headingUp = !!enabled;
+            whenReady(function () {
+                if (!headingUp) map.easeTo({ bearing: 0, duration: 300 });
+            });
+        }
+        function setHeading(deg) {
+            if (!headingUp) return;
+            whenReady(function () { map.setBearing(deg); });
+        }
+
         window.updateLocation = updateLocation;
         window.addRoutePoint = addRoutePoint;
         window.drawRoute = drawRoute;
         window.clearRoute = clearRoute;
         window.removeLastPoint = removeLastPoint;
         window.centerOnLocation = centerOnLocation;
+        window.setFollow = setFollow;
+        window.setHeadingUp = setHeadingUp;
+        window.setHeading = setHeading;
         window.mapReady = true;
     </script>
 </body>

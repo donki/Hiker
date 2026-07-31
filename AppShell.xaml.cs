@@ -4,9 +4,15 @@ namespace Hiker;
 
 public partial class AppShell : Shell
 {
+    private bool _followEnabled = true;   // el mapa arranca siguiendo al usuario
+    private bool _headingEnabled = false; // modo Rumbo desactivado por defecto
+
     public AppShell()
     {
         InitializeComponent();
+
+        // Pie del menu: version dinamica de la app.
+        VersionLabel.Text = $"v{Microsoft.Maui.ApplicationModel.AppInfo.Current.VersionString}";
     }
 
     // GPS: despliega/colapsa el submenu de acciones del mapa (no cierra el menu).
@@ -30,6 +36,53 @@ public partial class AppShell : Shell
         if (CurrentPage is not HomePage)
             await GoToAsync("//HomePage");
         (CurrentPage as HomePage)?.RunMapAction(action);
+    }
+
+    // Seguir: alterna el recentrado automatico del mapa en la ubicacion en vivo.
+    private async void OnActionFollow(object sender, TappedEventArgs e)
+    {
+        _followEnabled = !_followEnabled;
+        FollowLabel.Text = _followEnabled ? "Seguir: Sí" : "Seguir: No";
+        FlyoutIsPresented = false;
+        if (CurrentPage is not HomePage)
+            await GoToAsync("//HomePage");
+        (CurrentPage as HomePage)?.SetFollow(_followEnabled);
+    }
+
+    // Rumbo: alterna el modo heading-up (rota el mapa segun la brujula).
+    private async void OnActionHeading(object sender, TappedEventArgs e)
+    {
+        _headingEnabled = !_headingEnabled;
+        HeadingLabel.Text = _headingEnabled ? "Rumbo: Sí" : "Rumbo: No";
+        FlyoutIsPresented = false;
+        if (CurrentPage is not HomePage)
+            await GoToAsync("//HomePage");
+        (CurrentPage as HomePage)?.SetHeadingUp(_headingEnabled);
+    }
+
+    // Iconos de info (ℹ) del submenu GPS: explican brevemente cada accion.
+    private void OnInfoMap(object sender, TappedEventArgs e) =>
+        ShowInfo("Mapa", "Muestra el mapa a pantalla completa sin iniciar ninguna grabación.");
+    private void OnInfoPlay(object sender, TappedEventArgs e) =>
+        ShowInfo("Iniciar", "Comienza a grabar tu recorrido registrando los puntos GPS.");
+    private void OnInfoStop(object sender, TappedEventArgs e) =>
+        ShowInfo("Parar", "Detiene la grabación del recorrido en curso.");
+    private void OnInfoSave(object sender, TappedEventArgs e) =>
+        ShowInfo("Guardar", "Guarda el recorrido grabado como una ruta con nombre.");
+    private void OnInfoClear(object sender, TappedEventArgs e) =>
+        ShowInfo("Borrar", "Elimina del mapa el recorrido actual sin guardarlo.");
+    private void OnInfoFollow(object sender, TappedEventArgs e) =>
+        ShowInfo("Seguir", "Mantiene el mapa centrado automáticamente en tu ubicación en vivo.");
+    private void OnInfoHeading(object sender, TappedEventArgs e) =>
+        ShowInfo("Rumbo", "Rota el mapa para que la dirección hacia la que miras apunte hacia arriba.");
+
+    private async void ShowInfo(string title, string message)
+    {
+        var page = CurrentPage;
+        if (page is null)
+            return;
+        FlyoutIsPresented = false;
+        await SocShared.ModernDialog.AlertAsync(page, title, message, "Entendido");
     }
 
     private async void OnRoutesTapped(object sender, TappedEventArgs e) => await NavigateAsync("//RoutesPage");
