@@ -34,7 +34,14 @@ public partial class AppShell : Shell
     {
         FlyoutIsPresented = false;
         if (CurrentPage is not HomePage)
+        {
             await GoToAsync("//HomePage");
+            // Tras navegar, CurrentPage puede tardar un instante en ser la HomePage ya montada:
+            // se espera brevemente en vez de lanzar la accion al vacio (antes se perdia el
+            // "Grabar recorrido" cuando se pulsaba desde Rutas o Configuracion).
+            for (int i = 0; i < 20 && CurrentPage is not HomePage; i++)
+                await Task.Delay(50);
+        }
         (CurrentPage as HomePage)?.RunMapAction(action);
     }
 

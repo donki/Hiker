@@ -62,7 +62,7 @@
                     </Grid>
                     <Grid ColumnDefinitions="22,*,Auto" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
                         <Image Grid.Column="0" Source="ic_play.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
-                        <Label Grid.Column="1" Text="Iniciar" VerticalOptions="Center" FontSize="15"
+                        <Label Grid.Column="1" x:Name="RecordLabel" Text="Grabar recorrido" VerticalOptions="Center" FontSize="15"
                                TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
                         <Image Grid.Column="2" Source="info.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center">
                             <Image.GestureRecognizers><TapGestureRecognizer Tapped="OnInfoPlay" /></Image.GestureRecognizers>
@@ -71,7 +71,7 @@
                     </Grid>
                     <Grid ColumnDefinitions="22,*,Auto" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
                         <Image Grid.Column="0" Source="ic_stop.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
-                        <Label Grid.Column="1" Text="Parar" VerticalOptions="Center" FontSize="15"
+                        <Label Grid.Column="1" x:Name="StopRecordLabel" Text="Parar grabación" VerticalOptions="Center" FontSize="15"
                                TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
                         <Image Grid.Column="2" Source="info.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center">
                             <Image.GestureRecognizers><TapGestureRecognizer Tapped="OnInfoStop" /></Image.GestureRecognizers>

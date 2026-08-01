@@ -98,8 +98,11 @@ public partial class RoutesPage : ContentPage
         try
         {
             // Se marca la ruta a dibujar y se salta al mapa; HomePage la carga al aparecer.
+            // La ruta de Shell es "HomePage" (ver AppShell.xaml): antes se navegaba a "//GPS",
+            // que es el Title del FlyoutItem y NO una ruta registrada, asi que la navegacion
+            // fallaba y la ruta seleccionada nunca llegaba a pintarse en el mapa.
             RouteService.PendingRouteToLoad = routeInfo.Name;
-            await Shell.Current.GoToAsync("//GPS");
+            await Shell.Current.GoToAsync("//HomePage");
         }
         catch (Exception ex)
         {
