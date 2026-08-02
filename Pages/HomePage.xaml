@@ -50,7 +50,56 @@
         </Grid>
     </Shell.TitleView>
 
-    <!-- Mapa a pantalla completa -->
-    <WebView x:Name="mapWebView"
-             BackgroundColor="{StaticResource MapCanvasBackground}" />
+    <Grid>
+        <!-- Mapa a pantalla completa -->
+        <WebView x:Name="mapWebView"
+                 BackgroundColor="{StaticResource MapCanvasBackground}" />
+
+        <!-- Seguimiento de la ruta cargada. Solo aparece cuando hay una ruta en el mapa: dice a
+             que distancia estas del trazado y cuanto te queda, y se pone en rojo si te sales. -->
+        <Border x:Name="followBar"
+                IsVisible="False"
+                VerticalOptions="End"
+                Margin="12,0,12,12"
+                Padding="14,10"
+                StrokeThickness="0"
+                BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="16" />
+            </Border.StrokeShape>
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                <BoxView Grid.Column="0"
+                         x:Name="followStateDot"
+                         WidthRequest="12"
+                         HeightRequest="12"
+                         CornerRadius="6"
+                         VerticalOptions="Center"
+                         Color="{StaticResource Success}" />
+
+                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                    <Label x:Name="followTitleLabel"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           MaxLines="1"
+                           LineBreakMode="TailTruncation"
+                           TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                    <Label x:Name="followDetailLabel"
+                           FontSize="12"
+                           MaxLines="1"
+                           LineBreakMode="TailTruncation"
+                           TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+                </VerticalStackLayout>
+
+                <Button Grid.Column="2"
+                        x:Name="followStopButton"
+                        ImageSource="ic_stop.png"
+                        BackgroundColor="Transparent"
+                        WidthRequest="40"
+                        HeightRequest="40"
+                        Padding="0"
+                        VerticalOptions="Center"
+                        Clicked="OnStopFollowingClicked" />
+            </Grid>
+        </Border>
+    </Grid>
 </ContentPage>

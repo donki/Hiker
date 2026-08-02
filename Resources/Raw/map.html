@@ -62,21 +62,30 @@
 
         // Marcador de posicion actual: punto VERDE con halo, para que se distinga a simple vista
         // del trazado rojo de la ruta. Antes era indigo sobre fondo de mapa y se perdia.
-        // Mientras se graba parpadea, asi se ve de un vistazo que la captura esta activa.
+        //
+        // Lo pintan LAS DOS entradas de posicion: updateLocation, que llega con cada punto GPS, y
+        // centerOnLocation, que es la que corre al arrancar. Cuando solo lo hacia updateLocation,
+        // con el dispositivo quieto no llegaban puntos nuevos y salia la posicion en la cabecera
+        // pero ningun punto en el mapa: eso era «sale la posicion pero no el punto verde».
+        function showMe(lat, lng) {
+            var pos = [lng, lat];
+            if (!meMarker) {
+                var el = document.createElement('div');
+                el.className = 'me-dot';
+                el.style.cssText =
+                    'width:18px;height:18px;border-radius:50%;background:#4CAF50;' +
+                    'border:3px solid #ffffff;' +
+                    'box-shadow:0 0 0 6px rgba(76,175,80,.30), 0 0 6px rgba(0,0,0,.6)';
+                meMarker = new maplibregl.Marker({ element: el }).setLngLat(pos).addTo(map);
+            } else {
+                meMarker.setLngLat(pos);
+            }
+            return pos;
+        }
+
         function updateLocation(lat, lng, accuracy) {
             whenReady(function () {
-                var pos = [lng, lat];
-                if (!meMarker) {
-                    var el = document.createElement('div');
-                    el.className = 'me-dot';
-                    el.style.cssText =
-                        'width:18px;height:18px;border-radius:50%;background:#4CAF50;' +
-                        'border:3px solid #ffffff;' +
-                        'box-shadow:0 0 0 6px rgba(76,175,80,.30), 0 0 6px rgba(0,0,0,.6)';
-                    meMarker = new maplibregl.Marker({ element: el }).setLngLat(pos).addTo(map);
-                } else {
-                    meMarker.setLngLat(pos);
-                }
+                var pos = showMe(lat, lng);
                 if (followUser) map.easeTo({ center: pos, duration: 500 });
             });
         }
@@ -119,6 +128,7 @@
         function centerOnLocation(lat, lng, zoom) {
             whenReady(function () {
                 followUser = true;
+                showMe(lat, lng);   // al arrancar, esta es la unica que corre: tiene que pintar el punto
                 map.easeTo({ center: [lng, lat], zoom: zoom || 15, duration: 600 });
             });
         }

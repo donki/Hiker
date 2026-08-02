@@ -101,13 +101,14 @@ public partial class HomePage : ContentPage
     /// </summary>
     private void TranslateUi()
     {
-        var translation = Handler?.MauiContext?.Services.GetService<TranslationService>();
-        string L(string phrase) => translation?.Translate(phrase) ?? phrase;
-
-        Title = L("GPS Tracker");
+        Title = T("GPS Tracker");
         if (!_hasLocation)
-            statusLabel.Text = L("Obteniendo ubicación...");
+            statusLabel.Text = T("Obteniendo ubicación...");
     }
+
+    /// <summary>Traduce una frase (la clave es la propia frase en español, seccion 8).</summary>
+    private string T(string phrase) =>
+        Handler?.MauiContext?.Services.GetService<TranslationService>()?.Translate(phrase) ?? phrase;
 
     private async void InitializeMap()
     {
@@ -311,6 +312,8 @@ public partial class HomePage : ContentPage
             {
                 await UpdateMapLocation(location);
             }
+
+            UpdateRouteFollowing(location);
         });
     }
 
@@ -322,6 +325,7 @@ public partial class HomePage : ContentPage
             $"Lat {location.Latitude:F5} · Lon {location.Longitude:F5} · ±{location.Accuracy:F0} m · {speedKmh:F1} km/h";
 
         _hasLocation = true;
+        _lastLocation = location;   // la usa el seguimiento al cargar una ruta, sin esperar al siguiente punto
         UpdateStateIcon();
     }
 
@@ -370,6 +374,7 @@ public partial class HomePage : ContentPage
     {
         try
         {
+            StopFollowing();   // si se borra el trazado, no queda ruta que seguir
             if (_mapReady)
             {
                 await mapWebView.EvaluateJavaScriptAsync("clearRoute();");
@@ -391,6 +396,95 @@ public partial class HomePage : ContentPage
         var coords = string.Join(",", points.Select(p =>
             $"[{p.Latitude.ToString(ci)},{p.Longitude.ToString(ci)}]"));
         await mapWebView.EvaluateJavaScriptAsync($"drawRoute([{coords}]);");
+
+        StartFollowing(points);
+    }
+
+    // ============ Seguir un recorrido cargado ============
+
+    /// <summary>Distancia al trazado a partir de la cual se avisa de que te has salido.</summary>
+    private const double OffRouteMeters = 50;
+
+    private List<Location> _followRoute = new();
+    private Location? _lastLocation;
+
+    /// <summary>Metros acumulados desde el inicio hasta cada punto: evita recorrer la ruta entera
+    /// en cada actualizacion de GPS para saber cuanto queda.</summary>
+    private double[] _followCumulative = Array.Empty<double>();
+
+    private void StartFollowing(List<Location> points)
+    {
+        _followRoute = points;
+        _followCumulative = new double[points.Count];
+        for (int i = 1; i < points.Count; i++)
+            _followCumulative[i] = _followCumulative[i - 1] + MetersBetween(points[i - 1], points[i]);
+
+        followBar.IsVisible = true;
+        followTitleLabel.Text = T("Siguiendo la ruta");
+        followDetailLabel.Text = string.Format(T("Longitud total: {0}"), FormatDistance(_followCumulative[^1]));
+        followStateDot.Color = (Color)Application.Current!.Resources["Success"];
+
+        // Si ya hay posicion, no esperar al siguiente punto GPS para decir si estas en la ruta.
+        if (_lastLocation is not null)
+            UpdateRouteFollowing(_lastLocation);
+    }
+
+    private void OnStopFollowingClicked(object sender, EventArgs e) => StopFollowing();
+
+    private void StopFollowing()
+    {
+        _followRoute = new List<Location>();
+        _followCumulative = Array.Empty<double>();
+        followBar.IsVisible = false;
+    }
+
+    /// <summary>
+    /// Actualiza el aviso de seguimiento: a que distancia esta el trazado y cuanto queda hasta el
+    /// final. Se mide contra los vertices de la ruta, que es lo que hay guardado; con la densidad
+    /// de puntos de un GPX es suficiente y no hace falta proyectar sobre cada segmento.
+    /// </summary>
+    private void UpdateRouteFollowing(Location current)
+    {
+        if (_followRoute.Count == 0)
+            return;
+
+        var nearest = 0;
+        var nearestMeters = double.MaxValue;
+        for (int i = 0; i < _followRoute.Count; i++)
+        {
+            var d = MetersBetween(current, _followRoute[i]);
+            if (d < nearestMeters)
+            {
+                nearestMeters = d;
+                nearest = i;
+            }
+        }
+
+        var remaining = _followCumulative[^1] - _followCumulative[nearest];
+        var offRoute = nearestMeters > OffRouteMeters;
+
+        followTitleLabel.Text = offRoute
+            ? string.Format(T("Te has salido: a {0} de la ruta"), FormatDistance(nearestMeters))
+            : string.Format(T("En la ruta: a {0} del trazado"), FormatDistance(nearestMeters));
+
+        // Lo que "queda" solo significa algo si estas sobre la ruta: fuera de ella el punto mas
+        // cercano puede ser el final y saldria "quedan 0 m" estando a kilometros.
+        followDetailLabel.Text = offRoute
+            ? string.Format(T("Longitud total: {0}"), FormatDistance(_followCumulative[^1]))
+            : string.Format(T("Quedan {0}"), FormatDistance(remaining));
+
+        followStateDot.Color = (Color)Application.Current!.Resources[offRoute ? "Danger" : "Success"];
+    }
+
+    private static double MetersBetween(Location a, Location b) =>
+        Location.CalculateDistance(a, b, DistanceUnits.Kilometers) * 1000;
+
+    private string FormatDistance(double meters)
+    {
+        var ci = System.Globalization.CultureInfo.CurrentCulture;
+        return meters >= 1000
+            ? $"{(meters / 1000).ToString("0.0", ci)} km"
+            : $"{Math.Round(meters).ToString(ci)} m";
     }
 
     /// <summary>Si la pantalla de Rutas pidió abrir una ruta, la carga y la pinta.</summary>

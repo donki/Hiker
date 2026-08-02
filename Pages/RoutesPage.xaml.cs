@@ -1,6 +1,8 @@
 using Hiker.Services;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Windows.Input;
+using System.Xml.Linq;
 
 namespace Hiker.Pages;
 
@@ -28,16 +30,26 @@ public partial class RoutesPage : ContentPage
     {
         base.OnAppearing();
         
-        // Obtener servicios cuando el Handler esté disponible
-        if (Handler?.MauiContext?.Services != null)
-        {
-            _routeService = Handler.MauiContext.Services.GetService<RouteService>();
-            _translationService = Handler.MauiContext.Services.GetService<TranslationService>();
-        }
-
+        ResolveServices();
         TranslateUi();
 
         await LoadRoutes();
+    }
+
+    /// <summary>
+    /// Resuelve los servicios. Se cae a <c>IPlatformApplication</c> cuando el Handler todavia no
+    /// esta montado: en <c>OnAppearing</c> puede no estarlo, y entonces <c>_routeService</c> se
+    /// quedaba a null. Como los manejadores salian con un <c>return</c> mudo, el boton de cargar
+    /// GPX no hacia nada y no habia ni error ni aviso que lo delatara.
+    /// </summary>
+    private void ResolveServices()
+    {
+        var services = Handler?.MauiContext?.Services ?? IPlatformApplication.Current?.Services;
+        if (services is null)
+            return;
+
+        _routeService ??= services.GetService<RouteService>();
+        _translationService ??= services.GetService<TranslationService>();
     }
 
     /// <summary>Textos estaticos externalizados (constitucion seccion 8).</summary>
@@ -133,8 +145,14 @@ public partial class RoutesPage : ContentPage
     {
         try
         {
+            ResolveServices();
             if (_routeService is null)
+            {
+                // Antes esto era un return mudo: el boton parecia roto.
+                await SocShared.ModernDialog.AlertAsync(this, "Error",
+                    "No se pudo acceder al servicio de rutas. Cierra y vuelve a abrir la aplicación.", "OK");
                 return;
+            }
 
             var result = await FilePicker.PickAsync(new PickOptions
             {
@@ -157,13 +175,17 @@ public partial class RoutesPage : ContentPage
                 // Importar = parsear el GPX y guardarlo como una ruta mas de la app, con el nombre
                 // del fichero. Asi aparece en la lista y se puede abrir en el mapa como el resto.
                 var name = Path.GetFileNameWithoutExtension(result.FileName);
-                var data = await _routeService.SetRoute(gpxContent);
                 var points = await ExtractLocations(gpxContent);
                 if (points.Count == 0)
                 {
                     await SocShared.ModernDialog.AlertAsync(this, "Aviso", "El archivo GPX no contiene puntos.", "OK");
                     return;
                 }
+
+                // El servicio guarda el GPX crudo para quien lo pida despues; si su parser (mas
+                // estricto) no traga el fichero, la importacion no se pierde por eso.
+                try { await _routeService.SetRoute(gpxContent); }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"SetRoute no pudo procesar el GPX: {ex.Message}"); }
 
                 await _routeService.SaveRouteAsync(points, name);
                 await LoadRoutes();
@@ -176,21 +198,60 @@ public partial class RoutesPage : ContentPage
         }
     }
 
-    private static async Task<List<Location>> ExtractLocations(string gpxContent)
+    /// <summary>
+    /// Saca los puntos de un GPX sin pasar por el serializador estricto, que solo entendía tracks
+    /// (<c>trkpt</c>) del espacio de nombres de GPX 1.1 y obligaba a que cada punto trajera
+    /// <c>&lt;time&gt;</c>. Con esas tres condiciones fallaba la mayoría de ficheros descargados:
+    /// <list type="bullet">
+    ///   <item><description>Un GPX 1.0 usa otro espacio de nombres y no deserializaba nada.</description></item>
+    ///   <item><description>Las rutas (<c>rtept</c>) y los puntos sueltos (<c>wpt</c>) se ignoraban:
+    ///   salía «el archivo GPX no contiene puntos».</description></item>
+    ///   <item><description>Sin <c>&lt;time&gt;</c>, la fecha quedaba en <c>DateTime.MinValue</c> y
+    ///   construir el <c>DateTimeOffset</c> reventaba al aplicarle el desfase horario local, con lo
+    ///   que se perdía la importación entera.</description></item>
+    /// </list>
+    /// Aquí se busca por nombre local (cualquier espacio de nombres) y la marca de tiempo es
+    /// opcional: para pintar la ruta solo hacen falta latitud y longitud.
+    /// </summary>
+    private static Task<List<Location>> ExtractLocations(string gpxContent) => Task.Run(() =>
     {
         var points = new List<Location>();
-        await Task.Run(() =>
+        var doc = XDocument.Parse(gpxContent);
+
+        List<XElement> ByName(string name) =>
+            doc.Descendants().Where(e => e.Name.LocalName == name).ToList();
+
+        // Preferencia: track grabado > ruta planificada > puntos sueltos.
+        var nodes = ByName("trkpt");
+        if (nodes.Count == 0) nodes = ByName("rtept");
+        if (nodes.Count == 0) nodes = ByName("wpt");
+
+        foreach (var node in nodes)
         {
-            var gpx = Helpers.GPXFileHelper.FromXML(gpxContent);
-            foreach (var seg in gpx.Tracks.SelectMany(t => t.Segments))
-                foreach (var p in seg.TrackPoints)
-                    points.Add(new Location((double)p.Latitude, (double)p.Longitude, new DateTimeOffset(p.Time))
-                    {
-                        Altitude = (double)p.Elevation
-                    });
-        });
+            if (!TryParseCoordinate(node.Attribute("lat")?.Value, out var latitude) ||
+                !TryParseCoordinate(node.Attribute("lon")?.Value, out var longitude))
+                continue;
+
+            var location = new Location(latitude, longitude);
+
+            var child = node.Elements().ToList();
+
+            if (TryParseCoordinate(child.FirstOrDefault(e => e.Name.LocalName == "ele")?.Value, out var elevation))
+                location.Altitude = elevation;
+
+            var time = child.FirstOrDefault(e => e.Name.LocalName == "time")?.Value;
+            if (DateTimeOffset.TryParse(time, CultureInfo.InvariantCulture,
+                    DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out var timestamp))
+                location.Timestamp = timestamp;
+
+            points.Add(location);
+        }
+
         return points;
-    }
+    });
+
+    private static bool TryParseCoordinate(string? value, out double result) =>
+        double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out result);
 
     private async void OnRefreshClicked(object sender, EventArgs e)
     {

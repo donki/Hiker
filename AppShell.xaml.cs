@@ -98,7 +98,10 @@ public partial class AppShell : Shell
 
     private async Task NavigateAsync(string route)
     {
-        FlyoutIsPresented = false;
+        // Se navega ANTES de cerrar el menu. Al reves, cerrarlo dispara su animacion y Shell se
+        // traga la navegacion: el menu se cerraba y no se iba a ninguna parte, que es por lo que
+        // no habia manera de llegar a Rutas (ni, por tanto, al boton de cargar GPX).
         await GoToAsync(route);
+        FlyoutIsPresented = false;
     }
 }
