@@ -55,6 +55,71 @@
         <WebView x:Name="mapWebView"
                  BackgroundColor="{StaticResource MapCanvasBackground}" />
 
+        <!-- Grabacion de la ruta. La logica ya existia en el code-behind, pero se habia quedado
+             sin ningun control en pantalla al pasar el mapa a pantalla completa: no habia forma
+             de grabar (nota de autor del 2026-08-01). -->
+
+        <!-- Parado: un solo boton de grabar, arriba a la derecha del mapa. ZIndex explicito:
+             sin el, el WebView del mapa se queda con el toque y el boton no llega a pulsarse. -->
+        <Button x:Name="recordButton"
+                ZIndex="10"
+                ImageSource="ic_st_rec.png"
+                VerticalOptions="Start"
+                HorizontalOptions="End"
+                Margin="0,12,12,0"
+                WidthRequest="52"
+                HeightRequest="52"
+                CornerRadius="26"
+                Padding="0"
+                BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}"
+                Clicked="OnStartTrackingClicked" />
+
+        <!-- Grabando: lo que se lleva grabado y el boton de parar. -->
+        <Border x:Name="recordBar"
+                ZIndex="10"
+                IsVisible="False"
+                VerticalOptions="Start"
+                Margin="12,12,12,0"
+                Padding="14,10"
+                StrokeThickness="0"
+                BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="16" />
+            </Border.StrokeShape>
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                <BoxView Grid.Column="0"
+                         WidthRequest="12"
+                         HeightRequest="12"
+                         CornerRadius="6"
+                         VerticalOptions="Center"
+                         Color="{StaticResource Danger}" />
+
+                <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                    <Label x:Name="recordTitleLabel"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           MaxLines="1"
+                           LineBreakMode="TailTruncation"
+                           TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                    <Label x:Name="recordDetailLabel"
+                           FontSize="12"
+                           MaxLines="1"
+                           LineBreakMode="TailTruncation"
+                           TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+                </VerticalStackLayout>
+
+                <Button Grid.Column="2"
+                        x:Name="recordStopButton"
+                        ImageSource="ic_stop.png"
+                        BackgroundColor="Transparent"
+                        WidthRequest="40"
+                        HeightRequest="40"
+                        Padding="0"
+                        VerticalOptions="Center"
+                        Clicked="OnStopTrackingClicked" />
+            </Grid>
+        </Border>
+
         <!-- Seguimiento de la ruta cargada. Solo aparece cuando hay una ruta en el mapa: dice a
              que distancia estas del trazado y cuanto te queda, y se pone en rojo si te sales. -->
         <Border x:Name="followBar"

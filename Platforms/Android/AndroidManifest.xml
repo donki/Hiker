@@ -16,11 +16,21 @@
   <!-- REQUEST_IGNORE_BATTERY_OPTIMIZATIONS: el usuario puede pedir excluir la app de la
        optimización de batería para que el GPS no se corte durante una ruta larga (MainActivity). -->
   <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+  <!-- FOREGROUND_SERVICE (+ el tipo LOCATION que exige Android 14): mientras se GRABA una ruta,
+       un servicio en primer plano con notificación permanente mantiene vivo el proceso. Sin él,
+       Android deja de entregar posiciones a los pocos minutos de apagar la pantalla y la
+       grabación sale a trozos, que es justo lo que una app de senderismo no puede permitirse.
+       El servicio se arranca con la app en pantalla y se para al terminar la grabación. -->
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+  <!-- POST_NOTIFICATIONS: solo para esa notificación de "grabando", obligatoria en Android 13+. -->
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
   <!-- Retirados por no usarse (mínimo privilegio):
        - ACCESS_NETWORK_STATE: default de la plantilla MAUI, ninguna API de conectividad se usa.
        - ACCESS_WIFI_STATE: sin uso de WifiManager en el código.
-       - ACCESS_BACKGROUND_LOCATION: no hay servicio en segundo plano; el GPS se detiene al salir
-         de la pantalla. Es un permiso de alta revisión en Google Play y provocaría rechazo. -->
+       - ACCESS_BACKGROUND_LOCATION: no hace falta. Con un servicio en primer plano de tipo
+         "location" arrancado con la app visible, Android sigue entregando posiciones. Es un
+         permiso de alta revisión en Google Play que aquí no aporta nada. -->
   <uses-feature android:name="android.hardware.location" android:required="false" />
   <uses-feature android:name="android.hardware.location.gps" android:required="false" />
   <uses-feature android:name="android.hardware.location.network" android:required="false" />

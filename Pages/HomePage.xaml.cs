@@ -17,6 +17,10 @@ public partial class HomePage : ContentPage
     private bool _headingUp = false;   // modo "Rumbo" (heading-up): desactivado por defecto
     private static bool _backgroundPromptsChecked = false; // avisos de bateria: una vez por sesion
 
+    private DateTime _trackingStartedAt;
+    private double _trackedDistanceKm;
+    private IDispatcherTimer? _recordTimer;
+
     public HomePage()
     {
         InitializeComponent();
@@ -302,8 +306,15 @@ public partial class HomePage : ContentPage
                 var filteredLocation = _gpsFilterService.ProcessLocation(location);
                 if (filteredLocation != null)
                 {
+                    // La distancia se acumula tramo a tramo sobre los puntos ya filtrados: sumar
+                    // los crudos infla el total con el temblor del GPS estando parado.
+                    if (_recordedLocations.Count > 0)
+                        _trackedDistanceKm += Location.CalculateDistance(
+                            _recordedLocations[^1], filteredLocation, DistanceUnits.Kilometers);
+
                     _recordedLocations.Add(filteredLocation);
                     await AddRoutePointToMap(filteredLocation);
+                    UpdateRecordingLabels();
                 }
             }
             
@@ -546,21 +557,107 @@ public partial class HomePage : ContentPage
 
         _isTracking = true;
         _recordedLocations.Clear();
+        _trackingStartedAt = DateTime.Now;
+        _trackedDistanceKm = 0;
 
         // Se reinicia el filtro para no arrastrar el estado del Kalman de una grabacion anterior,
         // que sesgaba los primeros puntos de la nueva ruta.
         _gpsFilterService?.Reset();
 
         UpdateStateIcon();
+        ShowRecordingUi(true);
+        StartTrackingService();
 
         // Limpiar mapa
         await ClearMapRoute();
     }
 
-    private void OnStopTrackingClicked(object sender, EventArgs e)
+    private async void OnStopTrackingClicked(object sender, EventArgs e)
     {
+        if (!_isTracking)
+            return;
+
         _isTracking = false;
         UpdateStateIcon();
+        ShowRecordingUi(false);
+        StopTrackingService();
+
+        // Parar sin ofrecer guardar dejaria la ruta recien grabada colgando en memoria hasta la
+        // siguiente grabacion, que la borra: es justo cuando hay que preguntar.
+        if (_recordedLocations.Count == 0)
+        {
+            await ClearMapRoute();
+            return;
+        }
+
+        var save = await SocShared.ModernDialog.AlertAsync(this,
+            L("Ruta grabada"),
+            string.Format(L("Se han grabado {0} puntos ({1:0.00} km). ¿Quieres guardarla?"),
+                _recordedLocations.Count, _trackedDistanceKm),
+            L("Guardar"), L("Descartar"));
+
+        if (save)
+            OnSaveRouteClicked(this, EventArgs.Empty);
+        else
+            OnClearClicked(this, EventArgs.Empty);
+    }
+
+    /// <summary>Traduce si el servicio esta disponible; si no, deja la frase en castellano.</summary>
+    private string L(string phrase) =>
+        Handler?.MauiContext?.Services.GetService<TranslationService>()?.Translate(phrase) ?? phrase;
+
+    /// <summary>
+    /// Cambia entre el boton de grabar y la barra de grabacion, y lleva el contador de tiempo.
+    /// </summary>
+    private void ShowRecordingUi(bool recording)
+    {
+        recordButton.IsVisible = !recording;
+        recordBar.IsVisible = recording;
+
+        if (recording)
+        {
+            UpdateRecordingLabels();
+
+            _recordTimer ??= Dispatcher.CreateTimer();
+            _recordTimer.Interval = TimeSpan.FromSeconds(1);
+            _recordTimer.Tick -= OnRecordTimerTick;
+            _recordTimer.Tick += OnRecordTimerTick;
+            _recordTimer.Start();
+            return;
+        }
+
+        _recordTimer?.Stop();
+    }
+
+    private void OnRecordTimerTick(object? sender, EventArgs e) => UpdateRecordingLabels();
+
+    private void UpdateRecordingLabels()
+    {
+        var elapsed = DateTime.Now - _trackingStartedAt;
+
+        recordTitleLabel.Text = L("Grabando la ruta");
+        recordDetailLabel.Text = string.Format(@"{0:hh\:mm\:ss} · {1:0.00} km · {2} {3}",
+            elapsed, _trackedDistanceKm, _recordedLocations.Count, L("puntos"));
+    }
+
+    /// <summary>
+    /// Arranca el servicio en primer plano mientras dure la grabacion. Sin el, Android congela el
+    /// proceso al apagar la pantalla y la ruta sale a trozos.
+    /// </summary>
+    private void StartTrackingService()
+    {
+#if ANDROID
+        TrackingForegroundService.NotificationTitle = "Hiker";
+        TrackingForegroundService.NotificationText = L("Grabando la ruta");
+        TrackingForegroundService.Start();
+#endif
+    }
+
+    private void StopTrackingService()
+    {
+#if ANDROID
+        TrackingForegroundService.Stop();
+#endif
     }
 
     private async void OnSaveRouteClicked(object sender, EventArgs e)

@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026.08.28.1 (202608281)
+- **Grabacion de la ruta con seguimiento en vivo** (nota de autor del 2026-08-01). La logica ya
+  estaba en el code-behind, pero se habia quedado sin ningun control en pantalla al pasar el mapa
+  a pantalla completa: no habia forma de grabar. Ahora hay un boton de grabar en el mapa y, al
+  pulsarlo, una barra con el tiempo, la distancia y los puntos que se llevan, con el trazado
+  dibujandose sobre el mapa. Al parar se ofrece guardar la ruta como GPX o descartarla.
+- **Servicio en primer plano de tipo `location`** mientras se graba: sin el, Android deja de
+  entregar posiciones a los pocos minutos de apagar la pantalla y la ruta sale a trozos. Lleva
+  notificacion permanente, que es el requisito de Android y ademas deja claro que se esta
+  grabando. Se aniaden `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_LOCATION` y `POST_NOTIFICATIONS`
+  al manifiesto; **no** hace falta `ACCESS_BACKGROUND_LOCATION`, que es de alta revision en Play.
+- **API objetivo 36** (`net9.0-android36.0` + `TargetSdkVersion` explicito): requisito de Google
+  Play para cualquier actualizacion desde el 31-ago-2026. Antes resolvia a 35.
+- Correccion: los controles de grabacion llevan `ZIndex` explicito. Sin el, el WebView del mapa se
+  quedaba con el toque y el boton no llegaba a pulsarse (comprobado en dispositivo).
+
 ## 2026.07.20.0 (202607200)
 - Conformidad con la constitucion: tipografia del sistema (sin fuentes propias embebidas),
   colores/tamaños a tokens semanticos, botones de idioma con estilo, retirada la dependencia
