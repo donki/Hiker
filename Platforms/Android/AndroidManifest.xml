@@ -25,6 +25,13 @@
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
   <!-- POST_NOTIFICATIONS: solo para esa notificación de "grabando", obligatoria en Android 13+. -->
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+  <!--
+    WAKE_LOCK: mantiene la CPU despierta mientras se graba una ruta con la pantalla apagada. Sin
+    ella el sistema duerme el procesador entre posicion y posicion y la traza sale a trozos. Solo
+    se coge mientras dura la grabacion y se suelta al parar.
+  -->
+  <uses-permission android:name="android.permission.WAKE_LOCK" />
   <!-- Retirados por no usarse (mínimo privilegio):
        - ACCESS_NETWORK_STATE: default de la plantilla MAUI, ninguna API de conectividad se usa.
        - ACCESS_WIFI_STATE: sin uso de WifiManager en el código.

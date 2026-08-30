@@ -33,11 +33,10 @@
     <!-- Versions: ApplicationVersion debe ser entero incremental (constitucion seccion 6).
          Convencion: yyyyMMddR (R=rev del dia, empieza en 0). Mantener en sincronia con
          ApplicationDisplayVersion antes de cada publicacion. -->
-    <ApplicationDisplayVersion>2026.08.28.1</ApplicationDisplayVersion>
-    <ApplicationVersion>202608281</ApplicationVersion>
+    <ApplicationDisplayVersion>2026.08.30.1</ApplicationDisplayVersion>
+    <ApplicationVersion>202608301</ApplicationVersion>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
-    <TargetSdkVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">35</TargetSdkVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
     <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>

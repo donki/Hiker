@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026.08.29.1 (202608291)
+- **Corregido: la grabacion perdia puntos con la pantalla apagada o la app en segundo plano.** Eran
+  tres fallos a la vez y se han arreglado los tres:
+  - Quien escuchaba al GPS era la pagina del mapa, a traves de MAUI Essentials y con precision
+    «media». Con la pantalla apagada la pagina deja de recibir y los proveedores que no son GPS los
+    suspende el sistema en reposo. **Ahora escucha el propio servicio en primer plano**, pidiendo el
+    proveedor GPS (con la red como apoyo), que es lo que Android sigue entregando mientras corre un
+    servicio de tipo `location`.
+  - Los puntos solo existian en memoria hasta que el usuario pulsaba «guardar»: si Android mataba el
+    proceso en una ruta larga, se perdia todo. **Ahora cada punto se escribe en un diario en disco
+    nada mas llegar**, y al volver a abrir la aplicacion se ofrece recuperar la grabacion
+    interrumpida.
+  - Con el servicio recreandose solo (Sticky), la grabacion no se reanudaba porque el estado vivia
+    en la pagina. **La grabacion es ahora un servicio de aplicacion** (`TrackRecorder`) y el servicio
+    la reanuda desde el diario al recrearse.
+- Se coge un **bloqueo parcial de CPU** (`WAKE_LOCK`) mientras dura la grabacion: sin el, con la
+  pantalla apagada el procesador se duerme entre posicion y posicion y la traza sale a rachas. Se
+  suelta al parar de grabar.
+
 ## 2026.08.28.1 (202608281)
 - **Grabacion de la ruta con seguimiento en vivo** (nota de autor del 2026-08-01). La logica ya
   estaba en el code-behind, pero se habia quedado sin ningun control en pantalla al pasar el mapa

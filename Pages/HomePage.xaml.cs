@@ -1,5 +1,4 @@
 using Hiker.Services;
-using System.Collections.ObjectModel;
 
 namespace Hiker.Pages;
 
@@ -9,16 +8,20 @@ public partial class HomePage : ContentPage
     private GpsFilterService? _gpsFilterService;
     private SettingsService? _settingsService;
     private RouteService? _routeService;
-    private readonly ObservableCollection<Location> _recordedLocations = new();
-    private bool _isTracking = false;
+    private MapMatchService? _mapMatch;
+    /// <summary>
+    /// La grabacion vive fuera de la pagina (ver <see cref="TrackRecorder"/>): quien recibe los
+    /// puntos es el servicio en primer plano, que sigue vivo con la pantalla apagada.
+    /// </summary>
+    private TrackRecorder? _recorder;
+
+    private bool _isTracking => _recorder?.IsRecording == true;
     private bool _mapReady = false;
     private bool _hasLocation = false;
     private bool _followMode = true;   // el mapa arranca siguiendo al usuario (followUser=true en JS)
     private bool _headingUp = false;   // modo "Rumbo" (heading-up): desactivado por defecto
     private static bool _backgroundPromptsChecked = false; // avisos de bateria: una vez por sesion
 
-    private DateTime _trackingStartedAt;
-    private double _trackedDistanceKm;
     private IDispatcherTimer? _recordTimer;
 
     public HomePage()
@@ -48,6 +51,18 @@ public partial class HomePage : ContentPage
             _gpsFilterService ??= services.GetService<GpsFilterService>();
             _settingsService ??= services.GetService<SettingsService>();
             _routeService ??= services.GetService<RouteService>();
+            _mapMatch ??= services.GetService<MapMatchService>();
+
+            if (_recorder is null && services.GetService<TrackRecorder>() is { } recorder)
+            {
+                _recorder = recorder;
+                _recorder.PointAdded += OnRecordedPointAdded;
+            }
+
+            // La grabacion pudo seguir (o reanudarse sola) con la aplicacion cerrada: la interfaz
+            // tiene que reflejar lo que hay, no lo que habia al salir.
+            ShowRecordingUi(_isTracking);
+            UpdateStateIcon();
 
             GeolocationService.LogInfo($"HomePage.OnAppearing geoService={(_geolocationService != null)}");
             if (_geolocationService != null)
@@ -63,6 +78,9 @@ public partial class HomePage : ContentPage
 
         // Si venimos de la pantalla de Rutas con una ruta seleccionada, la pintamos en el mapa.
         await LoadPendingRouteAsync();
+
+        // Si una grabacion anterior se quedo a medias, se ofrece recuperarla.
+        await OfferPendingRecoveryAsync();
 
         // Si el modo Rumbo estaba activo, reanuda la brujula al volver a la pagina.
         if (_headingUp)
@@ -300,24 +318,10 @@ public partial class HomePage : ContentPage
         MainThread.BeginInvokeOnMainThread(async () =>
         {
             UpdateLocationDisplay(location);
-            
-            if (_isTracking && _gpsFilterService != null)
-            {
-                var filteredLocation = _gpsFilterService.ProcessLocation(location);
-                if (filteredLocation != null)
-                {
-                    // La distancia se acumula tramo a tramo sobre los puntos ya filtrados: sumar
-                    // los crudos infla el total con el temblor del GPS estando parado.
-                    if (_recordedLocations.Count > 0)
-                        _trackedDistanceKm += Location.CalculateDistance(
-                            _recordedLocations[^1], filteredLocation, DistanceUnits.Kilometers);
 
-                    _recordedLocations.Add(filteredLocation);
-                    await AddRoutePointToMap(filteredLocation);
-                    UpdateRecordingLabels();
-                }
-            }
-            
+            // Los puntos de la ruta NO se graban aqui: los recibe TrackRecorder desde el servicio
+            // en primer plano. Esta pagina solo dibuja, y puede no estar viva mientras se graba.
+
             // Actualizar mapa con la ubicación actual
             if (_mapReady)
             {
@@ -325,6 +329,21 @@ public partial class HomePage : ContentPage
             }
 
             UpdateRouteFollowing(location);
+        });
+    }
+
+    /// <summary>
+    /// Punto que acaba de grabar el servicio. Puede llegar con la pagina en segundo plano, asi que
+    /// se salta el dibujo si el mapa no esta listo: lo que importa (guardarlo) ya esta hecho.
+    /// </summary>
+    private void OnRecordedPointAdded(object? sender, Location point)
+    {
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            UpdateRecordingLabels();
+
+            if (_mapReady)
+                await AddRoutePointToMap(point);
         });
     }
 
@@ -555,18 +574,13 @@ public partial class HomePage : ContentPage
         if (_isTracking)
             return;
 
-        _isTracking = true;
-        _recordedLocations.Clear();
-        _trackingStartedAt = DateTime.Now;
-        _trackedDistanceKm = 0;
-
-        // Se reinicia el filtro para no arrastrar el estado del Kalman de una grabacion anterior,
-        // que sesgaba los primeros puntos de la nueva ruta.
-        _gpsFilterService?.Reset();
+        // El servicio arranca ANTES de marcar la grabacion: es quien escucha al GPS, y asi no se
+        // pierde ningun punto entre una cosa y la otra.
+        StartTrackingService();
+        _recorder?.Start();
 
         UpdateStateIcon();
         ShowRecordingUi(true);
-        StartTrackingService();
 
         // Limpiar mapa
         await ClearMapRoute();
@@ -577,14 +591,14 @@ public partial class HomePage : ContentPage
         if (!_isTracking)
             return;
 
-        _isTracking = false;
+        _recorder?.Stop();
         UpdateStateIcon();
         ShowRecordingUi(false);
         StopTrackingService();
 
-        // Parar sin ofrecer guardar dejaria la ruta recien grabada colgando en memoria hasta la
-        // siguiente grabacion, que la borra: es justo cuando hay que preguntar.
-        if (_recordedLocations.Count == 0)
+        // Parar sin ofrecer guardar dejaria la ruta recien grabada colgando hasta la siguiente
+        // grabacion, que la borra: es justo cuando hay que preguntar.
+        if ((_recorder?.PointCount ?? 0) == 0)
         {
             await ClearMapRoute();
             return;
@@ -593,13 +607,81 @@ public partial class HomePage : ContentPage
         var save = await SocShared.ModernDialog.AlertAsync(this,
             L("Ruta grabada"),
             string.Format(L("Se han grabado {0} puntos ({1:0.00} km). ¿Quieres guardarla?"),
-                _recordedLocations.Count, _trackedDistanceKm),
+                _recorder!.PointCount, _recorder.DistanceKm),
             L("Guardar"), L("Descartar"));
 
-        if (save)
-            OnSaveRouteClicked(this, EventArgs.Empty);
-        else
+        if (!save)
+        {
             OnClearClicked(this, EventArgs.Empty);
+            return;
+        }
+
+        await OfferMapMatchAsync();
+        OnSaveRouteClicked(this, EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// Ofrece ajustar la ruta al mapa antes de guardarla.
+    /// </summary>
+    /// <remarks>
+    /// <para>Se PREGUNTA, no se hace solo. El ajuste mueve puntos, y mover los datos de alguien sin
+    /// avisar no esta bien ni aunque quede mas bonito: quien ha andado por ahi es quien sabe si la
+    /// linea rara era error del GPS o el camino que tomo de verdad.</para>
+    ///
+    /// <para>Si no hay red o Overpass no responde, se sigue y se guarda la ruta tal cual. Perder
+    /// una grabacion por no poder consultar un mapa seria absurdo.</para>
+    /// </remarks>
+    private async Task OfferMapMatchAsync()
+    {
+        if (_mapMatch is null || _recorder is null || _recorder.PointCount < 2)
+            return;
+
+        var ask = await SocShared.ModernDialog.AlertAsync(this,
+            L("Ajustar la ruta"),
+            L("¿Quieres pegarla a los caminos del mapa y sacarla de los edificios? Se puede guardar tal cual si prefieres."),
+            L("Ajustar"), L("Dejarla igual"));
+
+        if (!ask)
+            return;
+
+        MatchResult? result;
+
+        try
+        {
+            result = await _mapMatch.MatchAsync(_recorder.Snapshot());
+        }
+        catch (Exception)
+        {
+            result = null;
+        }
+
+        if (result is null)
+        {
+            await SocShared.ModernDialog.AlertAsync(this, L("Ajustar la ruta"),
+                L("No se ha podido consultar el mapa. La ruta se guarda tal y como se grabo."), "OK");
+            return;
+        }
+
+        if (!result.AnyChange)
+        {
+            await SocShared.ModernDialog.AlertAsync(this, L("Ajustar la ruta"),
+                L("La ruta ya encajaba con el mapa: no ha hecho falta cambiar nada."), "OK");
+            return;
+        }
+
+        // Se ensena QUE se va a cambiar antes de cambiarlo, y aun se puede decir que no.
+        var apply = await SocShared.ModernDialog.AlertAsync(this,
+            L("Ajustar la ruta"),
+            string.Format(
+                L("Se pegarian {0} puntos a caminos cercanos y se sacarian {1} de dentro de edificios, de {2} en total."),
+                result.SnappedToPath, result.MovedOutOfBuilding, _recorder.PointCount),
+            L("Aplicar"), L("Dejarla igual"));
+
+        if (!apply)
+            return;
+
+        _recorder.Adopt(result.Points);
+        await DrawSavedRouteAsync(_recorder.Snapshot());
     }
 
     /// <summary>Traduce si el servicio esta disponible; si no, deja la frase en castellano.</summary>
@@ -633,11 +715,11 @@ public partial class HomePage : ContentPage
 
     private void UpdateRecordingLabels()
     {
-        var elapsed = DateTime.Now - _trackingStartedAt;
+        var elapsed = DateTime.Now - (_recorder?.StartedAt ?? DateTime.Now);
 
         recordTitleLabel.Text = L("Grabando la ruta");
         recordDetailLabel.Text = string.Format(@"{0:hh\:mm\:ss} · {1:0.00} km · {2} {3}",
-            elapsed, _trackedDistanceKm, _recordedLocations.Count, L("puntos"));
+            elapsed, _recorder?.DistanceKm ?? 0, _recorder?.PointCount ?? 0, L("puntos"));
     }
 
     /// <summary>
@@ -662,7 +744,7 @@ public partial class HomePage : ContentPage
 
     private async void OnSaveRouteClicked(object sender, EventArgs e)
     {
-        if (_recordedLocations.Count == 0)
+        if ((_recorder?.PointCount ?? 0) == 0)
         {
             await SocShared.ModernDialog.AlertAsync(this, "Aviso", "No hay datos de ruta para guardar", "OK");
             return;
@@ -680,7 +762,11 @@ public partial class HomePage : ContentPage
                 }
 
                 // Guardado real: escribe la ruta como GPX en el almacenamiento de la app.
-                await _routeService.SaveRouteAsync(_recordedLocations.ToList(), routeName);
+                await _routeService.SaveRouteAsync(_recorder!.Snapshot(), routeName);
+
+                // Guardada ya en su GPX, el diario de la grabacion sobra.
+                TrackRecorder.DeletePendingJournal();
+
                 await SocShared.ModernDialog.AlertAsync(this, "Éxito", $"Ruta '{routeName}' guardada correctamente", "OK");
             }
         }
@@ -692,8 +778,53 @@ public partial class HomePage : ContentPage
 
     private async void OnClearClicked(object sender, EventArgs e)
     {
-        _recordedLocations.Clear();
+        _recorder?.Discard();
         await ClearMapRoute();
+    }
+
+    /// <summary>
+    /// Grabacion que se quedo a medias porque Android mato el proceso (pantalla apagada, ruta
+    /// larga, poca memoria). Los puntos estan en el diario, asi que se ofrece rescatarlos en vez de
+    /// perderlos en silencio.
+    /// </summary>
+    private async Task OfferPendingRecoveryAsync()
+    {
+        if (_recorder is null || _recorder.IsRecording || _recorder.PointCount > 0)
+            return;
+
+        var pending = TrackRecorder.ReadPendingJournal();
+        if (pending.Count < 2)
+        {
+            // Un punto suelto no es una ruta: se limpia sin molestar a nadie.
+            if (pending.Count > 0)
+                TrackRecorder.DeletePendingJournal();
+
+            return;
+        }
+
+        var recover = await SocShared.ModernDialog.AlertAsync(this,
+            L("Grabación interrumpida"),
+            string.Format(L("Quedó una grabación sin guardar con {0} puntos. ¿La recuperas?"), pending.Count),
+            L("Recuperar"), L("Descartar"));
+
+        if (!recover)
+        {
+            TrackRecorder.DeletePendingJournal();
+            return;
+        }
+
+        _recorder.Adopt(pending);
+        await DrawRecoveredRouteAsync(pending);
+        OnSaveRouteClicked(this, EventArgs.Empty);
+    }
+
+    private async Task DrawRecoveredRouteAsync(List<Location> points)
+    {
+        if (!_mapReady)
+            return;
+
+        foreach (var point in points)
+            await AddRoutePointToMap(point);
     }
 
     /// <summary>Activa/desactiva el modo "Seguir": recentrar el mapa en cada punto GPS.</summary>

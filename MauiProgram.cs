@@ -31,6 +31,16 @@ namespace Hiker
                 builder.Services.AddSingleton<RouteService>();
                 builder.Services.AddSingleton<GpsFilterService>();
 
+                // Ajuste de la ruta contra el mapa. El tiempo de espera es generoso porque
+                // Overpass tarda: es una consulta unica al terminar de grabar, no algo continuo.
+                builder.Services.AddSingleton(new HttpClient { Timeout = TimeSpan.FromSeconds(30) });
+                builder.Services.AddSingleton<MapMatchService>();
+
+                // La grabacion de la ruta es un servicio de aplicacion, no estado de una pagina:
+                // quien le entrega los puntos es el servicio en primer plano, que sigue vivo con la
+                // pantalla apagada, y cada punto se escribe en disco nada mas llegar.
+                builder.Services.AddSingleton<TrackRecorder>();
+
                 // Comprobacion de version al arrancar (constitucion seccion 15).
                 builder.Services.AddSingleton<UpdateService>();
 
