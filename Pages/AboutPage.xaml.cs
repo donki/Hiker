@@ -10,7 +10,6 @@ namespace Hiker.Pages;
 public partial class AboutPage : ContentPage
 {
     private const string ContactEmail = "jsoladelarosa@gmail.com";
-    private const string KofiUrl = "https://ko-fi.com/josepsola";
 
     private TranslationService? _translation;
 
@@ -42,9 +41,6 @@ public partial class AboutPage : ContentPage
         ContactTitleLabel.Text = T("Contacto");
         ContactHintLabel.IsVisible = false;
 
-        SupportTitleLabel.Text = T("Apoya el Desarrollo");
-        DonationButton.Text = T("Ko-fi.com - Invítame un café");
-        SupportHintLabel.Text = T("Tu apoyo ayuda a mantener y mejorar la aplicación");
 
         LanguageTitleLabel.Text = T("Idioma");
         LanguageHintLabel.Text = T("Selecciona tu idioma preferido");
@@ -102,20 +98,4 @@ public partial class AboutPage : ContentPage
         }
     }
 
-    private async void OnDonationClicked(object? sender, EventArgs e)
-    {
-        try
-        {
-            await Browser.Default.OpenAsync(new Uri(KofiUrl), BrowserLaunchMode.SystemPreferred);
-        }
-        catch
-        {
-            try
-            {
-                await Clipboard.SetTextAsync(KofiUrl);
-                await SocShared.ModernDialog.AlertAsync(this, T("Apoya el Desarrollo"), $"{KofiUrl}", "OK");
-            }
-            catch { /* nada mas que hacer */ }
-        }
-    }
 }
