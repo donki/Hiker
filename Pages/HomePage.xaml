@@ -60,13 +60,17 @@
              de grabar (nota de autor del 2026-08-01). -->
 
         <!-- Parado: un solo boton de grabar, arriba a la derecha del mapa. ZIndex explicito:
-             sin el, el WebView del mapa se queda con el toque y el boton no llega a pulsarse. -->
+             sin el, el WebView del mapa se queda con el toque y el boton no llega a pulsarse.
+
+             El margen derecho deja libre la esquina: ahi viven los mandos de zoom del mapa
+             (NavigationControl en 'top-right', dentro del WebView), y el boton se les ponia
+             justo encima. -->
         <Button x:Name="recordButton"
                 ZIndex="10"
                 ImageSource="ic_st_rec.png"
                 VerticalOptions="Start"
                 HorizontalOptions="End"
-                Margin="0,12,12,0"
+                Margin="0,12,76,0"
                 WidthRequest="52"
                 HeightRequest="52"
                 CornerRadius="26"
@@ -74,12 +78,14 @@
                 BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}"
                 Clicked="OnStartTrackingClicked" />
 
-        <!-- Grabando: lo que se lleva grabado y el boton de parar. -->
+        <!-- Grabando: lo que se lleva grabado y el boton de parar. No llega hasta el borde
+             derecho por lo mismo que el boton: los mandos de zoom del mapa estan en esa esquina y
+             la barra los tapaba de lado a lado. -->
         <Border x:Name="recordBar"
                 ZIndex="10"
                 IsVisible="False"
                 VerticalOptions="Start"
-                Margin="12,12,12,0"
+                Margin="12,12,76,0"
                 Padding="14,10"
                 StrokeThickness="0"
                 BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
