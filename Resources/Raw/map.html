@@ -35,8 +35,21 @@
         var routeCoords = [];   // en formato [lng, lat]
         var styleReady = false;
 
+        // Trazado alternativo (gris, discontinuo): se usa al comparar la ruta grabada con la
+        // ajustada al mapa antes de guardar. Va DEBAJO de 'route', que es la que se guardaria.
+        var altCoords = [];
+
         function ensureRouteLayer() {
             if (map.getSource('route')) return;
+            map.addSource('route_alt', {
+                type: 'geojson',
+                data: { type: 'Feature', geometry: { type: 'LineString', coordinates: altCoords } }
+            });
+            map.addLayer({
+                id: 'route_alt', type: 'line', source: 'route_alt',
+                layout: { 'line-join': 'round', 'line-cap': 'round' },
+                paint: { 'line-color': '#9E9E9E', 'line-width': 4, 'line-opacity': 0.9, 'line-dasharray': [2, 2] }
+            });
             map.addSource('route', {
                 type: 'geojson',
                 data: { type: 'Feature', geometry: { type: 'LineString', coordinates: routeCoords } }
@@ -114,7 +127,26 @@
         }
 
         function clearRoute() {
-            whenReady(function () { routeCoords = []; setRouteData(); });
+            whenReady(function () { routeCoords = []; setRouteData(); clearAltRoute(); });
+        }
+
+        function setAltRouteData() {
+            if (map.getSource('route_alt'))
+                map.getSource('route_alt').setData(
+                    { type: 'Feature', geometry: { type: 'LineString', coordinates: altCoords } });
+        }
+
+        // Pinta el trazado alternativo en gris, sin mover el encuadre (lo fija drawRoute).
+        function drawAltRoute(coords) {
+            whenReady(function () {
+                altCoords = (coords || []).map(function (c) { return [c[1], c[0]]; });
+                ensureRouteLayer();
+                setAltRouteData();
+            });
+        }
+
+        function clearAltRoute() {
+            whenReady(function () { altCoords = []; setAltRouteData(); });
         }
 
         function removeLastPoint() {
@@ -144,7 +176,8 @@
 
         // Modo "Rumbo" (heading-up): rota el mapa para que la direccion del dispositivo
         // apunte hacia arriba. MapLibre soporta rotacion nativa (setBearing), sin CSS.
-        var headingUp = false;
+        // Arranca activado, igual que en AppShell/HomePage.
+        var headingUp = true;
         function setHeadingUp(enabled) {
             headingUp = !!enabled;
             whenReady(function () {
@@ -160,6 +193,8 @@
         window.addRoutePoint = addRoutePoint;
         window.drawRoute = drawRoute;
         window.clearRoute = clearRoute;
+        window.drawAltRoute = drawAltRoute;
+        window.clearAltRoute = clearAltRoute;
         window.removeLastPoint = removeLastPoint;
         window.centerOnLocation = centerOnLocation;
         window.setFollow = setFollow;

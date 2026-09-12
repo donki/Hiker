@@ -1,11 +1,11 @@
-using Hiker.Pages;
+﻿using Hiker.Pages;
 
 namespace Hiker;
 
 public partial class AppShell : Shell
 {
     private bool _followEnabled = true;   // el mapa arranca siguiendo al usuario
-    private bool _headingEnabled = false; // modo Rumbo desactivado por defecto
+    private bool _headingEnabled = true;  // modo Rumbo activado por defecto
 
     public AppShell()
     {
@@ -38,7 +38,7 @@ public partial class AppShell : Shell
             await GoToAsync("//HomePage");
             // Tras navegar, CurrentPage puede tardar un instante en ser la HomePage ya montada:
             // se espera brevemente en vez de lanzar la accion al vacio (antes se perdia el
-            // "Grabar recorrido" cuando se pulsaba desde Rutas o Configuracion).
+            // "Grabar" cuando se pulsaba desde Rutas o Configuracion).
             for (int i = 0; i < 20 && CurrentPage is not HomePage; i++)
                 await Task.Delay(50);
         }

@@ -1,4 +1,4 @@
-using Hiker.Services;
+﻿using Hiker.Services;
 
 namespace Hiker.Pages;
 
@@ -19,7 +19,7 @@ public partial class HomePage : ContentPage
     private bool _mapReady = false;
     private bool _hasLocation = false;
     private bool _followMode = true;   // el mapa arranca siguiendo al usuario (followUser=true en JS)
-    private bool _headingUp = false;   // modo "Rumbo" (heading-up): desactivado por defecto
+    private bool _headingUp = true;    // modo "Rumbo" (heading-up): activado por defecto
     private static bool _backgroundPromptsChecked = false; // avisos de bateria: una vez por sesion
 
     private IDispatcherTimer? _recordTimer;
@@ -146,6 +146,10 @@ public partial class HomePage : ContentPage
             // Esperar a que el mapa esté listo
             await Task.Delay(2000);
             _mapReady = true;
+
+            // OnAppearing corre antes de que el mapa este listo: se le pasa el estado del Rumbo
+            // ahora, que ya puede recibirlo (si no, con Rumbo por defecto el mapa no giraba).
+            await mapWebView.EvaluateJavaScriptAsync($"setHeadingUp({(_headingUp ? "true" : "false")});");
         }
         catch (Exception ex)
         {
@@ -422,10 +426,7 @@ public partial class HomePage : ContentPage
         if (!_mapReady || points.Count == 0)
             return;
 
-        var ci = System.Globalization.CultureInfo.InvariantCulture;
-        var coords = string.Join(",", points.Select(p =>
-            $"[{p.Latitude.ToString(ci)},{p.Longitude.ToString(ci)}]"));
-        await mapWebView.EvaluateJavaScriptAsync($"drawRoute([{coords}]);");
+        await mapWebView.EvaluateJavaScriptAsync($"drawRoute([{ToJsCoords(points)}]);");
 
         StartFollowing(points);
     }
@@ -574,6 +575,8 @@ public partial class HomePage : ContentPage
         if (_isTracking)
             return;
 
+        CancelComparison();
+
         // El servicio arranca ANTES de marcar la grabacion: es quien escucha al GPS, y asi no se
         // pierde ningun punto entre una cosa y la otra.
         StartTrackingService();
@@ -616,39 +619,45 @@ public partial class HomePage : ContentPage
             return;
         }
 
-        await OfferMapMatchAsync();
-        OnSaveRouteClicked(this, EventArgs.Empty);
+        if (await OfferMapMatchAsync())
+            OnSaveRouteClicked(this, EventArgs.Empty);
     }
 
     /// <summary>
-    /// Ofrece ajustar la ruta al mapa antes de guardarla.
+    /// Ofrece ajustar la ruta al mapa antes de guardarla, enseñando las dos versiones en el mapa.
     /// </summary>
     /// <remarks>
-    /// <para>Se PREGUNTA, no se hace solo. El ajuste mueve puntos, y mover los datos de alguien sin
-    /// avisar no esta bien ni aunque quede mas bonito: quien ha andado por ahi es quien sabe si la
-    /// linea rara era error del GPS o el camino que tomo de verdad.</para>
+    /// <para>Se ENSEÑA, no se hace solo. El ajuste mueve puntos, y mover los datos de alguien sin
+    /// que los vea no esta bien ni aunque quede mas bonito: quien ha andado por ahi es quien sabe
+    /// si la linea rara era error del GPS o el camino que tomo de verdad. Por eso se pintan la
+    /// grabada y la ajustada a la vez (roja la que se guardaria, gris la otra) y se puede
+    /// alternar entre ellas antes de decidir; antes se decidia a ciegas con un dialogo de texto.</para>
     ///
     /// <para>Si no hay red o Overpass no responde, se sigue y se guarda la ruta tal cual. Perder
     /// una grabacion por no poder consultar un mapa seria absurdo.</para>
     /// </remarks>
-    private async Task OfferMapMatchAsync()
+    /// <returns>false si, mientras se comparaba, se borro la ruta o se empezo otra grabacion: ya
+    /// no hay nada que guardar.</returns>
+    private async Task<bool> OfferMapMatchAsync()
     {
         if (_mapMatch is null || _recorder is null || _recorder.PointCount < 2)
-            return;
+            return true;
 
-        var ask = await SocShared.ModernDialog.AlertAsync(this,
-            L("Ajustar la ruta"),
-            L("¿Quieres pegarla a los caminos del mapa y sacarla de los edificios? Se puede guardar tal cual si prefieres."),
-            L("Ajustar"), L("Dejarla igual"));
+        var original = _recorder.Snapshot();
 
-        if (!ask)
-            return;
+        // Mientras se consulta el mapa se enseña la barra sin botones: la consulta tarda unos
+        // segundos y sin esto parecia que la app se habia quedado colgada tras pulsar Guardar.
+        compareTitleLabel.Text = L("Ajustando la ruta…");
+        compareDetailLabel.Text = L("Consultando los caminos del mapa");
+        compareSwapButton.IsVisible = false;
+        compareSaveButton.IsVisible = false;
+        compareBar.IsVisible = true;
 
         MatchResult? result;
 
         try
         {
-            result = await _mapMatch.MatchAsync(_recorder.Snapshot());
+            result = await _mapMatch.MatchAsync(original);
         }
         catch (Exception)
         {
@@ -657,31 +666,108 @@ public partial class HomePage : ContentPage
 
         if (result is null)
         {
+            compareBar.IsVisible = false;
             await SocShared.ModernDialog.AlertAsync(this, L("Ajustar la ruta"),
                 L("No se ha podido consultar el mapa. La ruta se guarda tal y como se grabo."), "OK");
-            return;
+            return true;
         }
 
         if (!result.AnyChange)
         {
+            compareBar.IsVisible = false;
             await SocShared.ModernDialog.AlertAsync(this, L("Ajustar la ruta"),
                 L("La ruta ya encajaba con el mapa: no ha hecho falta cambiar nada."), "OK");
-            return;
+            return true;
         }
 
-        // Se ensena QUE se va a cambiar antes de cambiarlo, y aun se puede decir que no.
-        var apply = await SocShared.ModernDialog.AlertAsync(this,
-            L("Ajustar la ruta"),
-            string.Format(
-                L("Se pegarian {0} puntos a caminos cercanos y se sacarian {1} de dentro de edificios, de {2} en total."),
-                result.SnappedToPath, result.MovedOutOfBuilding, _recorder.PointCount),
-            L("Aplicar"), L("Dejarla igual"));
+        _compareOriginal = original;
+        _compareResult = result;
+        _compareShowingAdjusted = true;
+        compareSwapButton.IsVisible = true;
+        compareSaveButton.IsVisible = true;
+        await ShowComparisonAsync();
 
-        if (!apply)
+        _compareChoice = new TaskCompletionSource<bool?>();
+        var keepAdjusted = await _compareChoice.Task;
+        _compareChoice = null;
+
+        compareBar.IsVisible = false;
+        await RunMapJsAsync("clearAltRoute();");
+
+        if (keepAdjusted is null)
+            return false;
+
+        if (keepAdjusted.Value)
+            _recorder.Adopt(result.Points);
+
+        await RunMapJsAsync($"drawRoute([{ToJsCoords(_recorder.Snapshot())}]);");
+        return true;
+    }
+
+    /// <summary>Cierra la comparacion sin guardar (se borro la ruta o se empezo a grabar otra).</summary>
+    private void CancelComparison() => _compareChoice?.TrySetResult(null);
+
+    // Estado de la comparacion grabada/ajustada (solo vive mientras se ve compareBar).
+    private List<Location> _compareOriginal = new();
+    private MatchResult? _compareResult;
+    private bool _compareShowingAdjusted;
+    private TaskCompletionSource<bool?>? _compareChoice;
+
+    /// <summary>Pinta en rojo la version elegida y en gris la otra, y explica cual es cual.</summary>
+    private async Task ShowComparisonAsync()
+    {
+        if (_compareResult is null)
             return;
 
-        _recorder.Adopt(result.Points);
-        await DrawSavedRouteAsync(_recorder.Snapshot());
+        var shown = _compareShowingAdjusted ? _compareResult.Points : _compareOriginal;
+        var other = _compareShowingAdjusted ? _compareOriginal : _compareResult.Points;
+
+        if (_compareShowingAdjusted)
+        {
+            compareTitleLabel.Text = L("En rojo: ruta ajustada");
+            compareDetailLabel.Text = string.Format(
+                L("{0} puntos pegados a caminos y {1} sacados de edificios, de {2}"),
+                _compareResult.SnappedToPath, _compareResult.MovedOutOfBuilding, _compareOriginal.Count);
+        }
+        else
+        {
+            compareTitleLabel.Text = L("En rojo: ruta grabada");
+            compareDetailLabel.Text = string.Format(L("{0} puntos, tal y como se grabó"), _compareOriginal.Count);
+        }
+
+        await RunMapJsAsync($"drawAltRoute([{ToJsCoords(other)}]);");
+        await RunMapJsAsync($"drawRoute([{ToJsCoords(shown)}]);");
+    }
+
+    private async void OnCompareSwapClicked(object sender, EventArgs e)
+    {
+        _compareShowingAdjusted = !_compareShowingAdjusted;
+        await ShowComparisonAsync();
+    }
+
+    private void OnCompareSaveClicked(object sender, EventArgs e) =>
+        _compareChoice?.TrySetResult(_compareShowingAdjusted);
+
+    private static string ToJsCoords(List<Location> points)
+    {
+        var ci = System.Globalization.CultureInfo.InvariantCulture;
+        return string.Join(",", points.Select(p =>
+            $"[{p.Latitude.ToString(ci)},{p.Longitude.ToString(ci)}]"));
+    }
+
+    private async Task RunMapJsAsync(string script)
+    {
+        if (!_mapReady)
+            return;
+
+        try
+        {
+            await mapWebView.EvaluateJavaScriptAsync(script);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error en el mapa: {ex.Message}");
+        }
     }
 
     /// <summary>Traduce si el servicio esta disponible; si no, deja la frase en castellano.</summary>
@@ -778,6 +864,7 @@ public partial class HomePage : ContentPage
 
     private async void OnClearClicked(object sender, EventArgs e)
     {
+        CancelComparison();
         _recorder?.Discard();
         await ClearMapRoute();
     }
