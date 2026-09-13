@@ -6,6 +6,11 @@ Cumple la [constitucion del proyecto](constitucion.md): privacidad primero, mini
 
 La constitucion canonica se versiona como submodulo Git en [constitution/](constitution/) (repo [donki/constitution](https://github.com/donki/constitution)). El fichero raiz [constitucion.md](constitucion.md) es la copia operativa que enlazan README y scripts; se mantiene sincronizada con la canonica. Tras clonar, inicializa el submodulo con `git submodule update --init`.
 
+## Dónde conseguirla
+
+- **Google Play:** https://play.google.com/store/apps/details?id=com.socratic.hiker
+- **Releases de GitHub** (APK / EXE / MSIX de cada versión): https://github.com/donki/Hiker/releases
+
 ## Arquitectura
 
 | Carpeta | Proposito |
