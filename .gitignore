@@ -16,3 +16,4 @@ keystore.password.txt
 keystore.password.local.txt
 hiker-*.json
 *-service-account*.json
+releases/
