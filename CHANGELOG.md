@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## 2026.09.19.02 (2026091902)
+- **Configuración simplificada**: fuera la configuración del GPS (GPS nativo, intervalo, precisión) y
+  los botones Guardar y Restablecer. Solo queda el idioma, que se guarda solo al pulsarlo.
+
 ## 2026.09.19.01 (2026091901)
 - **Ficha de ruta** desde el botón de información de la lista: distancia, desnivel positivo y
   negativo (suavizados para no sumar el ruido del GPS), altitud máxima, mínima y diferencia,
