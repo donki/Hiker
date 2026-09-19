@@ -1,4 +1,12 @@
-# Changelog
+﻿# Changelog
+
+## 2026.09.19.00 (2026091900)
+- **Corregido: el mapa se quedaba en Madrid aunque la cabecera ya enseñara la posición real.** El
+  centrado inicial se lanzaba «a los dos segundos» de cargar el mapa, y con un WebView lento la
+  función del mapa aún no existía: la llamada se perdía en silencio. Ahora se pregunta al WebView
+  si el mapa está listo (hasta 15 s) y, si la posición llegó antes, se centra en cuanto lo está.
+  Además, mover el mapa y pintar el punto de posición ya no esperan a que cargue el estilo (sin
+  red o con red lenta se ve la posición igual).
 
 ## 2026.08.29.1 (202608291)
 - **Corregido: la grabacion perdia puntos con la pantalla apagada o la app en segundo plano.** Eran

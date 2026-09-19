@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -65,7 +65,10 @@
 
         // Ejecuta fn cuando el estilo este cargado (las fuentes/capas solo se pueden tocar
         // despues de 'load'); si aun no lo esta, lo encola.
-        function whenReady(fn) { if (styleReady) fn(); else map.on('load', fn); }
+        function whenReady(fn) { if (styleReady || map.loaded()) { styleReady = true; fn(); } else map.on('load', fn); }
+        // Mover el mapa y pintar el punto de posicion no necesitan el estilo cargado: se hace al
+        // momento. Si el estilo tarda (o no llega, sin red) el usuario ve su posicion igual.
+        function rightNow(fn) { try { fn(); } catch (e) { whenReady(fn); } }
 
         function setRouteData() {
             if (map.getSource('route'))
@@ -97,7 +100,7 @@
         }
 
         function updateLocation(lat, lng, accuracy) {
-            whenReady(function () {
+            rightNow(function () {
                 var pos = showMe(lat, lng);
                 if (followUser) map.easeTo({ center: pos, duration: 500 });
             });
@@ -158,7 +161,7 @@
         }
 
         function centerOnLocation(lat, lng, zoom) {
-            whenReady(function () {
+            rightNow(function () {
                 followUser = true;
                 showMe(lat, lng);   // al arrancar, esta es la unica que corre: tiene que pintar el punto
                 map.easeTo({ center: [lng, lat], zoom: zoom || 15, duration: 600 });

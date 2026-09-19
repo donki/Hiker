@@ -142,10 +142,30 @@ public partial class HomePage : ContentPage
                 Html = await LoadMapHtml()
             };
             mapWebView.Source = htmlSource;
-            
-            // Esperar a que el mapa esté listo
-            await Task.Delay(2000);
+
+            // Listo de verdad, no «a los dos segundos»: se pregunta al WebView si las funciones del
+            // mapa ya existen (hasta 15 s). Con un WebView lento, el centrado inicial llegaba
+            // antes de que centerOnLocation existiera, se perdia en silencio y el mapa se quedaba
+            // en su centro por defecto aunque la cabecera ya enseñara la posicion real.
+            for (var i = 0; i < 100 && !_mapReady; i++)
+            {
+                await Task.Delay(150);
+                try
+                {
+                    var ready = await mapWebView.EvaluateJavaScriptAsync("(typeof centerOnLocation === 'function' && window.mapReady === true) ? 'yes' : 'no'");
+                    _mapReady = ready?.Trim('"') == "yes";
+                }
+                catch (Exception)
+                {
+                    // El WebView aun no acepta JavaScript: se vuelve a preguntar.
+                }
+            }
             _mapReady = true;
+
+            // Si la posicion llego antes que el mapa, se centra ahora (era el caso habitual: el
+            // GPS con ultima posicion conocida responde en un segundo y el mapa tarda mas).
+            if (_lastLocation is not null)
+                await CenterMapAsync(_lastLocation, 16);
 
             // OnAppearing corre antes de que el mapa este listo: se le pasa el estado del Rumbo
             // ahora, que ya puede recibirlo (si no, con Rumbo por defecto el mapa no giraba).
@@ -264,6 +284,7 @@ public partial class HomePage : ContentPage
             var last = await _geolocationService.GetLastKnownLocationAsync();
             if (last != null)
             {
+                _lastLocation = last;
                 UpdateLocationDisplay(last);
                 await CenterMapWhenReadyAsync(last, 15);
             }
@@ -271,6 +292,7 @@ public partial class HomePage : ContentPage
             var current = await _geolocationService.GetCurrentLocationAsync();
             if (current != null)
             {
+                _lastLocation = current;
                 UpdateLocationDisplay(current);
                 await CenterMapWhenReadyAsync(current, 16);
             }
@@ -292,7 +314,7 @@ public partial class HomePage : ContentPage
     /// actualizacion de la etiqueta de ubicacion, que ocurre por separado.</summary>
     private async Task CenterMapWhenReadyAsync(Location location, int zoom)
     {
-        for (int i = 0; i < 20 && !_mapReady; i++)
+        for (int i = 0; i < 100 && !_mapReady; i++)
             await Task.Delay(150);
         if (_mapReady)
             await CenterMapAsync(location, zoom);
