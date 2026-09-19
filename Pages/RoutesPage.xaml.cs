@@ -1,4 +1,4 @@
-using Hiker.Services;
+﻿using Hiker.Services;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows.Input;
@@ -14,6 +14,7 @@ public partial class RoutesPage : ContentPage
     
     public ICommand LoadRouteCommand { get; }
     public ICommand DeleteRouteCommand { get; }
+    public ICommand InfoRouteCommand { get; }
 
     public RoutesPage()
     {
@@ -21,6 +22,7 @@ public partial class RoutesPage : ContentPage
 
         LoadRouteCommand = new Command<RouteInfo>(OnLoadRoute);
         DeleteRouteCommand = new Command<RouteInfo>(OnDeleteRoute);
+        InfoRouteCommand = new Command<RouteInfo>(OnInfoRoute);
         
         routesCollectionView.ItemsSource = Routes;
         BindingContext = this;
@@ -120,6 +122,14 @@ public partial class RoutesPage : ContentPage
         {
             await SocShared.ModernDialog.AlertAsync(this, "Error", $"Error cargando ruta: {ex.Message}", "OK");
         }
+    }
+
+    /// <summary>La ficha de la ruta: distancia, desniveles, altitudes, tiempos y perfil de desnivel.</summary>
+    private async void OnInfoRoute(RouteInfo routeInfo)
+    {
+        if (_routeService is null)
+            return;
+        await Navigation.PushAsync(new RouteInfoPage(routeInfo.Name, _routeService, _translationService));
     }
 
     private async void OnDeleteRoute(RouteInfo routeInfo)

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Hiker.Pages.RoutesPage"
@@ -31,7 +31,7 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Border Style="{StaticResource Card}" Margin="5">
-                        <Grid Padding="14" ColumnDefinitions="*,Auto,Auto">
+                        <Grid Padding="14" ColumnDefinitions="*,Auto,Auto,Auto">
                             <VerticalStackLayout Grid.Column="0">
                                 <Label Text="{Binding Name}"
                                        Style="{StaticResource BodyText}"
@@ -43,7 +43,19 @@
                                        Style="{StaticResource HintText}" />
                             </VerticalStackLayout>
 
+                            <!-- Ficha de la ruta: distancia, desniveles, tiempos y perfil. -->
                             <Button Grid.Column="1"
+                                    ImageSource="info.png"
+                                    BackgroundColor="{StaticResource Primary}"
+                                    WidthRequest="40"
+                                    HeightRequest="40"
+                                    CornerRadius="20"
+                                    Padding="0"
+                                    Margin="5,0"
+                                    Command="{Binding Source={x:Reference routesCollectionView}, Path=BindingContext.InfoRouteCommand}"
+                                    CommandParameter="{Binding .}" />
+
+                            <Button Grid.Column="2"
                                     ImageSource="location.png"
                                     BackgroundColor="{StaticResource Primary}"
                                     WidthRequest="40"
@@ -54,7 +66,7 @@
                                     Command="{Binding Source={x:Reference routesCollectionView}, Path=BindingContext.LoadRouteCommand}"
                                     CommandParameter="{Binding .}" />
 
-                            <Button Grid.Column="2"
+                            <Button Grid.Column="3"
                                     ImageSource="ic_trash.png"
                                     BackgroundColor="{StaticResource Danger}"
                                     WidthRequest="40"

@@ -1,5 +1,11 @@
 ﻿# Changelog
 
+## 2026.09.19.01 (2026091901)
+- **Ficha de ruta** desde el botón de información de la lista: distancia, desnivel positivo y
+  negativo (suavizados para no sumar el ruido del GPS), altitud máxima, mínima y diferencia,
+  duración, tiempo en movimiento, ritmo, velocidad media y máxima, número de puntos, fecha y el
+  **perfil de desnivel** dibujado (altitud según la distancia). Desde ahí, «Ver en el mapa».
+
 ## 2026.09.19.00 (2026091900)
 - **Corregido: el mapa se quedaba en Madrid aunque la cabecera ya enseñara la posición real.** El
   centrado inicial se lanzaba «a los dos segundos» de cargar el mapa, y con un WebView lento la

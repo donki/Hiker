@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Hiker.Pages.RouteInfoPage">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="12" Spacing="10">
+
+            <!-- Cabecera: nombre y fecha -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Padding="16,12" Spacing="4">
+                    <Label x:Name="nameLabel" Style="{StaticResource CardTitle}" FontSize="18" LineBreakMode="TailTruncation" />
+                    <Label x:Name="dateLabel" Style="{StaticResource HintText}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Los numeros: distancia, desniveles, altitudes, tiempo, velocidades -->
+            <Border Style="{StaticResource Card}">
+                <Grid Padding="16,12" ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="12" ColumnSpacing="8">
+                    <VerticalStackLayout Grid.Row="0" Grid.Column="0">
+                        <Label x:Name="distanceValue" Style="{StaticResource BodyText}" FontSize="20" FontAttributes="Bold" />
+                        <Label x:Name="distanceTitle" Style="{StaticResource HintText}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Row="0" Grid.Column="1">
+                        <Label x:Name="gainValue" Style="{StaticResource BodyText}" FontSize="20" FontAttributes="Bold" TextColor="#0E9F6E" />
+                        <Label x:Name="gainTitle" Style="{StaticResource HintText}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Row="0" Grid.Column="2">
+                        <Label x:Name="lossValue" Style="{StaticResource BodyText}" FontSize="20" FontAttributes="Bold" TextColor="#D14343" />
+                        <Label x:Name="lossTitle" Style="{StaticResource HintText}" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Grid.Row="1" Grid.Column="0">
+                        <Label x:Name="maxAltValue" Style="{StaticResource BodyText}" FontAttributes="Bold" />
+                        <Label x:Name="maxAltTitle" Style="{StaticResource HintText}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Row="1" Grid.Column="1">
+                        <Label x:Name="minAltValue" Style="{StaticResource BodyText}" FontAttributes="Bold" />
+                        <Label x:Name="minAltTitle" Style="{StaticResource HintText}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Row="1" Grid.Column="2">
+                        <Label x:Name="rangeValue" Style="{StaticResource BodyText}" FontAttributes="Bold" />
+                        <Label x:Name="rangeTitle" Style="{StaticResource HintText}" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Grid.Row="2" Grid.Column="0">
+                        <Label x:Name="durationValue" Style="{StaticResource BodyText}" FontAttributes="Bold" />
+                        <Label x:Name="durationTitle" Style="{StaticResource HintText}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Row="2" Grid.Column="1">
+                        <Label x:Name="movingValue" Style="{StaticResource BodyText}" FontAttributes="Bold" />
+                        <Label x:Name="movingTitle" Style="{StaticResource HintText}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Row="2" Grid.Column="2">
+                        <Label x:Name="paceValue" Style="{StaticResource BodyText}" FontAttributes="Bold" />
+                        <Label x:Name="paceTitle" Style="{StaticResource HintText}" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Grid.Row="3" Grid.Column="0">
+                        <Label x:Name="avgSpeedValue" Style="{StaticResource BodyText}" FontAttributes="Bold" />
+                        <Label x:Name="avgSpeedTitle" Style="{StaticResource HintText}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Row="3" Grid.Column="1">
+                        <Label x:Name="maxSpeedValue" Style="{StaticResource BodyText}" FontAttributes="Bold" />
+                        <Label x:Name="maxSpeedTitle" Style="{StaticResource HintText}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Row="3" Grid.Column="2">
+                        <Label x:Name="pointsValue" Style="{StaticResource BodyText}" FontAttributes="Bold" />
+                        <Label x:Name="pointsTitle" Style="{StaticResource HintText}" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- Perfil de desnivel -->
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Padding="12,10" Spacing="6">
+                    <Label x:Name="profileTitle" Style="{StaticResource CardTitle}" />
+                    <GraphicsView x:Name="profileView" HeightRequest="220" />
+                    <Label x:Name="profileHint" Style="{StaticResource HintText}" FontSize="11" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Button x:Name="showOnMapButton"
+                    ImageSource="location.png"
+                    ContentLayout="Left,6"
+                    Style="{StaticResource PrimaryButton}"
+                    Clicked="OnShowOnMapClicked" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
