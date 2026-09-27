@@ -18,12 +18,12 @@ public partial class SettingsPage : ContentPage
     {
         base.OnAppearing();
         
-        // Obtener servicios cuando el Handler esté disponible
-        if (Handler?.MauiContext?.Services != null)
-        {
-            _translationService = Handler.MauiContext.Services.GetService<TranslationService>();
-        }
-        
+        // La primera vez que aparece la pagina el Handler aun no tiene MauiContext: sin la caida al
+        // proveedor global, el servicio se quedaba a null, la pantalla salia siempre en castellano
+        // con «Español» marcado y los botones de idioma no hacian nada.
+        _translationService ??= (Handler?.MauiContext?.Services ?? IPlatformApplication.Current?.Services)
+            ?.GetService<TranslationService>();
+
         LoadSettings();
     }
 

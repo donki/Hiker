@@ -1,6 +1,6 @@
 ﻿# Changelog
 
-## 2026.09.27.01 (2026092701)
+## 2026.09.28.00 (2026092800)
 - **Atribución del mapa**: la licencia ODbL de OpenStreetMap obliga a atribuir y el mapa la tenía
   quitada. Ahora va plegada en un botón «i» arriba a la derecha, debajo del zoom, donde no la tapan
   las barras de grabación, seguimiento ni comparación.
@@ -10,6 +10,13 @@
   Acerca de vuelve al mapa; y en el mapa oculta la app sin cerrarla. **Nunca para una grabación**.
   En Android 16 el «atrás predictivo» saltaba todo esto y cerraba la app: se desactiva en el
   manifiesto.
+- **Gestor global de excepciones** (constitución General 6.12, `Shared/CrashGuard.cs`): un error
+  inesperado ya no cierra la app ni corta la grabación; se apunta con su traza en `crash.log` y se
+  avisa en el idioma elegido en la app.
+- **Corregido: Configuración salía siempre en castellano** con «Español» marcado aunque la app
+  estuviera en inglés, y los botones de idioma no hacían nada la primera vez: la pantalla buscaba
+  el servicio de traducción antes de tenerlo.
+- `appcast.json` anuncia ya esta versión.
 
 ## 2026.09.27.00 (2026092700)
 - **Toda la interfaz traducida al inglés**: el menú lateral (Mapa, Grabar, Parar, Seguir, Rumbo,

@@ -9,6 +9,12 @@ namespace Hiker
     {
         public static MauiApp CreateMauiApp()
         {
+            // Gestor global de excepciones (constitucion General 6.12): un error inesperado se
+            // registra y se avisa en el idioma elegido en la app, sin cerrarla (ni cortar una
+            // grabacion en curso).
+            SocShared.CrashGuard.Install("Hiker", language: () =>
+                IPlatformApplication.Current?.Services.GetService<SettingsService>()?.GetSetting("Language"));
+
             var builder = MauiApp.CreateBuilder();
             
             try
