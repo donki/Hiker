@@ -24,6 +24,13 @@ public partial class HomePage : ContentPage
 
     private IDispatcherTimer? _recordTimer;
 
+    /// <summary>
+    /// Hay a la vista una pregunta cuya respuesta por defecto (cerrar el dialogo) es TIRAR la ruta:
+    /// «¿Guardar la ruta grabada?» y «¿Recuperar la grabacion interrumpida?». El boton de atras
+    /// cierra los dialogos (Mobile 7), pero estos no: un atras sin querer borraria una caminata.
+    /// </summary>
+    public bool IsKeepOrDiscardOpen { get; private set; }
+
     public HomePage()
     {
         InitializeComponent();
@@ -556,11 +563,13 @@ public partial class HomePage : ContentPage
             return;
         }
 
+        IsKeepOrDiscardOpen = true;
         var save = await SocShared.ModernDialog.AlertAsync(this,
             L("Ruta grabada"),
             string.Format(L("Se han grabado {0} puntos ({1:0.00} km). ¿Quieres guardarla?"),
                 _recorder!.PointCount, _recorder.DistanceKm),
             L("Guardar"), L("Descartar"));
+        IsKeepOrDiscardOpen = false;
 
         if (!save)
         {
@@ -843,10 +852,12 @@ public partial class HomePage : ContentPage
             return;
         }
 
+        IsKeepOrDiscardOpen = true;
         var recover = await SocShared.ModernDialog.AlertAsync(this,
             L("Grabación interrumpida"),
             string.Format(L("Quedó una grabación sin guardar con {0} puntos. ¿La recuperas?"), pending.Count),
             L("Recuperar"), L("Descartar"));
+        IsKeepOrDiscardOpen = false;
 
         if (!recover)
         {

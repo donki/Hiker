@@ -8,7 +8,8 @@
         MapLibre GL JS 4.7.1 EMPAQUETADO en la app (BSD-3-Clause, ver maplibre-LICENSE.txt): nada de
         CDN. HomePage carga esta pagina sin BaseUrl, asi que el WebView usa la base
         file:///android_asset/ y las rutas relativas llegan a los ficheros de Resources\Raw.
-        Estilo vectorial de OpenFreeMap (sin clave); los datos son de OpenStreetMap (ODbL).
+        Estilo vectorial de OpenFreeMap (sin clave); los datos son de OpenStreetMap (ODbL): la
+        atribucion se deja visible, plegada en el boton «i».
     -->
     <link href="maplibre-gl.css" rel="stylesheet" />
     <style>
@@ -32,6 +33,17 @@
             attributionControl: false
         });
         map.addControl(new maplibregl.NavigationControl(), 'top-right');
+        // La atribucion de OpenFreeMap / OpenStreetMap es obligatoria (licencia ODbL), pero va
+        // plegada en el boton «i», como en Family Together: MapLibre la abre sola al cargar.
+        // Va arriba a la derecha, debajo del zoom: esa columna la dejan libre el boton y la barra
+        // de grabar (Margin derecho de 76), y abajo la taparian las barras de seguimiento y de
+        // comparacion.
+        map.addControl(new maplibregl.AttributionControl({ compact: true }), 'top-right');
+        function foldAttribution() {
+            var a = document.querySelector('.maplibregl-ctrl-attrib');
+            if (a) { a.removeAttribute('open'); a.classList.remove('maplibregl-compact-show'); }
+        }
+        map.on('load', function () { foldAttribution(); setTimeout(foldAttribution, 500); });
 
         // Si el usuario arrastra, dejamos de recentrar hasta que pulse "centrar".
         var followUser = true;

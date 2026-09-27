@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-  <application android:allowBackup="true" android:icon="@mipmap/appicon" android:roundIcon="@mipmap/appicon_round" android:supportsRtl="true" android:label="Hiker" android:screenOrientation="portrait"></application>
+  <application android:allowBackup="true" android:icon="@mipmap/appicon" android:roundIcon="@mipmap/appicon_round" android:supportsRtl="true" android:label="Hiker" android:screenOrientation="portrait" android:enableOnBackInvokedCallback="false"></application>
+  <!-- enableOnBackInvokedCallback="false": con targetSdk 36, Android 16 activa el "atras predictivo"
+       y el boton de atras deja de llegar al Shell (AppShell.OnBackButtonPressed): la app se cerraba
+       desde cualquier pantalla (constitucion Mobile 7). -->
   <!-- Permisos justificados (constitución §A.3: cada permiso justificado, mínimo privilegio). -->
 
   <!-- INTERNET: descarga de teselas del mapa (MapLibre GL + OpenFreeMap) en el WebView. -->

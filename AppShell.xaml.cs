@@ -124,6 +124,77 @@ public partial class AppShell : Shell
     private async void OnSettingsTapped(object sender, TappedEventArgs e) => await NavigateAsync("//SettingsPage");
     private async void OnAboutTapped(object sender, TappedEventArgs e) => await NavigateAsync("//AboutPage");
 
+    /// <summary>
+    /// Atras (constitucion Mobile 7), por orden: cierra el menu lateral si esta abierto; cierra el
+    /// dialogo que haya encima (como tocar fuera de el); en Rutas › ficha de una ruta, vuelve a
+    /// Rutas; en Rutas, Configuracion o Acerca de, vuelve al mapa; y en el mapa, la app se oculta
+    /// (MoveTaskToBack) sin cerrarse. Nunca para una grabacion: esa vive en el servicio en primer
+    /// plano y solo se para con el boton de parar.
+    /// </summary>
+    protected override bool OnBackButtonPressed()
+    {
+        if (FlyoutIsPresented)
+        {
+            FlyoutIsPresented = false;
+            return true;
+        }
+
+        if (CurrentPage is ContentPage page && DismissDialog(page))
+            return true;
+
+        if (Navigation.NavigationStack.Count > 1)
+            return base.OnBackButtonPressed();
+
+        if (CurrentPage is not HomePage)
+        {
+            Dispatcher.Dispatch(async () => await GoToAsync("//HomePage"));
+            return true;
+        }
+
+#if ANDROID
+        Microsoft.Maui.ApplicationModel.Platform.CurrentActivity?.MoveTaskToBack(true);
+#endif
+        return true;
+    }
+
+    /// <summary>
+    /// Si la pagina tiene abierto un ModernDialog, lo cierra como si se tocara fuera de el (lo que
+    /// equivale a cancelar) y devuelve true. ModernDialog no expone como cerrarlo desde fuera, asi
+    /// que se busca su velo y se le manda el toque. Las preguntas que al cerrarse tirarian una ruta
+    /// (<see cref="HomePage.IsKeepOrDiscardOpen"/>) no se cierran: atras no hace nada con ellas.
+    /// </summary>
+    private static bool DismissDialog(ContentPage page)
+    {
+        if (page.Content is not Grid host)
+            return false;
+
+        var overlay = host.Children.OfType<Grid>().LastOrDefault(g => g.StyleId == "__modernDialogOverlay");
+        if (overlay is null)
+            return false;
+
+        if (page is HomePage { IsKeepOrDiscardOpen: true })
+            return true;
+
+        try
+        {
+            var scrim = overlay.Children.OfType<BoxView>().FirstOrDefault();
+            var tap = scrim?.GestureRecognizers.OfType<TapGestureRecognizer>().FirstOrDefault();
+            var send = typeof(TapGestureRecognizer).GetMethod("SendTapped",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+            if (scrim is not null && tap is not null && send is not null)
+            {
+                var args = new object?[send.GetParameters().Length];
+                args[0] = scrim;
+                send.Invoke(tap, args);
+            }
+        }
+        catch
+        {
+            // Si no se puede cerrar, al menos atras no se lleva la pantalla por delante.
+        }
+        return true;
+    }
+
     private async Task NavigateAsync(string route)
     {
         // Se navega ANTES de cerrar el menu. Al reves, cerrarlo dispara su animacion y Shell se

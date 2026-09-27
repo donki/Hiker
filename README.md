@@ -87,10 +87,12 @@ El mapa es [MapLibre GL JS](https://maplibre.org/) 4.7.1 (BSD-3-Clause) dentro d
 ([Resources/Raw/map.html](Resources/Raw/map.html)), con el estilo vectorial *liberty* de
 [OpenFreeMap](https://openfreemap.org/) (sin clave de API). La librería va **empaquetada en la app**
 (`maplibre-gl.js`, `maplibre-gl.css` y su licencia en `maplibre-LICENSE.txt`, en Resources/Raw): no se
-descarga de ningún CDN. Los datos del mapa son © OpenStreetMap contributors (ODbL).
+descarga de ningún CDN. Los datos del mapa son © OpenStreetMap contributors (ODbL): la atribución
+está en el botón «i» del mapa, debajo del zoom.
 
-Al guardar una ruta, la app puede ofrecer ajustarla a los caminos consultando la API de Overpass
-(datos de OpenStreetMap); si no hay red, la ruta se guarda tal cual.
+Al pulsar Guardar, la app consulta la API de Overpass (datos de OpenStreetMap) con el rectángulo de la
+zona de la ruta para ajustarla a los caminos, y enseña las dos versiones para elegir; si no hay red,
+la ruta se guarda tal cual.
 
 ## Permisos Android
 

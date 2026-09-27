@@ -1,5 +1,16 @@
 ﻿# Changelog
 
+## 2026.09.27.01 (2026092701)
+- **Atribución del mapa**: la licencia ODbL de OpenStreetMap obliga a atribuir y el mapa la tenía
+  quitada. Ahora va plegada en un botón «i» arriba a la derecha, debajo del zoom, donde no la tapan
+  las barras de grabación, seguimiento ni comparación.
+- **Botón de atrás** (constitución Mobile 7): con el menú lateral abierto, lo cierra; con un diálogo
+  abierto, lo cierra (salvo «¿Guardar la ruta?» y «¿Recuperar la grabación?», donde un atrás sin
+  querer tiraría la caminata); en la ficha de una ruta vuelve a Rutas; en Rutas, Configuración y
+  Acerca de vuelve al mapa; y en el mapa oculta la app sin cerrarla. **Nunca para una grabación**.
+  En Android 16 el «atrás predictivo» saltaba todo esto y cerraba la app: se desactiva en el
+  manifiesto.
+
 ## 2026.09.27.00 (2026092700)
 - **Toda la interfaz traducida al inglés**: el menú lateral (Mapa, Grabar, Parar, Seguir, Rumbo,
   Guardar, Borrar, Rutas, Configuración, Acerca de) y sus explicaciones, la grabación, el ajuste de
