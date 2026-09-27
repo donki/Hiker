@@ -1,4 +1,4 @@
-using Hiker.Services;
+﻿using Hiker.Services;
 
 namespace Hiker.Pages;
 
@@ -80,7 +80,7 @@ public partial class RouteInfoPage : ContentPage
         }
         catch (Exception ex)
         {
-            await SocShared.ModernDialog.AlertAsync(this, "Error", ex.Message, "OK");
+            await SocShared.ModernDialog.AlertAsync(this, L("Error"), ex.Message, "OK");
         }
     }
 

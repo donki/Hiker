@@ -1,4 +1,4 @@
-using Hiker.Services;
+﻿using Hiker.Services;
 
 namespace Hiker.Pages;
 
@@ -21,7 +21,8 @@ public partial class AboutPage : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        _translation ??= Handler?.MauiContext?.Services.GetService<TranslationService>();
+        _translation ??= (Handler?.MauiContext?.Services ?? IPlatformApplication.Current?.Services)
+            ?.GetService<TranslationService>();
         UpdateTexts();
         UpdateLanguageButtons();
     }
@@ -84,6 +85,9 @@ public partial class AboutPage : ContentPage
         _translation?.SetLanguage(languageCode);
         UpdateTexts();
         UpdateLanguageButtons();
+
+        // El menu lateral ya esta pintado: se le pide que se retraduzca.
+        (Shell.Current as AppShell)?.ApplyTranslations();
     }
 
     private async void OnContactClicked(object? sender, EventArgs e)

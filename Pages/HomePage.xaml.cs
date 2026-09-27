@@ -123,14 +123,11 @@ public partial class HomePage : ContentPage
     /// </summary>
     private void TranslateUi()
     {
-        Title = T("GPS Tracker");
+        Title = L("GPS Tracker");
         if (!_hasLocation)
-            statusLabel.Text = T("Obteniendo ubicación...");
+            statusLabel.Text = L("Obteniendo ubicación...");
     }
 
-    /// <summary>Traduce una frase (la clave es la propia frase en español, seccion 8).</summary>
-    private string T(string phrase) =>
-        Handler?.MauiContext?.Services.GetService<TranslationService>()?.Translate(phrase) ?? phrase;
 
     private async void InitializeMap()
     {
@@ -188,81 +185,11 @@ public partial class HomePage : ContentPage
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error loading map HTML: {ex.Message}");
-            // HTML básico de fallback
-            return @"
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset='utf-8' />
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>Hiker Map</title>
-    <link rel='stylesheet' href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css' />
-    <style>
-        body { margin: 0; padding: 0; background-color: #1a1a1a; }
-        #map { height: 100vh; width: 100vw; }
-    </style>
-</head>
-<body>
-    <div id='map'></div>
-    <script src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'></script>
-    <script>
-        var map = L.map('map').setView([40.4168, -3.7038], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors',
-            maxZoom: 19
-        }).addTo(map);
-        
-        var currentLocationMarker = null;
-        var routePolyline = null;
-        var routePoints = [];
-        
-        function updateLocation(lat, lng, accuracy) {
-            if (currentLocationMarker) {
-                map.removeLayer(currentLocationMarker);
-            }
-            currentLocationMarker = L.circleMarker([lat, lng], {
-                color: '#4CAF50',
-                fillColor: '#4CAF50',
-                fillOpacity: 0.8,
-                radius: 8
-            }).addTo(map);
-            map.setView([lat, lng], map.getZoom());
-        }
-        
-        function addRoutePoint(lat, lng) {
-            routePoints.push([lat, lng]);
-            if (routePolyline) {
-                map.removeLayer(routePolyline);
-            }
-            if (routePoints.length > 1) {
-                routePolyline = L.polyline(routePoints, {
-                    color: '#F44336',
-                    weight: 4,
-                    opacity: 0.8
-                }).addTo(map);
-            }
-        }
-        
-        function clearRoute() {
-            if (routePolyline) {
-                map.removeLayer(routePolyline);
-                routePolyline = null;
-            }
-            routePoints = [];
-        }
-        
-        function centerOnLocation(lat, lng, zoom) {
-            map.setView([lat, lng], zoom || 15);
-        }
-        
-        window.updateLocation = updateLocation;
-        window.addRoutePoint = addRoutePoint;
-        window.clearRoute = clearRoute;
-        window.centerOnLocation = centerOnLocation;
-        window.mapReady = true;
-    </script>
-</body>
-</html>";
+            // map.html va siempre en el paquete (Resources\Raw, junto a MapLibre empaquetado): si
+            // aun asi no se puede leer, se deja el lienzo vacio. Antes habia aqui un mapa de
+            // respaldo con Leaflet y teselas de OpenStreetMap por CDN que nunca llegaba a usarse
+            // y que ademas no tenia las funciones de seguimiento, rumbo ni comparacion.
+            return "<!DOCTYPE html><html><body style='margin:0;background-color:#1a1a1a'></body></html>";
         }
     }
 
@@ -329,13 +256,13 @@ public partial class HomePage : ContentPage
                 var success = await _geolocationService.ListeningStartAsync();
                 if (!success)
                 {
-                    await SocShared.ModernDialog.AlertAsync(this, "Error", "No se pudo iniciar el GPS", "OK");
+                    await SocShared.ModernDialog.AlertAsync(this, L("Error"), L("No se pudo iniciar el GPS"), "OK");
                 }
             }
         }
         catch (Exception ex)
         {
-            await SocShared.ModernDialog.AlertAsync(this, "Error", $"Error al iniciar GPS: {ex.Message}", "OK");
+            await SocShared.ModernDialog.AlertAsync(this, L("Error"), string.Format(L("Error al iniciar el GPS: {0}"), ex.Message), "OK");
         }
     }
 
@@ -473,8 +400,8 @@ public partial class HomePage : ContentPage
             _followCumulative[i] = _followCumulative[i - 1] + MetersBetween(points[i - 1], points[i]);
 
         followBar.IsVisible = true;
-        followTitleLabel.Text = T("Siguiendo la ruta");
-        followDetailLabel.Text = string.Format(T("Longitud total: {0}"), FormatDistance(_followCumulative[^1]));
+        followTitleLabel.Text = L("Siguiendo la ruta");
+        followDetailLabel.Text = string.Format(L("Longitud total: {0}"), FormatDistance(_followCumulative[^1]));
         followStateDot.Color = (Color)Application.Current!.Resources["Success"];
 
         // Si ya hay posicion, no esperar al siguiente punto GPS para decir si estas en la ruta.
@@ -517,14 +444,14 @@ public partial class HomePage : ContentPage
         var offRoute = nearestMeters > OffRouteMeters;
 
         followTitleLabel.Text = offRoute
-            ? string.Format(T("Te has salido: a {0} de la ruta"), FormatDistance(nearestMeters))
-            : string.Format(T("En la ruta: a {0} del trazado"), FormatDistance(nearestMeters));
+            ? string.Format(L("Te has salido: a {0} de la ruta"), FormatDistance(nearestMeters))
+            : string.Format(L("En la ruta: a {0} del trazado"), FormatDistance(nearestMeters));
 
         // Lo que "queda" solo significa algo si estas sobre la ruta: fuera de ella el punto mas
         // cercano puede ser el final y saldria "quedan 0 m" estando a kilometros.
         followDetailLabel.Text = offRoute
-            ? string.Format(T("Longitud total: {0}"), FormatDistance(_followCumulative[^1]))
-            : string.Format(T("Quedan {0}"), FormatDistance(remaining));
+            ? string.Format(L("Longitud total: {0}"), FormatDistance(_followCumulative[^1]))
+            : string.Format(L("Quedan {0}"), FormatDistance(remaining));
 
         followStateDot.Color = (Color)Application.Current!.Resources[offRoute ? "Danger" : "Success"];
     }
@@ -575,7 +502,7 @@ public partial class HomePage : ContentPage
         }
         catch (Exception ex)
         {
-            await SocShared.ModernDialog.AlertAsync(this, "Error", $"No se pudo obtener la ubicación: {ex.Message}", "OK");
+            await SocShared.ModernDialog.AlertAsync(this, L("Error"), string.Format(L("No se pudo obtener la ubicación: {0}"), ex.Message), "OK");
         }
     }
 
@@ -690,7 +617,7 @@ public partial class HomePage : ContentPage
         {
             compareBar.IsVisible = false;
             await SocShared.ModernDialog.AlertAsync(this, L("Ajustar la ruta"),
-                L("No se ha podido consultar el mapa. La ruta se guarda tal y como se grabo."), "OK");
+                L("No se ha podido consultar el mapa. La ruta se guarda tal y como se grabó."), "OK");
             return true;
         }
 
@@ -792,9 +719,14 @@ public partial class HomePage : ContentPage
         }
     }
 
-    /// <summary>Traduce si el servicio esta disponible; si no, deja la frase en castellano.</summary>
+    /// <summary>
+    /// Traduce una frase (la clave es la propia frase en castellano, seccion 8). Se cae al
+    /// proveedor global cuando el Handler aun no esta montado: si no, en OnAppearing salia en
+    /// castellano aunque el idioma fuera otro.
+    /// </summary>
     private string L(string phrase) =>
-        Handler?.MauiContext?.Services.GetService<TranslationService>()?.Translate(phrase) ?? phrase;
+        (Handler?.MauiContext?.Services ?? IPlatformApplication.Current?.Services)
+            ?.GetService<TranslationService>()?.Translate(phrase) ?? phrase;
 
     /// <summary>
     /// Cambia entre el boton de grabar y la barra de grabacion, y lleva el contador de tiempo.
@@ -854,18 +786,18 @@ public partial class HomePage : ContentPage
     {
         if ((_recorder?.PointCount ?? 0) == 0)
         {
-            await SocShared.ModernDialog.AlertAsync(this, "Aviso", "No hay datos de ruta para guardar", "OK");
+            await SocShared.ModernDialog.AlertAsync(this, L("Aviso"), L("No hay datos de ruta para guardar"), "OK");
             return;
         }
 
         try
         {
-            var routeName = await SocShared.ModernDialog.PromptAsync(this, "Guardar Ruta", "Nombre de la ruta:", "Guardar", "Cancelar");
+            var routeName = await SocShared.ModernDialog.PromptAsync(this, L("Guardar ruta"), L("Nombre de la ruta:"), L("Guardar"), L("Cancelar"));
             if (!string.IsNullOrWhiteSpace(routeName))
             {
                 if (_routeService is null)
                 {
-                    await SocShared.ModernDialog.AlertAsync(this, "Error", "El servicio de rutas no está disponible.", "OK");
+                    await SocShared.ModernDialog.AlertAsync(this, L("Error"), L("El servicio de rutas no está disponible."), "OK");
                     return;
                 }
 
@@ -875,12 +807,12 @@ public partial class HomePage : ContentPage
                 // Guardada ya en su GPX, el diario de la grabacion sobra.
                 TrackRecorder.DeletePendingJournal();
 
-                await SocShared.ModernDialog.AlertAsync(this, "Éxito", $"Ruta '{routeName}' guardada correctamente", "OK");
+                await SocShared.ModernDialog.AlertAsync(this, L("Hecho"), string.Format(L("Ruta «{0}» guardada."), routeName), "OK");
             }
         }
         catch (Exception ex)
         {
-            await SocShared.ModernDialog.AlertAsync(this, "Error", $"Error al guardar la ruta: {ex.Message}", "OK");
+            await SocShared.ModernDialog.AlertAsync(this, L("Error"), string.Format(L("Error al guardar la ruta: {0}"), ex.Message), "OK");
         }
     }
 
@@ -1035,9 +967,6 @@ public partial class HomePage : ContentPage
         {
             if (MainActivity.IsBatteryOptimizationIgnored())
                 return; // ya esta exenta: no hace falta preguntar nada
-
-            var translation = Handler?.MauiContext?.Services.GetService<TranslationService>();
-            string L(string phrase) => translation?.Translate(phrase) ?? phrase;
 
             if (!Preferences.Get("prompt_battery_opt", false))
             {

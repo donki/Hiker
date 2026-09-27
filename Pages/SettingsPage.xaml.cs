@@ -29,7 +29,21 @@ public partial class SettingsPage : ContentPage
 
     // Solo queda el idioma: se guarda solo al pulsar (TranslationService.SetLanguage). La
     // configuracion del GPS y los botones Guardar/Restablecer se quitaron a peticion.
-    private void LoadSettings() => UpdateLanguageButtons();
+    private void LoadSettings()
+    {
+        TranslateUi();
+        UpdateLanguageButtons();
+    }
+
+    /// <summary>Textos de la pantalla en el idioma activo (constitucion seccion 8).</summary>
+    private void TranslateUi()
+    {
+        string L(string phrase) => _translationService?.Translate(phrase) ?? phrase;
+
+        Title = L("Configuración");
+        languageTitleLabel.Text = L("Idioma");
+        languageHintLabel.Text = L("Selecciona tu idioma preferido");
+    }
 
     private void UpdateLanguageButtons()
     {
@@ -53,6 +67,10 @@ public partial class SettingsPage : ContentPage
     private void ApplyLanguage(string languageCode)
     {
         _translationService?.SetLanguage(languageCode);
+        TranslateUi();
         UpdateLanguageButtons();
+
+        // El menu lateral ya esta pintado: se le pide que se retraduzca.
+        (Shell.Current as AppShell)?.ApplyTranslations();
     }
 }

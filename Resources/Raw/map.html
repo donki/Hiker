@@ -4,7 +4,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hiker Map</title>
-    <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+    <!--
+        MapLibre GL JS 4.7.1 EMPAQUETADO en la app (BSD-3-Clause, ver maplibre-LICENSE.txt): nada de
+        CDN. HomePage carga esta pagina sin BaseUrl, asi que el WebView usa la base
+        file:///android_asset/ y las rutas relativas llegan a los ficheros de Resources\Raw.
+        Estilo vectorial de OpenFreeMap (sin clave); los datos son de OpenStreetMap (ODbL).
+    -->
+    <link href="maplibre-gl.css" rel="stylesheet" />
     <style>
         body { margin: 0; padding: 0; background-color: #1a1a1a; }
         #map { position: absolute; top: 0; bottom: 0; left: 0; right: 0; }
@@ -13,7 +19,7 @@
 <body>
     <div id="map"></div>
 
-    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+    <script src="maplibre-gl.js"></script>
     <script>
         // Mapa con MapLibre GL (nativo del navegador) y teselas vectoriales de OpenFreeMap
         // (gratis, sin API key). Se mantiene EXACTAMENTE la misma interfaz window.* que

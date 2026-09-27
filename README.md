@@ -21,25 +21,25 @@ La constitucion canonica se versiona como submodulo Git en [constitution/](const
 | [Helpers/](Helpers/) | Utilidades (GPX, formato, Kalman, ficheros) |
 | [Platforms/Android/](Platforms/Android/) | Codigo Android nativo, manifest, recursos |
 | [Platforms/Windows/](Platforms/Windows/) | Codigo Windows (objetivo secundario de desarrollo) |
-| [Resources/](Resources/) | Iconos, imagenes, fuentes, traducciones, mapa HTML |
+| [Resources/](Resources/) | Iconos, imagenes, traducciones (`Translations.csv`, castellano e ingles), mapa HTML con MapLibre empaquetado |
 
 La logica de negocio reside exclusivamente en `Services/` y se consume via inyeccion de dependencias desde [MauiProgram.cs](MauiProgram.cs). Las paginas no contienen codigo de plataforma.
 
 - ApplicationId: `com.socratic.hiker`
-- TargetFramework principal: `net9.0-android` (API 24+)
+- TargetFramework principal: `net9.0-android36.0` (API 24+)
 - Tambien compila para `net9.0-windows10.0.19041.0` durante desarrollo
 
 ## Arranque local
 
 ```pwsh
 dotnet restore
-dotnet build -f net9.0-android
+dotnet build -f net9.0-android36.0
 ```
 
 Para depurar en dispositivo o emulador Android conectado:
 
 ```pwsh
-dotnet build -t:Run -f net9.0-android
+dotnet build -t:Run -f net9.0-android36.0
 ```
 
 ## Build y firma
@@ -77,9 +77,20 @@ Credenciales Google requeridas via `$env:GOOGLE_APPLICATION_CREDENTIALS` apuntan
 
 Sigue [constitucion seccion 6](constitucion.md):
 
-- `ApplicationDisplayVersion`: cadena legible (`1.9.326`).
-- `ApplicationVersion`: entero incremental formato `yyyyMMddR` (`202605210`).
+- `ApplicationDisplayVersion`: fecha y revision del dia (`2026.09.27.00`).
+- `ApplicationVersion`: entero incremental formato `yyyyMMddRR` (`2026092700`).
 - Ambos se actualizan en sincronia antes de publicar y se reflejan en [CHANGELOG.md](CHANGELOG.md).
+
+## Mapa
+
+El mapa es [MapLibre GL JS](https://maplibre.org/) 4.7.1 (BSD-3-Clause) dentro de un WebView
+([Resources/Raw/map.html](Resources/Raw/map.html)), con el estilo vectorial *liberty* de
+[OpenFreeMap](https://openfreemap.org/) (sin clave de API). La librería va **empaquetada en la app**
+(`maplibre-gl.js`, `maplibre-gl.css` y su licencia en `maplibre-LICENSE.txt`, en Resources/Raw): no se
+descarga de ningún CDN. Los datos del mapa son © OpenStreetMap contributors (ODbL).
+
+Al guardar una ruta, la app puede ofrecer ajustarla a los caminos consultando la API de Overpass
+(datos de OpenStreetMap); si no hay red, la ruta se guarda tal cual.
 
 ## Permisos Android
 
@@ -87,16 +98,16 @@ Todos los permisos declarados en [Platforms/Android/AndroidManifest.xml](Platfor
 
 | Permiso | Justificacion |
 |---|---|
-| `INTERNET` | Carga de tiles de OpenStreetMap y descarga de elevacion |
-| `ACCESS_NETWORK_STATE` | Detectar conectividad para usar cache de mapa cuando no hay red |
-| `ACCESS_WIFI_STATE` | Mejorar precision de geolocalizacion cuando GPS no esta disponible |
+| `INTERNET` | Teselas y estilo del mapa (OpenFreeMap), consulta de caminos a Overpass para ajustar la ruta y comprobacion de version nueva |
 | `ACCESS_COARSE_LOCATION` | Posicion aproximada para inicio rapido del tracker |
 | `ACCESS_FINE_LOCATION` | Tracking GPS de alta precision (funcionalidad principal) |
-| `ACCESS_BACKGROUND_LOCATION` | Mantener la grabacion de ruta cuando la pantalla se apaga durante una caminata |
+| `FOREGROUND_SERVICE` / `FOREGROUND_SERVICE_LOCATION` | Servicio en primer plano que mantiene la grabacion con la pantalla apagada |
+| `POST_NOTIFICATIONS` | Notificacion permanente de «grabando» que exige ese servicio (Android 13+) |
+| `WAKE_LOCK` | Mantener la CPU despierta mientras se graba con la pantalla apagada; se suelta al parar |
 | `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` | Evitar que el sistema mate el servicio de tracking en rutas largas |
 
 Permisos de almacenamiento acotados por minimo privilegio:
-- `READ_EXTERNAL_STORAGE` (`maxSdkVersion=32`) / `WRITE_EXTERNAL_STORAGE` (`maxSdkVersion=28`): la app usa `FileSaver` del CommunityToolkit, que desde Android 11 (API 30) emplea SAF y no los requiere. Se mantienen solo para Android antiguo (export GPX) y se retiran automaticamente en Android moderno. Validar export GPX en dispositivo API ≤ 28 antes de eliminarlos por completo.
+- `READ_EXTERNAL_STORAGE` (`maxSdkVersion=32`) / `WRITE_EXTERNAL_STORAGE` (`maxSdkVersion=28`): solo en Android antiguo; en Android moderno no se solicitan. La app **importa** GPX con el selector de ficheros del sistema; no exporta.
 
 ## Secretos
 

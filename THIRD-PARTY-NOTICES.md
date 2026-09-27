@@ -13,12 +13,19 @@ own license terms, reproduced or referenced below.
 | Microsoft.Maui.Essentials | 9.0.21 | MIT |
 | Microsoft.Extensions.Logging.Debug | 9.0.0 | MIT |
 | System.Text.Json | 9.0.0 | MIT |
+| MapLibre GL JS (bundled in `Resources/Raw`) | 4.7.1 | BSD-3-Clause |
 
 ## Additional acknowledgements
 
+- Map rendering: [MapLibre GL JS](https://maplibre.org/) 4.7.1, BSD-3-Clause
+  license. It is bundled inside the app (`Resources/Raw/maplibre-gl.js` and
+  `maplibre-gl.css`); the full license text ships next to it in
+  `Resources/Raw/maplibre-LICENSE.txt`.
+- Map style and vector tiles: [OpenFreeMap](https://openfreemap.org/)
+  ("liberty" style), used without an API key.
 - Map data: © OpenStreetMap contributors, available under the Open Database
-  License (ODbL).
-- Map rendering: [Leaflet](https://leafletjs.com/) — BSD-2-Clause license.
+  License (ODbL). The same data is queried through the Overpass API when a
+  recorded route is adjusted to the paths on the map.
 
 ---
 

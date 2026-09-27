@@ -29,7 +29,8 @@
         </Grid>
     </Shell.FlyoutHeader>
 
-    <!-- Contenido del menu a medida: GPS con submenu desplegable, y el resto de opciones -->
+    <!-- Contenido del menu a medida: GPS con submenu desplegable, y el resto de opciones.
+         Los textos no van aqui: los pone AppShell.ApplyTranslations con TranslationService. -->
     <Shell.FlyoutContent>
         <ScrollView>
             <VerticalStackLayout Padding="0,8" Spacing="0">
@@ -53,7 +54,7 @@
                                      BackgroundColor="{AppThemeBinding Light={StaticResource SubmenuBackgroundLight}, Dark={StaticResource SubmenuBackgroundDark}}">
                     <Grid ColumnDefinitions="22,*,Auto" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
                         <Image Grid.Column="0" Source="location.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
-                        <Label Grid.Column="1" Text="Mapa" VerticalOptions="Center" FontSize="15"
+                        <Label Grid.Column="1" x:Name="MapLabel" VerticalOptions="Center" FontSize="15"
                                TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
                         <Image Grid.Column="2" Source="info.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center">
                             <Image.GestureRecognizers><TapGestureRecognizer Tapped="OnInfoMap" /></Image.GestureRecognizers>
@@ -62,7 +63,7 @@
                     </Grid>
                     <Grid ColumnDefinitions="22,*,Auto" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
                         <Image Grid.Column="0" Source="ic_play.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
-                        <Label Grid.Column="1" x:Name="RecordLabel" Text="Grabar" VerticalOptions="Center" FontSize="15"
+                        <Label Grid.Column="1" x:Name="RecordLabel" VerticalOptions="Center" FontSize="15"
                                TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
                         <Image Grid.Column="2" Source="info.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center">
                             <Image.GestureRecognizers><TapGestureRecognizer Tapped="OnInfoPlay" /></Image.GestureRecognizers>
@@ -71,7 +72,7 @@
                     </Grid>
                     <Grid ColumnDefinitions="22,*,Auto" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
                         <Image Grid.Column="0" Source="ic_stop.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
-                        <Label Grid.Column="1" x:Name="StopRecordLabel" Text="Parar" VerticalOptions="Center" FontSize="15"
+                        <Label Grid.Column="1" x:Name="StopRecordLabel" VerticalOptions="Center" FontSize="15"
                                TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
                         <Image Grid.Column="2" Source="info.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center">
                             <Image.GestureRecognizers><TapGestureRecognizer Tapped="OnInfoStop" /></Image.GestureRecognizers>
@@ -81,7 +82,7 @@
                     <!-- Seguir: mantiene el mapa centrado en la ubicacion en vivo -->
                     <Grid ColumnDefinitions="22,*,Auto" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
                         <Image Grid.Column="0" Source="location.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
-                        <Label Grid.Column="1" x:Name="FollowLabel" Text="Seguir: Sí" VerticalOptions="Center" FontSize="15"
+                        <Label Grid.Column="1" x:Name="FollowLabel" VerticalOptions="Center" FontSize="15"
                                TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
                         <Image Grid.Column="2" Source="info.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center">
                             <Image.GestureRecognizers><TapGestureRecognizer Tapped="OnInfoFollow" /></Image.GestureRecognizers>
@@ -91,7 +92,7 @@
                     <!-- Rumbo: rota el mapa segun la brujula (heading-up). Por defecto activado. -->
                     <Grid ColumnDefinitions="22,*,Auto" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
                         <Image Grid.Column="0" Source="map.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
-                        <Label Grid.Column="1" x:Name="HeadingLabel" Text="Rumbo: Sí" VerticalOptions="Center" FontSize="15"
+                        <Label Grid.Column="1" x:Name="HeadingLabel" VerticalOptions="Center" FontSize="15"
                                TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
                         <Image Grid.Column="2" Source="info.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center">
                             <Image.GestureRecognizers><TapGestureRecognizer Tapped="OnInfoHeading" /></Image.GestureRecognizers>
@@ -100,7 +101,7 @@
                     </Grid>
                     <Grid ColumnDefinitions="22,*,Auto" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
                         <Image Grid.Column="0" Source="ic_save.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
-                        <Label Grid.Column="1" Text="Guardar" VerticalOptions="Center" FontSize="15"
+                        <Label Grid.Column="1" x:Name="SaveLabel" VerticalOptions="Center" FontSize="15"
                                TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
                         <Image Grid.Column="2" Source="info.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center">
                             <Image.GestureRecognizers><TapGestureRecognizer Tapped="OnInfoSave" /></Image.GestureRecognizers>
@@ -109,7 +110,7 @@
                     </Grid>
                     <Grid ColumnDefinitions="22,*,Auto" Padding="46,0,20,0" HeightRequest="46" ColumnSpacing="16">
                         <Image Grid.Column="0" Source="ic_trash.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
-                        <Label Grid.Column="1" Text="Borrar" VerticalOptions="Center" FontSize="15"
+                        <Label Grid.Column="1" x:Name="ClearLabel" VerticalOptions="Center" FontSize="15"
                                TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
                         <Image Grid.Column="2" Source="info.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center">
                             <Image.GestureRecognizers><TapGestureRecognizer Tapped="OnInfoClear" /></Image.GestureRecognizers>
@@ -121,7 +122,7 @@
                 <!-- Rutas -->
                 <Grid ColumnDefinitions="26,*" Padding="20,0" HeightRequest="52" ColumnSpacing="16">
                     <Image Grid.Column="0" Source="map.png" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" />
-                    <Label Grid.Column="1" Text="Rutas" VerticalOptions="Center" FontSize="16"
+                    <Label Grid.Column="1" x:Name="RoutesLabel" VerticalOptions="Center" FontSize="16"
                            TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
                     <Grid.GestureRecognizers><TapGestureRecognizer Tapped="OnRoutesTapped" /></Grid.GestureRecognizers>
                 </Grid>
@@ -129,7 +130,7 @@
                 <!-- Configuración -->
                 <Grid ColumnDefinitions="26,*" Padding="20,0" HeightRequest="52" ColumnSpacing="16">
                     <Image Grid.Column="0" Source="settings.png" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" />
-                    <Label Grid.Column="1" Text="Configuración" VerticalOptions="Center" FontSize="16"
+                    <Label Grid.Column="1" x:Name="SettingsLabel" VerticalOptions="Center" FontSize="16"
                            TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
                     <Grid.GestureRecognizers><TapGestureRecognizer Tapped="OnSettingsTapped" /></Grid.GestureRecognizers>
                 </Grid>
@@ -137,7 +138,7 @@
                 <!-- Acerca de -->
                 <Grid ColumnDefinitions="26,*" Padding="20,0" HeightRequest="52" ColumnSpacing="16">
                     <Image Grid.Column="0" Source="info.png" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" />
-                    <Label Grid.Column="1" Text="Acerca de" VerticalOptions="Center" FontSize="16"
+                    <Label Grid.Column="1" x:Name="AboutLabel" VerticalOptions="Center" FontSize="16"
                            TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
                     <Grid.GestureRecognizers><TapGestureRecognizer Tapped="OnAboutTapped" /></Grid.GestureRecognizers>
                 </Grid>

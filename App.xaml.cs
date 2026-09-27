@@ -11,7 +11,7 @@ namespace Hiker
         {
             var window = new Window(new AppShell())
             {
-                Title = "Hiker - Tu compañero de aventuras"
+                Title = "Hiker"
             };
 #if DEBUG
             SocShared.AuthorNotes.Attach(window);   // notas de autor: SOLO Debug, desactivado en Release/produccion

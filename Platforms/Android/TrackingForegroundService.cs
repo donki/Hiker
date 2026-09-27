@@ -41,7 +41,19 @@ public class TrackingForegroundService : Service, ILocationListener
     /// <summary>Texto de la notificacion. Lo pone la capa MAUI, que es la que sabe de idiomas.</summary>
     public static string NotificationTitle { get; set; } = "Hiker";
 
-    public static string NotificationText { get; set; } = "Grabando la ruta";
+    /// <summary>
+    /// Si el sistema recrea el servicio solo (Sticky), nadie de la capa MAUI ha puesto el texto:
+    /// se traduce aqui con el idioma guardado, en vez de dejarlo fijo en castellano.
+    /// </summary>
+    public static string NotificationText
+    {
+        get => _notificationText ??=
+            IPlatformApplication.Current?.Services.GetService<TranslationService>()?.Translate("Grabando la ruta")
+            ?? "Grabando la ruta";
+        set => _notificationText = value;
+    }
+
+    private static string? _notificationText;
 
     private LocationManager? _locationManager;
     private PowerManager.WakeLock? _wakeLock;

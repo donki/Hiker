@@ -1,8 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Hiker.Pages.HomePage"
-             Title="GPS Tracker">
+             x:Class="Hiker.Pages.HomePage">
 
     <!-- La barra de estado vive en la CABECERA (Shell.TitleView): icono de estado + datos en
          una linea + boton de centrar. Asi el mapa ocupa toda la pantalla. -->

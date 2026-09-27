@@ -1,8 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Hiker.Pages.RoutesPage"
-             Title="Rutas Guardadas">
+             x:Class="Hiker.Pages.RoutesPage">
 
     <Grid RowDefinitions="Auto,*,Auto">
 
@@ -37,9 +36,9 @@
                                        Style="{StaticResource BodyText}"
                                        FontSize="16"
                                        FontAttributes="Bold" />
-                                <Label Text="{Binding Distance, StringFormat='Distancia: {0:F2} km'}"
+                                <Label Text="{Binding DistanceText}"
                                        Style="{StaticResource HintText}" />
-                                <Label Text="{Binding CreatedDate, StringFormat='Fecha: {0:dd/MM/yyyy}'}"
+                                <Label Text="{Binding DateText}"
                                        Style="{StaticResource HintText}" />
                             </VerticalStackLayout>
 

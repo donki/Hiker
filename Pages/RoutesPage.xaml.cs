@@ -54,11 +54,12 @@ public partial class RoutesPage : ContentPage
         _translationService ??= services.GetService<TranslationService>();
     }
 
+    /// <summary>Traduce una frase (la clave es la propia frase en castellano, seccion 8).</summary>
+    private string L(string phrase) => _translationService?.Translate(phrase) ?? phrase;
+
     /// <summary>Textos estaticos externalizados (constitucion seccion 8).</summary>
     private void TranslateUi()
     {
-        string L(string phrase) => _translationService?.Translate(phrase) ?? phrase;
-
         Title = L("Rutas Guardadas");
         headerLabel.Text = L("Gestión de Rutas");
         loadGpxButton.Text = L("Cargar GPX");
@@ -76,18 +77,25 @@ public partial class RoutesPage : ContentPage
 
             foreach (var route in routes)
             {
-                Routes.Add(new RouteInfo
+                var info = new RouteInfo
                 {
                     Name = route.routeName,
                     Distance = route.totalDistance, // ProcessData ya calcula la distancia en km
                     CreatedDate = _routeService.GetRouteDate(route.routeName),
                     Route = route
-                });
+                };
+
+                // Los rotulos de la tarjeta salen traducidos de aqui: en el XAML iban fijos en
+                // castellano dentro del StringFormat. Se ponen ANTES de añadirla a la lista, que
+                // RouteInfo no avisa de cambios.
+                info.DistanceText = string.Format(CultureInfo.CurrentCulture, L("Distancia: {0:F2} km"), (double)info.Distance);
+                info.DateText = string.Format(CultureInfo.CurrentCulture, L("Fecha: {0:dd/MM/yyyy}"), info.CreatedDate);
+                Routes.Add(info);
             }
         }
         catch (Exception ex)
         {
-            await SocShared.ModernDialog.AlertAsync(this, "Error", $"Error cargando rutas: {ex.Message}", "OK");
+            await SocShared.ModernDialog.AlertAsync(this, L("Error"), string.Format(L("Error cargando las rutas: {0}"), ex.Message), "OK");
         }
     }
 
@@ -120,7 +128,7 @@ public partial class RoutesPage : ContentPage
         }
         catch (Exception ex)
         {
-            await SocShared.ModernDialog.AlertAsync(this, "Error", $"Error cargando ruta: {ex.Message}", "OK");
+            await SocShared.ModernDialog.AlertAsync(this, L("Error"), string.Format(L("Error cargando la ruta: {0}"), ex.Message), "OK");
         }
     }
 
@@ -136,8 +144,8 @@ public partial class RoutesPage : ContentPage
     {
         try
         {
-            var confirm = await SocShared.ModernDialog.AlertAsync(this, "Confirmar",
-                $"¿Eliminar la ruta '{routeInfo.Name}'?", "Sí", "No");
+            var confirm = await SocShared.ModernDialog.AlertAsync(this, L("Confirmar"),
+                string.Format(L("¿Eliminar la ruta «{0}»?"), routeInfo.Name), L("Sí"), L("No"));
 
             if (confirm && _routeService != null)
             {
@@ -147,7 +155,7 @@ public partial class RoutesPage : ContentPage
         }
         catch (Exception ex)
         {
-            await SocShared.ModernDialog.AlertAsync(this, "Error", $"Error eliminando ruta: {ex.Message}", "OK");
+            await SocShared.ModernDialog.AlertAsync(this, L("Error"), string.Format(L("Error eliminando la ruta: {0}"), ex.Message), "OK");
         }
     }
 
@@ -159,14 +167,14 @@ public partial class RoutesPage : ContentPage
             if (_routeService is null)
             {
                 // Antes esto era un return mudo: el boton parecia roto.
-                await SocShared.ModernDialog.AlertAsync(this, "Error",
-                    "No se pudo acceder al servicio de rutas. Cierra y vuelve a abrir la aplicación.", "OK");
+                await SocShared.ModernDialog.AlertAsync(this, L("Error"),
+                    L("No se pudo acceder al servicio de rutas. Cierra y vuelve a abrir la aplicación."), "OK");
                 return;
             }
 
             var result = await FilePicker.PickAsync(new PickOptions
             {
-                PickerTitle = "Seleccionar archivo GPX",
+                PickerTitle = L("Seleccionar archivo GPX"),
                 FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
                 {
                     // Android resuelve .gpx como octet-stream/xml (no hay MIME oficial); con "*/*"
@@ -188,7 +196,7 @@ public partial class RoutesPage : ContentPage
                 var points = await ExtractLocations(gpxContent);
                 if (points.Count == 0)
                 {
-                    await SocShared.ModernDialog.AlertAsync(this, "Aviso", "El archivo GPX no contiene puntos.", "OK");
+                    await SocShared.ModernDialog.AlertAsync(this, L("Aviso"), L("El archivo GPX no contiene puntos."), "OK");
                     return;
                 }
 
@@ -199,12 +207,12 @@ public partial class RoutesPage : ContentPage
 
                 await _routeService.SaveRouteAsync(points, name);
                 await LoadRoutes();
-                await SocShared.ModernDialog.AlertAsync(this, "Éxito", $"Ruta '{name}' importada.", "OK");
+                await SocShared.ModernDialog.AlertAsync(this, L("Hecho"), string.Format(L("Ruta «{0}» importada."), name), "OK");
             }
         }
         catch (Exception ex)
         {
-            await SocShared.ModernDialog.AlertAsync(this, "Error", $"Error cargando GPX: {ex.Message}", "OK");
+            await SocShared.ModernDialog.AlertAsync(this, L("Error"), string.Format(L("Error cargando el GPX: {0}"), ex.Message), "OK");
         }
     }
 
@@ -274,5 +282,7 @@ public class RouteInfo
     public string Name { get; set; } = "";
     public double Distance { get; set; }
     public DateTime CreatedDate { get; set; }
+    public string DistanceText { get; set; } = "";
+    public string DateText { get; set; } = "";
     public dynamic Route { get; set; } = null!;
 }

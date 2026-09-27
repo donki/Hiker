@@ -14,7 +14,12 @@ public class UpdateService
     private const string AppcastUrl = "https://raw.githubusercontent.com/donki/Hiker/main/appcast.json";
 
     private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(8) };
+    private readonly TranslationService _translation;
     private bool _checkedThisSession;
+
+    public UpdateService(TranslationService translation) => _translation = translation;
+
+    private string L(string phrase) => _translation.Translate(phrase);
 
     public async Task CheckAndPromptAsync(Page page)
     {
@@ -34,9 +39,9 @@ public class UpdateService
                 return; // ya se esta en la ultima version (o mas nueva)
 
             var wantsUpdate = await SocShared.ModernDialog.AlertAsync(page,
-                "Actualización disponible",
-                $"Hay una versión más reciente ({manifest.Version}). Tienes la {current}.\n¿Quieres actualizar?",
-                "Actualizar", "Ahora no");
+                L("Actualización disponible"),
+                string.Format(L("Hay una versión más reciente ({0}). Tienes la {1}. ¿Quieres actualizar?"), manifest.Version, current),
+                L("UpdateButton"), L("Ahora no"));
 
             if (wantsUpdate && !string.IsNullOrWhiteSpace(manifest.Url))
                 await Browser.Default.OpenAsync(new Uri(manifest.Url), BrowserLaunchMode.SystemPreferred);

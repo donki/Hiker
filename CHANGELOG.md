@@ -1,5 +1,21 @@
 ﻿# Changelog
 
+## 2026.09.27.00 (2026092700)
+- **Toda la interfaz traducida al inglés**: el menú lateral (Mapa, Grabar, Parar, Seguir, Rumbo,
+  Guardar, Borrar, Rutas, Configuración, Acerca de) y sus explicaciones, la grabación, el ajuste de
+  la ruta al mapa, el seguimiento de una ruta, la recuperación de una grabación interrumpida, los
+  diálogos de guardar, importar y eliminar rutas, las tarjetas de la lista (distancia y fecha), la
+  pantalla de Configuración, los avisos de batería y segundo plano, el aviso de versión nueva y la
+  notificación de «grabando» estaban escritos a mano en castellano. Ahora salen de
+  `Translations.csv` (castellano e inglés), y el menú se retraduce al cambiar de idioma.
+- **MapLibre GL va dentro de la app**: `maplibre-gl.js`, `maplibre-gl.css` y su licencia
+  (BSD-3-Clause) se empaquetan en Resources/Raw en vez de cargarse de unpkg.
+- Fuera el mapa de respaldo con Leaflet que había en HomePage: nunca se usaba (map.html va siempre
+  en el paquete) y no tenía seguimiento, rumbo ni comparación.
+- README y THIRD-PARTY-NOTICES al día: MapLibre GL 4.7.1 con el estilo de OpenFreeMap en lugar de
+  Leaflet y las teselas de OpenStreetMap; permisos reales del manifiesto.
+- `appcast.json` anuncia la última versión publicada (2026.09.19.02) en vez de la 2026.07.20.0.
+
 ## 2026.09.19.02 (2026091902)
 - **Configuración simplificada**: fuera la configuración del GPS (GPS nativo, intervalo, precisión) y
   los botones Guardar y Restablecer. Solo queda el idioma, que se guarda solo al pulsarlo.
