@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Pruebas de la logica de Hiker. La app es un unico proyecto MAUI, asi que aqui se ENLAZAN (no se
+    copian) sus ficheros sin interfaz: GPX, filtros del GPS, grabacion, estadisticas de ruta, ajuste
+    al mapa, ajustes y traducciones. Location viene del paquete Microsoft.Maui.Essentials (su parte
+    portable); FileSystem y Preferences los sustituye Shims.cs dentro del espacio Hiker.Services.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <NoWarn>$(NoWarn);CS1998;CS8600;CS8601;CS8602;CS8603;CS8604;CS8618;CS8625</NoWarn>
+    <RunSettingsFilePath>$(MSBuildThisFileDirectory)coverage.runsettings</RunSettingsFilePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- xunit y su runner (Apache-2.0), Microsoft.NET.Test.Sdk y coverlet.collector (MIT): solo para probar. -->
+    <PackageReference Include="coverlet.collector" Version="10.1.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <!-- Las mismas que usa la app para esta logica (MIT / MS-PL-Apache). -->
+    <PackageReference Include="Microsoft.Maui.Essentials" Version="9.0.21" />
+    <PackageReference Include="CsvHelper" Version="33.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="Microsoft.Maui.Devices.Sensors" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Models\*.cs" LinkBase="App\Models" />
+    <Compile Include="..\Helpers\*.cs" LinkBase="App\Helpers" />
+    <Compile Include="..\Services\GpsFilterService.cs;..\Services\MapMatchService.cs;..\Services\RouteService.cs;..\Services\SettingsService.cs;..\Services\TrackRecorder.cs;..\Services\TranslationService.cs;..\Services\Translations.cs" LinkBase="App\Services" />
+    <None Include="..\Ruta_Cortijo.gpx" Link="Ruta_Cortijo.gpx" CopyToOutputDirectory="PreserveNewest" />
+    <EmbeddedResource Include="..\Resources\Translations.csv" LogicalName="Hiker.Resources.Translations.csv" Link="App\Translations.csv" />
+  </ItemGroup>
+
+</Project>

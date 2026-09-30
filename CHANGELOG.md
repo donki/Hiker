@@ -1,5 +1,17 @@
 ﻿# Changelog
 
+## 2026.09.30.00 (2026093000)
+- **Corregido: el filtro de Kalman del GPS no suavizaba nada.** Recibía la hora en ticks (100 ns)
+  cuando cuenta en milisegundos, así que la incertidumbre crecía 10 000 veces más deprisa y cada
+  lectura nueva se tomaba casi tal cual. Ahora, con el filtro activo (lo está de fábrica), la traza
+  tiembla menos al grabar. Lo encontró la prueba nueva `KalmanSuavizaEntreLecturasSeparadasEnElTiempo`.
+- **Corregido: los GPX guardados decían `encoding="utf-16"`** pero se escribían en UTF-8. Dentro de
+  Hiker no se notaba, pero otro programa (o leerlo como flujo) podía rechazar el fichero. Ahora
+  declaran `utf-8`.
+- **Pruebas automáticas** (`Hiker.Tests`, xUnit): GPX, filtros del GPS, grabación y su diario,
+  estadísticas de ruta, guardar/listar/borrar rutas, ajuste al mapa, ajustes y traducciones es/en.
+- `appcast.json` anuncia ya esta versión.
+
 ## 2026.09.28.00 (2026092800)
 - **Atribución del mapa**: la licencia ODbL de OpenStreetMap obliga a atribuir y el mapa la tenía
   quitada. Ahora va plegada en un botón «i» arriba a la derecha, debajo del zoom, donde no la tapan

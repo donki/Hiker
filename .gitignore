@@ -17,3 +17,6 @@ keystore.password.local.txt
 hiker-*.json
 *-service-account*.json
 releases/
+
+# Resultados y cobertura de dotnet test
+TestResults/

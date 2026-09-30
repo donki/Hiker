@@ -1,4 +1,4 @@
-# Hiker
+﻿# Hiker
 
 Aplicacion Android en .NET MAUI para grabar y consultar rutas GPS. Optimizada para uso offline: los datos del usuario se mantienen en el dispositivo.
 
@@ -40,6 +40,28 @@ Para depurar en dispositivo o emulador Android conectado:
 
 ```pwsh
 dotnet build -t:Run -f net9.0-android36.0
+```
+
+## Pruebas
+
+77 pruebas (xUnit, `Hiker.Tests`), todas pasan; el banco tarda menos de 1 s (sin contar la
+compilación). Medido el 2026-09-30:
+
+- **Cobertura de lo instrumentado: 95 %** de las líneas de los ficheros de la app que se enlazan a
+  las pruebas: GPX, filtros del GPS (Kalman, precisión, velocidad, media), grabación y su diario,
+  estadísticas de ruta, guardar/listar/borrar rutas, ajuste al mapa, ajustes y traducciones.
+- **Cobertura sobre toda la app: 25 %** (984 de ~3970 líneas de C#). Lo que queda son las páginas
+  MAUI, el mapa y los servicios de Android (GPS, servicio en primer plano), que no se prueban aquí.
+
+Sin red ni móvil: Overpass es un servidor falso y `FileSystem`/`Preferences` se sustituyen en
+`Hiker.Tests/Shims.cs`. Las pruebas encontraron dos fallos, corregidos en la 2026.09.30.00 (el
+Kalman no suavizaba y los GPX decían `utf-16`).
+
+```powershell
+dotnet test Hiker.Tests
+# con cobertura (ReportGenerator es herramienta local: dotnet tool restore)
+dotnet test Hiker.Tests --collect:"XPlat Code Coverage" --results-directory cov
+dotnet reportgenerator -reports:cov/*/coverage.cobertura.xml -targetdir:cov/rep -reporttypes:TextSummary
 ```
 
 ## Build y firma

@@ -143,7 +143,9 @@ namespace Hiker.Services
                         newLocation.Latitude, 
                         newLocation.Longitude, 
                         (float)(newLocation.Accuracy ?? 10), 
-                        newLocation.Timestamp.Ticks
+                        // El filtro cuenta el tiempo en milisegundos. Antes se le pasaban ticks
+                        // (100 ns): la incertidumbre crecia 10 000 veces mas deprisa y no suavizaba nada.
+                        newLocation.Timestamp.ToUnixTimeMilliseconds()
                     );
 
                     processedLocation = new Location(_kalmanFilter.Latitude, _kalmanFilter.Longitude)

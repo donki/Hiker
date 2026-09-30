@@ -67,12 +67,19 @@ namespace Hiker.Helpers
             XmlSerializer serializer = new XmlSerializer(typeof(GPXFileHelper));
 
             // Usar StringWriter para escribir el XML en una cadena
-            using (StringWriter stringWriter = new StringWriter())
+            // StringWriter declara encoding="utf-16", pero el texto acaba en ficheros UTF-8: el GPX
+            // mentia sobre su codificacion y otros programas (o leerlo como flujo) fallaban.
+            using (StringWriter stringWriter = new Utf8StringWriter())
             {
                 serializer.Serialize(stringWriter, this);
                 return stringWriter.ToString(); // Retornar el XML como string
             }
         }
+    }
+
+    internal sealed class Utf8StringWriter : StringWriter
+    {
+        public override System.Text.Encoding Encoding => new System.Text.UTF8Encoding(false);
     }
 
     public class Track

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Cobertura (coverlet): el codigo de la app se compila dentro del ensamblado de pruebas (ficheros
+  enlazados), asi que se incluye ese ensamblado y se excluyen por ruta las propias pruebas.
+-->
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat code coverage">
+        <Configuration>
+          <IncludeTestAssembly>true</IncludeTestAssembly>
+          <ExcludeByFile>**/Hiker.Tests/**/*.cs,**/Microsoft.NET.Test.Sdk.Program.cs</ExcludeByFile>
+          <ExcludeByAttribute>GeneratedCodeAttribute,CompilerGeneratedAttribute</ExcludeByAttribute>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>
