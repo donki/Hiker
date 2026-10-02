@@ -1,12 +1,12 @@
-﻿using Hiker.Pages;
+using Hiker.Pages;
+using Hiker.Presenters;
 using Hiker.Services;
 
 namespace Hiker;
 
 public partial class AppShell : Shell
 {
-    private bool _followEnabled = true;   // el mapa arranca siguiendo al usuario
-    private bool _headingEnabled = true;  // modo Rumbo activado por defecto
+    private readonly ShellPresenter _presenter = new(L);
 
     public AppShell()
     {
@@ -28,20 +28,12 @@ public partial class AppShell : Shell
     /// </summary>
     public void ApplyTranslations()
     {
-        MapLabel.Text = L("Mapa");
-        RecordLabel.Text = L("Grabar");
-        StopRecordLabel.Text = L("Parar");
-        FollowLabel.Text = FollowText();
-        HeadingLabel.Text = HeadingText();
-        SaveLabel.Text = L("Guardar");
-        ClearLabel.Text = L("Borrar");
-        RoutesLabel.Text = L("Rutas");
-        SettingsLabel.Text = L("Configuración");
-        AboutLabel.Text = L("Acerca de");
+        var t = _presenter.Texts();
+        (MapLabel.Text, RecordLabel.Text, StopRecordLabel.Text, FollowLabel.Text, HeadingLabel.Text) =
+            (t.Map, t.Record, t.Stop, t.Follow, t.Heading);
+        (SaveLabel.Text, ClearLabel.Text, RoutesLabel.Text, SettingsLabel.Text, AboutLabel.Text) =
+            (t.Save, t.Clear, t.Routes, t.Settings, t.About);
     }
-
-    private string FollowText() => _followEnabled ? L("Seguir: Sí") : L("Seguir: No");
-    private string HeadingText() => _headingEnabled ? L("Rumbo: Sí") : L("Rumbo: No");
 
     // GPS: despliega/colapsa el submenu de acciones del mapa (no cierra el menu).
     private void OnGpsTapped(object sender, TappedEventArgs e)
@@ -76,48 +68,45 @@ public partial class AppShell : Shell
     // Seguir: alterna el recentrado automatico del mapa en la ubicacion en vivo.
     private async void OnActionFollow(object sender, TappedEventArgs e)
     {
-        _followEnabled = !_followEnabled;
-        FollowLabel.Text = FollowText();
-        FlyoutIsPresented = false;
-        if (CurrentPage is not HomePage)
-            await GoToAsync("//HomePage");
-        (CurrentPage as HomePage)?.SetFollow(_followEnabled);
+        var enabled = _presenter.ToggleFollow();
+        FollowLabel.Text = _presenter.FollowText;
+        (await ShowHomeAsync())?.SetFollow(enabled);
     }
 
     // Rumbo: alterna el modo heading-up (rota el mapa segun la brujula).
     private async void OnActionHeading(object sender, TappedEventArgs e)
     {
-        _headingEnabled = !_headingEnabled;
-        HeadingLabel.Text = HeadingText();
+        var enabled = _presenter.ToggleHeading();
+        HeadingLabel.Text = _presenter.HeadingText;
+        (await ShowHomeAsync())?.SetHeadingUp(enabled);
+    }
+
+    private async Task<HomePage?> ShowHomeAsync()
+    {
         FlyoutIsPresented = false;
         if (CurrentPage is not HomePage)
             await GoToAsync("//HomePage");
-        (CurrentPage as HomePage)?.SetHeadingUp(_headingEnabled);
+        return CurrentPage as HomePage;
     }
 
     // Iconos de info (ℹ) del submenu GPS: explican brevemente cada accion.
-    private void OnInfoMap(object sender, TappedEventArgs e) =>
-        ShowInfo(L("Mapa"), L("Muestra el mapa a pantalla completa sin iniciar ninguna grabación."));
-    private void OnInfoPlay(object sender, TappedEventArgs e) =>
-        ShowInfo(L("Grabar"), L("Comienza a grabar tu recorrido registrando los puntos GPS."));
-    private void OnInfoStop(object sender, TappedEventArgs e) =>
-        ShowInfo(L("Parar"), L("Detiene la grabación del recorrido en curso."));
-    private void OnInfoSave(object sender, TappedEventArgs e) =>
-        ShowInfo(L("Guardar"), L("Guarda el recorrido grabado como una ruta con nombre."));
-    private void OnInfoClear(object sender, TappedEventArgs e) =>
-        ShowInfo(L("Borrar"), L("Elimina del mapa el recorrido actual sin guardarlo."));
-    private void OnInfoFollow(object sender, TappedEventArgs e) =>
-        ShowInfo(L("Seguir"), L("Mantiene el mapa centrado automáticamente en tu ubicación en vivo."));
-    private void OnInfoHeading(object sender, TappedEventArgs e) =>
-        ShowInfo(L("Rumbo"), L("Rota el mapa para que la dirección hacia la que miras apunte hacia arriba."));
+    // Iconos (i) del submenu GPS: explican brevemente cada accion.
+    private void OnInfoMap(object sender, TappedEventArgs e) => ShowInfo("map");
+    private void OnInfoPlay(object sender, TappedEventArgs e) => ShowInfo("play");
+    private void OnInfoStop(object sender, TappedEventArgs e) => ShowInfo("stop");
+    private void OnInfoSave(object sender, TappedEventArgs e) => ShowInfo("save");
+    private void OnInfoClear(object sender, TappedEventArgs e) => ShowInfo("clear");
+    private void OnInfoFollow(object sender, TappedEventArgs e) => ShowInfo("follow");
+    private void OnInfoHeading(object sender, TappedEventArgs e) => ShowInfo("heading");
 
-    private async void ShowInfo(string title, string message)
+    private async void ShowInfo(string action)
     {
         var page = CurrentPage;
         if (page is null)
             return;
         FlyoutIsPresented = false;
-        await SocShared.ModernDialog.AlertAsync(page, title, message, L("Entendido"));
+        var (title, message) = _presenter.InfoFor(action);
+        await SocShared.ModernDialog.AlertAsync(page, title, message, _presenter.Understood);
     }
 
     private async void OnRoutesTapped(object sender, TappedEventArgs e) => await NavigateAsync("//RoutesPage");
@@ -133,29 +122,35 @@ public partial class AppShell : Shell
     /// </summary>
     protected override bool OnBackButtonPressed()
     {
-        if (FlyoutIsPresented)
+        var overlay = CurrentPage is ContentPage page ? FindDialogOverlay(page) : null;
+        switch (ShellPresenter.DecideBack(FlyoutIsPresented, overlay is not null,
+                    CurrentPage is HomePage { IsKeepOrDiscardOpen: true },
+                    Navigation.NavigationStack.Count, CurrentPage is HomePage))
         {
-            FlyoutIsPresented = false;
-            return true;
-        }
-
-        if (CurrentPage is ContentPage page && DismissDialog(page))
-            return true;
-
-        if (Navigation.NavigationStack.Count > 1)
-            return base.OnBackButtonPressed();
-
-        if (CurrentPage is not HomePage)
-        {
-            Dispatcher.Dispatch(async () => await GoToAsync("//HomePage"));
-            return true;
-        }
-
+            case BackAction.CloseFlyout:
+                FlyoutIsPresented = false;
+                return true;
+            case BackAction.DismissDialog:
+                DismissDialog(overlay!);
+                return true;
+            case BackAction.PopPage:
+                return base.OnBackButtonPressed();
+            case BackAction.GoHome:
+                Dispatcher.Dispatch(async () => await GoToAsync("//HomePage"));
+                return true;
+            case BackAction.MoveToBack:
 #if ANDROID
-        Microsoft.Maui.ApplicationModel.Platform.CurrentActivity?.MoveTaskToBack(true);
+                Microsoft.Maui.ApplicationModel.Platform.CurrentActivity?.MoveTaskToBack(true);
 #endif
-        return true;
+                return true;
+            default:
+                return true;   // Ignore: la pregunta de guardar/recuperar se queda
+        }
     }
+
+    /// <summary>El velo de un ModernDialog abierto en la pagina, si lo hay.</summary>
+    private static Grid? FindDialogOverlay(ContentPage page) =>
+        (page.Content as Grid)?.Children.OfType<Grid>().LastOrDefault(g => g.StyleId == "__modernDialogOverlay");
 
     /// <summary>
     /// Si la pagina tiene abierto un ModernDialog, lo cierra como si se tocara fuera de el (lo que
@@ -163,18 +158,8 @@ public partial class AppShell : Shell
     /// que se busca su velo y se le manda el toque. Las preguntas que al cerrarse tirarian una ruta
     /// (<see cref="HomePage.IsKeepOrDiscardOpen"/>) no se cierran: atras no hace nada con ellas.
     /// </summary>
-    private static bool DismissDialog(ContentPage page)
+    private static void DismissDialog(Grid overlay)
     {
-        if (page.Content is not Grid host)
-            return false;
-
-        var overlay = host.Children.OfType<Grid>().LastOrDefault(g => g.StyleId == "__modernDialogOverlay");
-        if (overlay is null)
-            return false;
-
-        if (page is HomePage { IsKeepOrDiscardOpen: true })
-            return true;
-
         try
         {
             var scrim = overlay.Children.OfType<BoxView>().FirstOrDefault();
@@ -192,7 +177,6 @@ public partial class AppShell : Shell
         {
             // Si no se puede cerrar, al menos atras no se lleva la pantalla por delante.
         }
-        return true;
     }
 
     private async Task NavigateAsync(string route)

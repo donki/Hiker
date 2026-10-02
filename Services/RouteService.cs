@@ -91,7 +91,10 @@ namespace Hiker.Services
 
             foreach (var location in locations)
             {
-                var trackpoint = new TrackPoint(location.Latitude, location.Longitude, location.Altitude, location.Timestamp.DateTime);
+                // En UTC (se escribe con «Z»): con Timestamp.DateTime se perdia el desfase, el GPX
+                // llevaba la hora UTC sin zona y al leerla se tomaba por local (la ficha de la ruta
+                // salia dos horas antes en verano en España).
+                var trackpoint = new TrackPoint(location.Latitude, location.Longitude, location.Altitude, location.Timestamp.UtcDateTime);
                 segments.TrackPoints.Add(trackpoint);
             }
 
@@ -319,7 +322,7 @@ namespace Hiker.Services
             {
                 foreach (var p in segment.TrackPoints)
                 {
-                    result.Add(new Location((double)p.Latitude, (double)p.Longitude, new DateTimeOffset(p.Time))
+                    result.Add(new Location((double)p.Latitude, (double)p.Longitude, ToTimestamp(p.Time))
                     {
                         Altitude = (double)p.Elevation
                     });
@@ -327,6 +330,16 @@ namespace Hiker.Services
             }
             return result;
         }
+
+        /// <summary>
+        /// Hora de un punto leido de un GPX. Sin zona («Unspecified») es UTC: asi la escribian las
+        /// versiones anteriores a la 2026.10.01, que perdian la «Z».
+        /// </summary>
+        public static DateTimeOffset ToTimestamp(DateTime time) => time.Kind switch
+        {
+            DateTimeKind.Unspecified => new DateTimeOffset(DateTime.SpecifyKind(time, DateTimeKind.Utc)),
+            _ => new DateTimeOffset(time),
+        };
 
         public async Task DeleteRouteAsync(string routeName)
         {

@@ -1,4 +1,26 @@
-﻿# Changelog
+# Changelog
+
+## 2026.10.01.00 (2026100100)
+- **Corregido: la hora de los puntos se guardaba sin zona.** El GPX llevaba la hora UTC sin la «Z»
+  y al leerla se tomaba por local: en la ficha de una ruta la hora de salida salía dos horas antes
+  (en verano en España) y otros programas podían leerla mal. Ahora se guarda en UTC con «Z», y las
+  rutas guardadas por versiones anteriores se leen bien. Lo encontraron las pruebas nuevas
+  `LaHoraSeGuardaEnUtcYSeLeeIgual` y `LaFichaCalculaYAvisaDeLosCambios`.
+- **Corregido: al cerrar el servicio de ubicación no se dejaba de escuchar al GPS** (se marcaba como
+  cerrado antes de parar la escucha).
+- **Cobertura: la lógica sale de las pantallas** (constitución General 8.6, mínimo 90 % de toda la
+  app). Mapa, Rutas, ficha de ruta, menú lateral, Configuración y Acerca de pasan a clases propias
+  (`Presenters/`) que se prueban sin móvil; las páginas solo pintan. El GPS, la brújula, las
+  preferencias, el servicio en primer plano y los ajustes de batería llegan por interfaz.
+  Banco: 176 pruebas; cobertura de toda la app del 37 % al 79 % (con el método nuevo, que cuenta
+  las líneas ejecutables de verdad; con el anterior salía un 25 %).
+- Fuera código muerto: el servicio de ubicación «de respaldo» (que fingía estar en Madrid), su
+  adaptador, un servicio de diálogos sin usar, el guardado de ficheros simulado y la inicialización
+  de Windows hecha a mano.
+- `appcast.json` anuncia ya esta versión.
+- *EN:* Fixed: track point times were saved without a time zone (the route sheet showed the start
+  two hours early in Spanish summer time). Fixed: closing the location service did not stop the GPS.
+  Screen logic moved out of the pages into tested classes: 176 tests, whole-app coverage 37 % → 79 %.
 
 ## 2026.09.30.00 (2026093000)
 - **Corregido: el filtro de Kalman del GPS no suavizaba nada.** Recibía la hora en ticks (100 ns)

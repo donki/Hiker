@@ -5,7 +5,6 @@ using Android.OS;
 using AndroidX.Core.App;
 using Hiker.Services;
 using AndroidLocation = Android.Locations.Location;
-using MauiLocation = Microsoft.Maui.Devices.Sensors.Location;
 
 namespace Hiker;
 
@@ -168,8 +167,7 @@ public class TrackingForegroundService : Service, ILocationListener
     private static long ReadIntervalMilliseconds()
     {
         var settings = IPlatformApplication.Current?.Services.GetService<SettingsService>();
-        var seconds = settings?.AppSettings.TimerInterval ?? 1;
-        return Math.Max(1000, seconds * 1000);
+        return TrackPointFactory.IntervalMilliseconds(settings?.AppSettings.TimerInterval);
     }
 
     public void OnLocationChanged(AndroidLocation location)
@@ -178,14 +176,12 @@ public class TrackingForegroundService : Service, ILocationListener
         if (recorder is null || !recorder.IsRecording)
             return;
 
-        var point = new MauiLocation(location.Latitude, location.Longitude,
-            location.HasAltitude ? location.Altitude : 0)
-        {
-            Accuracy = location.HasAccuracy ? location.Accuracy : null,
-            Speed = location.HasSpeed ? location.Speed : null,
-            Course = location.HasBearing ? location.Bearing : null,
-            Timestamp = DateTimeOffset.FromUnixTimeMilliseconds(location.Time),
-        };
+        var point = TrackPointFactory.Create(location.Latitude, location.Longitude,
+            location.HasAltitude ? location.Altitude : null,
+            location.HasAccuracy ? location.Accuracy : null,
+            location.HasSpeed ? location.Speed : null,
+            location.HasBearing ? location.Bearing : null,
+            location.Time);
 
         recorder.Push(point);
     }

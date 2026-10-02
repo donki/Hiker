@@ -1,7 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Hiker.Pages.AboutPage">
+             x:Class="Hiker.Pages.AboutPage"
+             Title="{Binding Title}">
 
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="16">
@@ -20,11 +21,11 @@
                            TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
                            HorizontalOptions="Center" />
 
-                    <Label x:Name="VersionLabel"
+                    <Label x:Name="VersionLabel" Text="{Binding Version}"
                            Style="{StaticResource HintText}"
                            HorizontalOptions="Center" />
 
-                    <Label x:Name="DescriptionLabel"
+                    <Label x:Name="DescriptionLabel" IsVisible="False"
                            Style="{StaticResource HintText}"
                            HorizontalTextAlignment="Center"
                            Margin="0,4,0,0" />
@@ -39,7 +40,7 @@
             <!-- Contacto -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="20,18" Spacing="12">
-                    <Label x:Name="ContactTitleLabel" Style="{StaticResource CardTitle}" />
+                    <Label x:Name="ContactTitleLabel" Text="{Binding ContactTitle}" Style="{StaticResource CardTitle}" />
 
                     <Button Text="jsoladelarosa@gmail.com"
                             Style="{StaticResource OutlineButton}"
@@ -48,7 +49,7 @@
                             Clicked="OnContactClicked"
                             HorizontalOptions="Fill" />
 
-                    <Label x:Name="ContactHintLabel"
+                    <Label x:Name="ContactHintLabel" IsVisible="False"
                            Style="{StaticResource HintText}"
                            HorizontalOptions="Center" />
                 </VerticalStackLayout>
@@ -57,7 +58,7 @@
             <!-- Idioma -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="20,18" Spacing="12">
-                    <Label x:Name="LanguageTitleLabel" Style="{StaticResource CardTitle}" />
+                    <Label x:Name="LanguageTitleLabel" Text="{Binding LanguageTitle}" Style="{StaticResource CardTitle}" />
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                         <Button Grid.Column="0"
@@ -73,7 +74,7 @@
                                 Clicked="OnEnglishClicked" />
                     </Grid>
 
-                    <Label x:Name="LanguageHintLabel"
+                    <Label x:Name="LanguageHintLabel" Text="{Binding LanguageHint}"
                            Style="{StaticResource HintText}"
                            HorizontalOptions="Center" />
                 </VerticalStackLayout>
@@ -82,16 +83,16 @@
             <!-- Privacidad -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="20,18" Spacing="10">
-                    <Label x:Name="PrivacyTitleLabel" Style="{StaticResource CardTitle}" />
-                    <Label x:Name="PrivacyTextLabel" Style="{StaticResource BodyText}" FontSize="13" />
+                    <Label x:Name="PrivacyTitleLabel" Text="{Binding PrivacyTitle}" Style="{StaticResource CardTitle}" />
+                    <Label x:Name="PrivacyTextLabel" Text="{Binding PrivacyText}" Style="{StaticResource BodyText}" FontSize="13" />
                 </VerticalStackLayout>
             </Border>
 
             <!-- Licencia -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="20,18" Spacing="10">
-                    <Label x:Name="LicenseTitleLabel" Style="{StaticResource CardTitle}" />
-                    <Label x:Name="LicenseTextLabel" Style="{StaticResource BodyText}" FontSize="13" />
+                    <Label x:Name="LicenseTitleLabel" Text="{Binding LicenseTitle}" Style="{StaticResource CardTitle}" />
+                    <Label x:Name="LicenseTextLabel" Text="{Binding LicenseText}" Style="{StaticResource BodyText}" FontSize="13" />
                     <Label Text="MIT License · Copyright © 2026 Socratic"
                            Style="{StaticResource HintText}"
                            FontSize="11" />
@@ -101,12 +102,12 @@
             <!-- Aviso legal -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="20,18" Spacing="12">
-                    <Label x:Name="LegalTitleLabel"
+                    <Label x:Name="LegalTitleLabel" Text="{Binding LegalTitle}"
                            Style="{StaticResource CardTitle}"
                            TextColor="{StaticResource Danger}" />
 
-                    <Label x:Name="LegalText1Label" Style="{StaticResource BodyText}" FontSize="13" />
-                    <Label x:Name="LegalText2Label" Style="{StaticResource BodyText}" FontSize="13" />
+                    <Label x:Name="LegalText1Label" Text="{Binding LegalText1}" Style="{StaticResource BodyText}" FontSize="13" />
+                    <Label x:Name="LegalText2Label" Text="{Binding LegalText2}" Style="{StaticResource BodyText}" FontSize="13" />
 
                     <Border BackgroundColor="{StaticResource Danger}"
                             StrokeThickness="0"
@@ -114,7 +115,7 @@
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="8" />
                         </Border.StrokeShape>
-                        <Label x:Name="LegalWarningLabel"
+                        <Label x:Name="LegalWarningLabel" Text="{Binding LegalWarning}"
                                FontSize="13"
                                FontAttributes="Bold"
                                TextColor="{StaticResource White}"

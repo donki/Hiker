@@ -11,17 +11,32 @@ namespace Hiker.Services;
 /// </summary>
 public class UpdateService
 {
-    private const string AppcastUrl = "https://raw.githubusercontent.com/donki/Hiker/main/appcast.json";
+    public const string AppcastUrl = "https://raw.githubusercontent.com/donki/Hiker/main/appcast.json";
 
     private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(8) };
     private readonly TranslationService _translation;
+    private readonly Func<Task<string>> _fetchAppcast;
+    private readonly Func<string> _currentVersion;
+    private readonly ILinkOpener _links;
     private bool _checkedThisSession;
 
-    public UpdateService(TranslationService translation) => _translation = translation;
+    public UpdateService(TranslationService translation, ILinkOpener links)
+        : this(translation, links, () => Http.GetStringAsync(AppcastUrl), () => AppInfo.Current.VersionString)
+    {
+    }
+
+    public UpdateService(TranslationService translation, ILinkOpener links,
+        Func<Task<string>> fetchAppcast, Func<string> currentVersion)
+    {
+        _translation = translation;
+        _links = links;
+        _fetchAppcast = fetchAppcast;
+        _currentVersion = currentVersion;
+    }
 
     private string L(string phrase) => _translation.Translate(phrase);
 
-    public async Task CheckAndPromptAsync(Page page)
+    public async Task CheckAndPromptAsync(IUserDialogs dialogs)
     {
         if (_checkedThisSession)
             return;
@@ -29,22 +44,21 @@ public class UpdateService
 
         try
         {
-            var json = await Http.GetStringAsync(AppcastUrl);
-            var manifest = JsonSerializer.Deserialize<Appcast>(json);
+            var manifest = JsonSerializer.Deserialize<Appcast>(await _fetchAppcast());
             if (manifest?.Version is null)
                 return;
 
-            var current = AppInfo.Current.VersionString;
+            var current = _currentVersion();
             if (CompareVersions(manifest.Version, current) <= 0)
                 return; // ya se esta en la ultima version (o mas nueva)
 
-            var wantsUpdate = await SocShared.ModernDialog.AlertAsync(page,
+            var wantsUpdate = await dialogs.ConfirmAsync(
                 L("Actualización disponible"),
                 string.Format(L("Hay una versión más reciente ({0}). Tienes la {1}. ¿Quieres actualizar?"), manifest.Version, current),
                 L("UpdateButton"), L("Ahora no"));
 
             if (wantsUpdate && !string.IsNullOrWhiteSpace(manifest.Url))
-                await Browser.Default.OpenAsync(new Uri(manifest.Url), BrowserLaunchMode.SystemPreferred);
+                await _links.OpenAsync(manifest.Url);
         }
         catch
         {
@@ -53,7 +67,7 @@ public class UpdateService
     }
 
     /// <summary>Compara versiones numericas por partes ("2026.07.19.0"). &gt;0 si a es mas nueva que b.</summary>
-    private static int CompareVersions(string a, string b)
+    public static int CompareVersions(string a, string b)
     {
         var pa = Parts(a);
         var pb = Parts(b);

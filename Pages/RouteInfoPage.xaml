@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Hiker.Pages.RouteInfoPage">
+             x:Class="Hiker.Pages.RouteInfoPage"
+             Title="{Binding Name}">
 
     <ScrollView>
         <VerticalStackLayout Padding="12" Spacing="10">
@@ -9,8 +10,8 @@
             <!-- Cabecera: nombre y fecha -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="16,12" Spacing="4">
-                    <Label x:Name="nameLabel" Style="{StaticResource CardTitle}" FontSize="18" LineBreakMode="TailTruncation" />
-                    <Label x:Name="dateLabel" Style="{StaticResource HintText}" />
+                    <Label x:Name="nameLabel" Text="{Binding Name}" Style="{StaticResource CardTitle}" FontSize="18" LineBreakMode="TailTruncation" />
+                    <Label x:Name="dateLabel" Text="{Binding Date}" Style="{StaticResource HintText}" />
                 </VerticalStackLayout>
             </Border>
 
@@ -18,55 +19,55 @@
             <Border Style="{StaticResource Card}">
                 <Grid Padding="16,12" ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="12" ColumnSpacing="8">
                     <VerticalStackLayout Grid.Row="0" Grid.Column="0">
-                        <Label x:Name="distanceValue" Style="{StaticResource BodyText}" FontSize="20" FontAttributes="Bold" />
-                        <Label x:Name="distanceTitle" Style="{StaticResource HintText}" />
+                        <Label x:Name="distanceValue" Text="{Binding DistanceValue}" Style="{StaticResource BodyText}" FontSize="20" FontAttributes="Bold" />
+                        <Label x:Name="distanceTitle" Text="{Binding DistanceTitle}" Style="{StaticResource HintText}" />
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Row="0" Grid.Column="1">
-                        <Label x:Name="gainValue" Style="{StaticResource BodyText}" FontSize="20" FontAttributes="Bold" TextColor="#0E9F6E" />
-                        <Label x:Name="gainTitle" Style="{StaticResource HintText}" />
+                        <Label x:Name="gainValue" Text="{Binding GainValue}" Style="{StaticResource BodyText}" FontSize="20" FontAttributes="Bold" TextColor="#0E9F6E" />
+                        <Label x:Name="gainTitle" Text="{Binding GainTitle}" Style="{StaticResource HintText}" />
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Row="0" Grid.Column="2">
-                        <Label x:Name="lossValue" Style="{StaticResource BodyText}" FontSize="20" FontAttributes="Bold" TextColor="#D14343" />
-                        <Label x:Name="lossTitle" Style="{StaticResource HintText}" />
+                        <Label x:Name="lossValue" Text="{Binding LossValue}" Style="{StaticResource BodyText}" FontSize="20" FontAttributes="Bold" TextColor="#D14343" />
+                        <Label x:Name="lossTitle" Text="{Binding LossTitle}" Style="{StaticResource HintText}" />
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Grid.Row="1" Grid.Column="0">
-                        <Label x:Name="maxAltValue" Style="{StaticResource BodyText}" FontAttributes="Bold" />
-                        <Label x:Name="maxAltTitle" Style="{StaticResource HintText}" />
+                        <Label x:Name="maxAltValue" Text="{Binding MaxAltValue}" Style="{StaticResource BodyText}" FontAttributes="Bold" />
+                        <Label x:Name="maxAltTitle" Text="{Binding MaxAltTitle}" Style="{StaticResource HintText}" />
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Row="1" Grid.Column="1">
-                        <Label x:Name="minAltValue" Style="{StaticResource BodyText}" FontAttributes="Bold" />
-                        <Label x:Name="minAltTitle" Style="{StaticResource HintText}" />
+                        <Label x:Name="minAltValue" Text="{Binding MinAltValue}" Style="{StaticResource BodyText}" FontAttributes="Bold" />
+                        <Label x:Name="minAltTitle" Text="{Binding MinAltTitle}" Style="{StaticResource HintText}" />
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Row="1" Grid.Column="2">
-                        <Label x:Name="rangeValue" Style="{StaticResource BodyText}" FontAttributes="Bold" />
-                        <Label x:Name="rangeTitle" Style="{StaticResource HintText}" />
+                        <Label x:Name="rangeValue" Text="{Binding RangeValue}" Style="{StaticResource BodyText}" FontAttributes="Bold" />
+                        <Label x:Name="rangeTitle" Text="{Binding RangeTitle}" Style="{StaticResource HintText}" />
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Grid.Row="2" Grid.Column="0">
-                        <Label x:Name="durationValue" Style="{StaticResource BodyText}" FontAttributes="Bold" />
-                        <Label x:Name="durationTitle" Style="{StaticResource HintText}" />
+                        <Label x:Name="durationValue" Text="{Binding DurationValue}" Style="{StaticResource BodyText}" FontAttributes="Bold" />
+                        <Label x:Name="durationTitle" Text="{Binding DurationTitle}" Style="{StaticResource HintText}" />
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Row="2" Grid.Column="1">
-                        <Label x:Name="movingValue" Style="{StaticResource BodyText}" FontAttributes="Bold" />
-                        <Label x:Name="movingTitle" Style="{StaticResource HintText}" />
+                        <Label x:Name="movingValue" Text="{Binding MovingValue}" Style="{StaticResource BodyText}" FontAttributes="Bold" />
+                        <Label x:Name="movingTitle" Text="{Binding MovingTitle}" Style="{StaticResource HintText}" />
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Row="2" Grid.Column="2">
-                        <Label x:Name="paceValue" Style="{StaticResource BodyText}" FontAttributes="Bold" />
-                        <Label x:Name="paceTitle" Style="{StaticResource HintText}" />
+                        <Label x:Name="paceValue" Text="{Binding PaceValue}" Style="{StaticResource BodyText}" FontAttributes="Bold" />
+                        <Label x:Name="paceTitle" Text="{Binding PaceTitle}" Style="{StaticResource HintText}" />
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Grid.Row="3" Grid.Column="0">
-                        <Label x:Name="avgSpeedValue" Style="{StaticResource BodyText}" FontAttributes="Bold" />
-                        <Label x:Name="avgSpeedTitle" Style="{StaticResource HintText}" />
+                        <Label x:Name="avgSpeedValue" Text="{Binding AvgSpeedValue}" Style="{StaticResource BodyText}" FontAttributes="Bold" />
+                        <Label x:Name="avgSpeedTitle" Text="{Binding AvgSpeedTitle}" Style="{StaticResource HintText}" />
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Row="3" Grid.Column="1">
-                        <Label x:Name="maxSpeedValue" Style="{StaticResource BodyText}" FontAttributes="Bold" />
-                        <Label x:Name="maxSpeedTitle" Style="{StaticResource HintText}" />
+                        <Label x:Name="maxSpeedValue" Text="{Binding MaxSpeedValue}" Style="{StaticResource BodyText}" FontAttributes="Bold" />
+                        <Label x:Name="maxSpeedTitle" Text="{Binding MaxSpeedTitle}" Style="{StaticResource HintText}" />
                     </VerticalStackLayout>
                     <VerticalStackLayout Grid.Row="3" Grid.Column="2">
-                        <Label x:Name="pointsValue" Style="{StaticResource BodyText}" FontAttributes="Bold" />
-                        <Label x:Name="pointsTitle" Style="{StaticResource HintText}" />
+                        <Label x:Name="pointsValue" Text="{Binding PointsValue}" Style="{StaticResource BodyText}" FontAttributes="Bold" />
+                        <Label x:Name="pointsTitle" Text="{Binding PointsTitle}" Style="{StaticResource HintText}" />
                     </VerticalStackLayout>
                 </Grid>
             </Border>
@@ -74,13 +75,14 @@
             <!-- Perfil de desnivel -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="12,10" Spacing="6">
-                    <Label x:Name="profileTitle" Style="{StaticResource CardTitle}" />
+                    <Label x:Name="profileTitle" Text="{Binding ProfileTitle}" Style="{StaticResource CardTitle}" />
                     <GraphicsView x:Name="profileView" HeightRequest="220" />
-                    <Label x:Name="profileHint" Style="{StaticResource HintText}" FontSize="11" />
+                    <Label x:Name="profileHint" Text="{Binding ProfileHint}" Style="{StaticResource HintText}" FontSize="11" />
                 </VerticalStackLayout>
             </Border>
 
             <Button x:Name="showOnMapButton"
+                    Text="{Binding ShowOnMap}"
                     ImageSource="location.png"
                     ContentLayout="Left,6"
                     Style="{StaticResource PrimaryButton}"

@@ -1,13 +1,15 @@
-﻿using Hiker.Services;
+using Hiker.Presenters;
+using Hiker.Services;
 
 namespace Hiker.Pages;
 
+/// <summary>Configuracion: solo el idioma. Los textos se enlazan a <see cref="LanguagePresenter"/>.</summary>
 public partial class SettingsPage : ContentPage
 {
     // Verde de marca de Hiker para resaltar el idioma activo.
     private static readonly Color ActiveLanguage = Color.FromArgb("#2E7D32");
 
-    private TranslationService? _translationService;
+    private LanguagePresenter? _presenter;
 
     public SettingsPage()
     {
@@ -17,39 +19,17 @@ public partial class SettingsPage : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        
         // La primera vez que aparece la pagina el Handler aun no tiene MauiContext: sin la caida al
-        // proveedor global, el servicio se quedaba a null, la pantalla salia siempre en castellano
-        // con «Español» marcado y los botones de idioma no hacian nada.
-        _translationService ??= (Handler?.MauiContext?.Services ?? IPlatformApplication.Current?.Services)
-            ?.GetService<TranslationService>();
-
-        LoadSettings();
-    }
-
-    // Solo queda el idioma: se guarda solo al pulsar (TranslationService.SetLanguage). La
-    // configuracion del GPS y los botones Guardar/Restablecer se quitaron a peticion.
-    private void LoadSettings()
-    {
-        TranslateUi();
+        // proveedor global, la pantalla salia siempre en castellano y los botones no hacian nada.
+        BindingContext = _presenter ??= new LanguagePresenter(
+            (Handler?.MauiContext?.Services ?? IPlatformApplication.Current?.Services)?.GetService<TranslationService>());
         UpdateLanguageButtons();
-    }
-
-    /// <summary>Textos de la pantalla en el idioma activo (constitucion seccion 8).</summary>
-    private void TranslateUi()
-    {
-        string L(string phrase) => _translationService?.Translate(phrase) ?? phrase;
-
-        Title = L("Configuración");
-        languageTitleLabel.Text = L("Idioma");
-        languageHintLabel.Text = L("Selecciona tu idioma preferido");
     }
 
     private void UpdateLanguageButtons()
     {
-        var spanishActive = (_translationService?.GetCurrentLanguage() ?? "es") == "es";
-        StyleLanguageButton(spanishButton, spanishActive);
-        StyleLanguageButton(englishButton, !spanishActive);
+        StyleLanguageButton(spanishButton, _presenter!.SpanishActive);
+        StyleLanguageButton(englishButton, !_presenter.SpanishActive);
     }
 
     private static void StyleLanguageButton(Button button, bool active)
@@ -66,10 +46,8 @@ public partial class SettingsPage : ContentPage
 
     private void ApplyLanguage(string languageCode)
     {
-        _translationService?.SetLanguage(languageCode);
-        TranslateUi();
+        _presenter?.SetLanguage(languageCode);
         UpdateLanguageButtons();
-
         // El menu lateral ya esta pintado: se le pide que se retraduzca.
         (Shell.Current as AppShell)?.ApplyTranslations();
     }

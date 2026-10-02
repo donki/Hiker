@@ -1,4 +1,4 @@
-﻿# Hiker
+# Hiker
 
 Aplicacion Android en .NET MAUI para grabar y consultar rutas GPS. Optimizada para uso offline: los datos del usuario se mantienen en el dispositivo.
 
@@ -44,18 +44,26 @@ dotnet build -t:Run -f net9.0-android36.0
 
 ## Pruebas
 
-77 pruebas (xUnit, `Hiker.Tests`), todas pasan; el banco tarda menos de 1 s (sin contar la
-compilación). Medido el 2026-09-30:
+176 pruebas (xUnit, `Hiker.Tests`), todas pasan; el banco tarda menos de 1 s (sin contar la
+compilación). Medido el 2026-10-01:
 
-- **Cobertura de lo instrumentado: 95 %** de las líneas de los ficheros de la app que se enlazan a
-  las pruebas: GPX, filtros del GPS (Kalman, precisión, velocidad, media), grabación y su diario,
-  estadísticas de ruta, guardar/listar/borrar rutas, ajuste al mapa, ajustes y traducciones.
-- **Cobertura sobre toda la app: 25 %** (984 de ~3970 líneas de C#). Lo que queda son las páginas
-  MAUI, el mapa y los servicios de Android (GPS, servicio en primer plano), que no se prueban aquí.
+- **Cobertura de lo instrumentado: 97 %** de las líneas de los ficheros de la app que compila el
+  banco: GPX, filtros del GPS, grabación y su diario, estadísticas y ficha de ruta, guardar, listar,
+  importar y borrar rutas, ajuste al mapa, seguir una ruta, ubicación en vivo, la lógica de cada
+  pantalla (`Presenters/`: mapa, Rutas, ficha, menú lateral, Configuración y Acerca de),
+  comprobación de versión, registro de servicios y traducciones.
+- **Cobertura sobre toda la app: 79 %** (2072 de 2612 líneas ejecutables de C#). Se cuentan las
+  líneas que mide coverlet en lo que compila el banco y, en el resto, las líneas con código (sin
+  llaves solas, `using` ni comentarios); con el método anterior, que contaba todas las líneas no
+  vacías, la 2026.09.30.00 salía con un 25 % (37 % con el nuevo). **Mínimo de la constitución:
+  90 %**; lo que falta (el servicio en primer plano y `MainActivity` de Android, y el enlace fino
+  de las páginas y del menú con MAUI) y el plan para llegar están en `02-TAREAS-Hiker.md`.
 
-Sin red ni móvil: Overpass es un servidor falso y `FileSystem`/`Preferences` se sustituyen en
-`Hiker.Tests/Shims.cs`. Las pruebas encontraron dos fallos, corregidos en la 2026.09.30.00 (el
-Kalman no suavizaba y los GPX decían `utf-16`).
+Sin red ni móvil: Overpass es un servidor falso, `FileSystem`/`Preferences` se sustituyen en
+`Hiker.Tests/Shims.cs` y el GPS, la brújula, las preferencias, el servicio en primer plano y los
+diálogos son dobles (`Hiker.Tests/Fakes.cs`). Las pruebas encontraron cuatro fallos: el Kalman no
+suavizaba y los GPX decían `utf-16` (corregidos en la 2026.09.30.00); la hora de los puntos se
+guardaba sin zona y cerrar el servicio de ubicación no paraba el GPS (en la 2026.10.01.00).
 
 ```powershell
 dotnet test Hiker.Tests

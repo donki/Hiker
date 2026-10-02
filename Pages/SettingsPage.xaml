@@ -1,7 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Hiker.Pages.SettingsPage">
+             x:Class="Hiker.Pages.SettingsPage"
+             Title="{Binding Title}">
 
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="15">
@@ -9,7 +10,7 @@
             <!-- Idioma -->
             <Border Style="{StaticResource Card}">
                 <VerticalStackLayout Padding="16" Spacing="10">
-                    <Label x:Name="languageTitleLabel" Style="{StaticResource CardTitle}" />
+                    <Label x:Name="languageTitleLabel" Text="{Binding LanguageTitle}" Style="{StaticResource CardTitle}" />
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                         <Button Grid.Column="0"
@@ -29,7 +30,7 @@
                                 Clicked="OnEnglishClicked" />
                     </Grid>
 
-                    <Label x:Name="languageHintLabel"
+                    <Label x:Name="languageHintLabel" Text="{Binding LanguageHint}"
                            Style="{StaticResource HintText}"
                            HorizontalOptions="Center" />
                 </VerticalStackLayout>
