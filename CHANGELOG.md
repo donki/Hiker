@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026.10.25.0 (2026102500)
+- **Corregido: tocar fuera del diálogo tiraba la ruta.** Las preguntas «¿Guardar la ruta?» y
+  «¿Recuperar la grabación?» se cerraban con un toque fuera, que contaba como «Descartar». Ahora
+  solo se cierran con sus botones.
+- *EN:* Fixed: tapping outside the "save route" and "recover recording" dialogs discarded the route;
+  they now close only with their buttons.
+
 ## 2026.10.01.00 (2026100100)
 - **Corregido: la hora de los puntos se guardaba sin zona.** El GPX llevaba la hora UTC sin la «Z»
   y al leerla se tomaba por local: en la ficha de una ruta la hora de salida salía dos horas antes

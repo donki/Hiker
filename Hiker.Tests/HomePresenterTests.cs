@@ -307,6 +307,8 @@ public class HomePresenterTests : IDisposable
         Assert.False(presenter.IsKeepOrDiscardOpen);
         Assert.Equal(0, _recorder.PointCount);
         Assert.StartsWith("Ruta grabada|Se han grabado 3 puntos", _dialogs.Shown[0]);
+        // Tocar fuera del diálogo no debe descartar la ruta: se pide sin cierre por toque fuera.
+        Assert.Equal(false, _dialogs.LastConfirmDismissOnOutsideTap);
     }
 
     [Fact]
@@ -502,6 +504,8 @@ public class HomePresenterTests : IDisposable
         Assert.StartsWith("Grabación interrumpida|Quedó una grabación sin guardar con 3 puntos", _dialogs.Shown[0]);
         Assert.Equal(3, _map.Scripts.Count(s => s.StartsWith("addRoutePoint")));
         Assert.True(File.Exists(Path.Combine(RouteService.RoutesDirectory, "Recuperada.gpx")));
+        // Tocar fuera no debe descartar la grabación pendiente.
+        Assert.Equal(false, _dialogs.LastConfirmDismissOnOutsideTap);
     }
 
     [Fact]

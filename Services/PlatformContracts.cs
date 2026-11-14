@@ -46,7 +46,7 @@ public interface IUiThread
 public interface IUserDialogs
 {
     Task AlertAsync(string title, string message, string ok);
-    Task<bool> ConfirmAsync(string title, string message, string accept, string cancel);
+    Task<bool> ConfirmAsync(string title, string message, string accept, string cancel, bool dismissOnOutsideTap = true);
     Task<string?> PromptAsync(string title, string message, string accept, string cancel);
 }
 

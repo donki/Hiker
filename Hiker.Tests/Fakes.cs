@@ -20,9 +20,13 @@ internal sealed class FakeDialogs : IUserDialogs
         return Task.CompletedTask;
     }
 
-    public Task<bool> ConfirmAsync(string title, string message, string accept, string cancel)
+    /// <summary>El último valor de dismissOnOutsideTap con que se pidió una confirmación (para comprobar que las preguntas que tirarían datos no se cierran al tocar fuera).</summary>
+    public bool? LastConfirmDismissOnOutsideTap { get; private set; }
+
+    public Task<bool> ConfirmAsync(string title, string message, string accept, string cancel, bool dismissOnOutsideTap = true)
     {
         Shown.Add($"{title}|{message}");
+        LastConfirmDismissOnOutsideTap = dismissOnOutsideTap;
         DuringConfirm?.Invoke();
         return Task.FromResult(Confirms.Count > 0 && Confirms.Dequeue());
     }

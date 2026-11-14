@@ -11,8 +11,8 @@ public sealed class ModernDialogs(Page page) : IUserDialogs
     public Task AlertAsync(string title, string message, string ok) =>
         SocShared.ModernDialog.AlertAsync(page, title, message, ok);
 
-    public Task<bool> ConfirmAsync(string title, string message, string accept, string cancel) =>
-        SocShared.ModernDialog.AlertAsync(page, title, message, accept, cancel);
+    public Task<bool> ConfirmAsync(string title, string message, string accept, string cancel, bool dismissOnOutsideTap = true) =>
+        SocShared.ModernDialog.AlertAsync(page, title, message, accept, cancel, dismissOnOutsideTap);
 
     public Task<string?> PromptAsync(string title, string message, string accept, string cancel) =>
         SocShared.ModernDialog.PromptAsync(page, title, message, accept, cancel);

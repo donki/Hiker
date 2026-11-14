@@ -499,7 +499,7 @@ public sealed class HomePresenter
         var save = await _dialogs.ConfirmAsync(
             L("Ruta grabada"),
             string.Format(L("Se han grabado {0} puntos ({1:0.00} km). ¿Quieres guardarla?"), recorder.PointCount, recorder.DistanceKm),
-            L("Guardar"), L("Descartar"));
+            L("Guardar"), L("Descartar"), dismissOnOutsideTap: false);   // tocar fuera no debe tirar la ruta
         IsKeepOrDiscardOpen = false;
 
         if (!save)
@@ -698,7 +698,7 @@ public sealed class HomePresenter
         var recover = await _dialogs.ConfirmAsync(
             L("Grabación interrumpida"),
             string.Format(L("Quedó una grabación sin guardar con {0} puntos. ¿La recuperas?"), pending.Count),
-            L("Recuperar"), L("Descartar"));
+            L("Recuperar"), L("Descartar"), dismissOnOutsideTap: false);   // tocar fuera no debe tirar la grabación
         IsKeepOrDiscardOpen = false;
 
         if (!recover)
